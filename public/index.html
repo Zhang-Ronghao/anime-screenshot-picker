@@ -60,7 +60,8 @@
       flex-wrap: wrap;
     }
 
-    input {
+    input,
+    select {
       padding: 10px 12px;
       border: 1px solid #cccccc;
       border-radius: 8px;
@@ -68,7 +69,8 @@
       background: #ffffff;
     }
 
-    input:focus {
+    input:focus,
+    select:focus {
       outline: 2px solid #d8d8d8;
       border-color: #999999;
     }
@@ -80,11 +82,36 @@
 
     #proxyInput {
       width: 100%;
-      margin-top: 8px;
+    }
+
+    #proxyPreset {
+      width: 100%;
+    }
+
+    .proxy-settings-grid {
+      display: grid;
+      grid-template-columns: minmax(180px, 260px) 1fr;
+      gap: 10px;
+      margin-top: 10px;
+      align-items: end;
+    }
+
+    .proxy-field label {
+      display: block;
+      color: var(--muted);
+      font-size: 12px;
+      margin-bottom: 5px;
+    }
+
+    @media (max-width: 720px) {
+      .proxy-settings-grid {
+        grid-template-columns: 1fr;
+      }
     }
 
     button,
-    a.button {
+    a.button,
+    label.button {
       padding: 9px 12px;
       border: none;
       border-radius: 8px;
@@ -98,7 +125,8 @@
     }
 
     button:hover,
-    a.button:hover {
+    a.button:hover,
+    label.button:hover {
       background: var(--dark-hover);
     }
 
@@ -108,19 +136,22 @@
     }
 
     button.secondary,
-    a.secondary {
+    a.secondary,
+    label.secondary {
       background: var(--secondary);
     }
 
     button.light,
-    a.light {
+    a.light,
+    label.light {
       background: #e7e7e7;
       color: #222222;
       border: 1px solid #cccccc;
     }
 
     button.light:hover,
-    a.light:hover {
+    a.light:hover,
+    label.light:hover {
       background: #dcdcdc;
     }
 
@@ -140,6 +171,58 @@
       color: var(--muted);
       font-size: 13px;
       user-select: none;
+    }
+
+    .proxy-current {
+      margin-top: 10px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 8px;
+      flex-wrap: wrap;
+      color: var(--muted);
+      font-size: 13px;
+      line-height: 1.5;
+      padding: 8px 10px;
+      background: #fafafa;
+      border: 1px solid var(--border);
+      border-radius: 10px;
+    }
+
+    .proxy-current strong {
+      color: #222222;
+      font-weight: 700;
+    }
+
+    .proxy-current button {
+      padding: 5px 9px;
+      font-size: 12px;
+    }
+
+    .proxy-summary {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      padding: 7px 11px;
+      border: 1px solid var(--border);
+      border-radius: 999px;
+      background: #fafafa;
+      color: #333333;
+      font-size: 13px;
+      font-weight: 600;
+      list-style: none;
+    }
+
+    .proxy-summary:hover {
+      background: #f0f0f0;
+    }
+
+    .proxy-summary::-webkit-details-marker {
+      display: none;
+    }
+
+    .proxy-details[open] .proxy-summary {
+      background: #eeeeee;
     }
 
     .grid {
@@ -209,6 +292,43 @@
       display: grid;
       grid-template-columns: repeat(auto-fill, minmax(340px, 1fr));
       gap: 12px;
+    }
+
+    .result-section {
+      margin-top: 12px;
+    }
+
+    .result-section-title {
+      font-weight: 700;
+      margin: 10px 0 8px;
+    }
+
+    .result-details {
+      margin-top: 14px;
+      border-top: 1px solid #eeeeee;
+      padding-top: 10px;
+    }
+
+    .result-details summary {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      padding: 7px 11px;
+      border: 1px solid var(--border);
+      border-radius: 999px;
+      background: #fafafa;
+      color: #333333;
+      font-size: 13px;
+      font-weight: 600;
+      list-style: none;
+    }
+
+    .result-details summary::-webkit-details-marker {
+      display: none;
+    }
+
+    .result-details[open] summary {
+      background: #eeeeee;
     }
 
     .result-card {
@@ -487,16 +607,88 @@
     }
 
     button.quiet,
-    a.quiet {
+    a.quiet,
+    label.quiet {
       background: transparent;
       color: #555555;
       border: 1px solid #d4d4d4;
     }
 
     button.quiet:hover,
-    a.quiet:hover {
+    a.quiet:hover,
+    label.quiet:hover {
       background: #f0f0f0;
       color: #111111;
+    }
+
+
+
+    .subject-step-layout {
+      display: flex;
+      flex-direction: column;
+      gap: 14px;
+      margin-top: 14px;
+    }
+
+    .subject-main-flow,
+    .subject-side-flow {
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 12px;
+      background: #ffffff;
+    }
+
+    .subject-main-flow {
+      border-color: #d0d0d0;
+    }
+
+    .subject-side-flow {
+      background: #fafafa;
+      color: #444444;
+    }
+
+    .side-title {
+      font-weight: 700;
+      font-size: 15px;
+      margin-bottom: 8px;
+      color: #333333;
+    }
+
+    .section-headline {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 10px;
+      flex-wrap: wrap;
+    }
+
+    .source-note {
+      color: var(--muted);
+      font-size: 12px;
+      line-height: 1.45;
+    }
+
+    .side-action-stack {
+      display: flex;
+      gap: 7px;
+      margin-top: 10px;
+      flex-wrap: wrap;
+    }
+
+    .side-action-stack button,
+    .side-action-stack a.button,
+    .side-action-stack label.button {
+      text-align: center;
+      justify-content: center;
+    }
+
+    .compact-details {
+      margin-top: 10px;
+    }
+
+    .compact-details summary {
+      font-size: 12px;
+      color: #666666;
     }
 
     @media (max-width: 640px) {
@@ -546,11 +738,32 @@
       <button class="light" onclick="clearAll()">清空</button>
     </div>
 
-    <details>
-      <summary>代理设置</summary>
-      <input id="proxyInput" />
-      <div class="fineprint">用于读取 FanCaps 页面。部署到 Cloudflare Pages 后默认走本站 /proxy。</div>
-    </details>
+    <div class="proxy-current">
+      <span>当前代理：<strong id="currentProxyLabel">Cloudflare Pages Function（推荐）</strong></span>
+      <button class="light" type="button" onclick="toggleProxyPanel()">切换代理</button>
+    </div>
+    <div id="proxyDetails" class="proxy-details" style="display: none;">
+      <div class="proxy-settings-grid">
+        <div class="proxy-field">
+          <label for="proxyPreset">代理选项</label>
+          <select id="proxyPreset">
+            <option value="/proxy?url=">Cloudflare Pages Function /proxy?url=（推荐）</option>
+            <option value="https://corsproxy.io/?url=">corsproxy.io（公共备用）</option>
+            <option value="https://api.allorigins.win/raw?url=">AllOrigins raw（公共备用）</option>
+            <option value="https://api.codetabs.com/v1/proxy?quest=">CodeTabs Proxy（公共备用）</option>
+            <option value="custom">自定义</option>
+          </select>
+        </div>
+        <div class="proxy-field">
+          <label for="proxyInput">代理前缀</label>
+          <input id="proxyInput" />
+        </div>
+      </div>
+      <div class="toolbar" style="margin-top: 10px;">
+        <button class="light" onclick="resetProxyToDefault()">恢复默认代理</button>
+      </div>
+      <div class="fineprint">默认使用本站 Cloudflare Pages Function。公共代理只作为临时保险，速度和稳定性不保证。</div>
+    </div>
 
     <div id="status" class="status"></div>
     <div id="progressWrap" class="loading-line" style="display: none;">
@@ -570,12 +783,20 @@
   <script>
     const BGM_API = "https://api.bgm.tv";
     const FANCAPS_BASE = "https://fancaps.net";
+    const ANIDB_TITLES_URL = "https://anidb.net/api/anime-titles.xml.gz";
+    const ANIDB_LOCAL_DUMP_MONTH = "2026-05";
+    const ANIDB_LOCAL_TITLE_PATHS = [
+      "./anime-titles.xml",
+      "./anime-titles.xml.gz"
+    ];
     const DEFAULT_PROXY = "/proxy?url=";
     const TOP_IMAGES_PER_EPISODE = 4;
     const MAX_SHOW_PAGES = 30;
 
     const keywordInput = document.getElementById("keyword");
     const proxyInput = document.getElementById("proxyInput");
+    const proxyPreset = document.getElementById("proxyPreset");
+    const currentProxyLabel = document.getElementById("currentProxyLabel");
     const statusEl = document.getElementById("status");
     const progressWrapEl = document.getElementById("progressWrap");
     const progressBarEl = document.getElementById("progressBar");
@@ -589,14 +810,81 @@
     let selectedImages = new Map();
     let imageItemsById = new Map();
     let episodeDetailStates = new Map();
+    let currentSubject = null;
+    let anidbTitleIndex = null;
+    let anidbTitleIndexPromise = null;
+    let anidbTitleIndexSource = "";
 
     proxyInput.value = DEFAULT_PROXY;
+    proxyPreset.value = DEFAULT_PROXY;
+    updateCurrentProxyLabel();
+    proxyPreset.addEventListener("change", handleProxyPresetChange);
+    proxyInput.addEventListener("input", syncProxyPresetByInput);
     renderSelectedBasket();
 
     document.getElementById("searchBangumiBtn").addEventListener("click", searchBangumi);
     keywordInput.addEventListener("keydown", (e) => {
       if (e.key === "Enter") searchBangumi();
     });
+
+    function toggleProxyPanel() {
+      const panel = document.getElementById("proxyDetails");
+      if (!panel) return;
+      const isHidden = panel.style.display === "none" || !panel.style.display;
+      panel.style.display = isHidden ? "block" : "none";
+      if (isHidden) {
+        panel.scrollIntoView({ behavior: "smooth", block: "nearest" });
+      }
+    }
+
+    function toggleAniDbUpdatePanel() {
+      const panel = document.getElementById("anidbUpdatePanel");
+      if (!panel) return;
+      const isHidden = panel.style.display === "none" || !panel.style.display;
+      panel.style.display = isHidden ? "block" : "none";
+      if (isHidden) {
+        panel.scrollIntoView({ behavior: "smooth", block: "nearest" });
+      }
+    }
+
+    function handleProxyPresetChange() {
+      const value = proxyPreset.value;
+
+      if (value === "custom") {
+        proxyInput.focus();
+        return;
+      }
+
+      proxyInput.value = value;
+      updateCurrentProxyLabel();
+      setStatus(`已切换代理：${proxyPreset.options[proxyPreset.selectedIndex].text}`);
+    }
+
+    function syncProxyPresetByInput() {
+      const value = proxyInput.value.trim();
+      const match = [...proxyPreset.options].find(option => option.value === value);
+      proxyPreset.value = match ? match.value : "custom";
+      updateCurrentProxyLabel();
+    }
+
+    function resetProxyToDefault() {
+      proxyInput.value = DEFAULT_PROXY;
+      proxyPreset.value = DEFAULT_PROXY;
+      updateCurrentProxyLabel();
+      setStatus("已恢复默认代理。");
+    }
+
+    function updateCurrentProxyLabel() {
+      if (!currentProxyLabel) return;
+      const selected = proxyPreset.options[proxyPreset.selectedIndex];
+      if (proxyPreset.value === "custom") {
+        currentProxyLabel.textContent = "自定义代理";
+      } else if (selected) {
+        currentProxyLabel.textContent = selected.textContent;
+      } else {
+        currentProxyLabel.textContent = proxyInput.value.trim() || "未设置";
+      }
+    }
 
     function clearAll() {
       keywordInput.value = "";
@@ -609,6 +897,7 @@
       selectedImages.clear();
       imageItemsById.clear();
       episodeDetailStates.clear();
+      currentSubject = null;
       renderSelectedBasket();
       showElement(bangumiResultsEl);
       showElement(subjectDetailEl);
@@ -634,6 +923,7 @@
       hideElement(imagePanelEl);
       imageItemsById.clear();
       episodeDetailStates.clear();
+      currentSubject = null;
       setProgress(0, false);
       setStatus("正在搜索 Bangumi...");
 
@@ -703,6 +993,7 @@
       hideElement(imagePanelEl);
       imageItemsById.clear();
       episodeDetailStates.clear();
+      currentSubject = null;
       setProgress(0, false);
       setStatus("正在读取 Bangumi 条目...");
 
@@ -714,6 +1005,7 @@
         if (!res.ok) throw new Error(`读取条目失败：HTTP ${res.status}`);
 
         const subject = await res.json();
+        currentSubject = subject;
         renderSubjectDetail(subject);
         hideElement(bangumiResultsEl);
         showElement(subjectDetailEl);
@@ -726,31 +1018,68 @@
     }
 
     function renderSubjectDetail(subject) {
-      const aliases = extractAliases(subject);
-      const allTitles = unique([
-        subject.name,
-        subject.name_cn,
-        ...aliases
-      ].filter(Boolean));
-
-      const latinCandidates = rankFanCapsCandidates(
-        allTitles.filter(isLatinTitle)
-      );
+      const allTitles = getBangumiAllTitleCandidates(subject);
+      const latinCandidates = rankFanCapsCandidates(allTitles.filter(isLatinTitle));
+      const anidbSourceLabel = anidbTitleIndexSource
+        ? `当前库：${anidbTitleIndexSource}`
+        : `默认库：${ANIDB_LOCAL_DUMP_MONTH}`;
 
       subjectDetailEl.innerHTML = `
         <div class="panel">
           <h2>${escapeHtml(subject.name_cn || subject.name || "已选择条目")}</h2>
           <div class="sub">${escapeHtml(subject.name || "")}</div>
 
-          <div class="hint">下一步：选择一个标题，点击“搜 FanCaps”。</div>
+          <div class="subject-step-layout">
+            <section class="subject-main-flow">
+              <div class="section-headline">
+                <div>
+                  <div class="side-title">1. AniDB ID 检索（推荐）</div>
+                  <div class="source-note">${escapeHtml(anidbSourceLabel)}；full match Bangumi 全部标题。</div>
+                </div>
+                <button class="quiet" type="button" onclick="toggleAniDbUpdatePanel()">更新标题库</button>
+              </div>
 
-          <div style="margin-top: 8px;">
-            ${
-              latinCandidates.length
-                ? renderFanCapsCandidateTags(latinCandidates)
-                : `<span class="empty">没有提取到拉丁字母标题。</span>`
-            }
+              <div class="side-action-stack">
+                <button onclick="matchAniDbAndSearchFanCaps()">用 AniDB ID 搜 FanCaps</button>
+              </div>
+
+              <div id="anidbUpdatePanel" style="display: none; margin-top: 10px; padding-top: 10px; border-top: 1px solid #e2e2e2;">
+                <div class="source-note">需要新版时，下载 GZ 后上传。</div>
+                <div class="side-action-stack">
+                  <a class="button quiet" href="${escapeHtml(ANIDB_TITLES_URL)}" target="_blank" rel="noopener noreferrer">下载最新 GZ</a>
+                  <label class="button secondary" for="anidbLocalFileInput">上传 XML/GZ</label>
+                  <input
+                    id="anidbLocalFileInput"
+                    type="file"
+                    accept=".xml,.gz,.gzip,text/xml,application/xml,application/gzip"
+                    style="display: none;"
+                    onchange="loadAniDbTitleIndexFromFile(this.files && this.files[0])"
+                  >
+                </div>
+              </div>
+
+              <div id="anidbMatchResults" class="fineprint"></div>
+            </section>
+
+            <section class="subject-side-flow">
+              <div class="side-title">2. 标题/别名检索</div>
+              <div class="source-note">AniDB 未命中时，用 Bangumi 的英文、罗马音或别名搜索。</div>
+
+              <div style="margin-top: 8px;">
+                ${
+                  latinCandidates.length
+                    ? renderFanCapsCandidateTags(latinCandidates)
+                    : `<span class="empty">没有提取到拉丁字母标题。</span>`
+                }
+              </div>
+
+              <details class="compact-details">
+                <summary>查看全部匹配标题（${allTitles.length}）</summary>
+                <div class="fineprint">${escapeHtml(allTitles.join(" / "))}</div>
+              </details>
+            </section>
           </div>
+
           <div class="toolbar" style="margin-top: 12px;">
             <button class="quiet" onclick="showBangumiResults()">重新选择 Bangumi 条目</button>
           </div>
@@ -769,6 +1098,324 @@
           </span>
         `;
       }).join("");
+    }
+
+    async function matchAniDbAndSearchFanCaps() {
+      if (!currentSubject) {
+        setStatus("请先选择一个 Bangumi 条目。");
+        return;
+      }
+
+      const panel = document.getElementById("anidbMatchResults");
+      const bangumiTitles = getBangumiAllTitleCandidates(currentSubject);
+      if (!bangumiTitles.length) {
+        setStatus("当前 Bangumi 条目没有可用于 AniDB 匹配的标题。");
+        if (panel) panel.innerHTML = `<div class="empty">没有可匹配标题。</div>`;
+        return;
+      }
+
+      if (panel) {
+        panel.innerHTML = `<div style="margin-top: 8px;">正在加载并匹配 AniDB title dump...</div>`;
+      }
+      setProgress(8, true);
+      setStatus("正在加载 AniDB 标题 dump，用 Bangumi 标题做 full match...");
+
+      try {
+        const index = await loadAniDbTitleIndex();
+        setProgress(75, true);
+        const matches = findAniDbMatchesByTitles(bangumiTitles, index);
+        renderAniDbMatchResults(matches, bangumiTitles);
+        setProgress(100, false);
+
+        if (!matches.length) {
+          setStatus("AniDB full match 没有命中。可以继续使用上面的标题直接搜 FanCaps。");
+          return;
+        }
+
+        if (matches.length === 1) {
+          const aidQuery = `${matches[0].aid}`;
+          setStatus(`AniDB full match 命中 aid=${matches[0].aid}，正在用 ${aidQuery} 搜 FanCaps...`);
+          await searchFanCaps(aidQuery);
+          return;
+        }
+
+        setStatus(`AniDB full match 命中 ${matches.length} 个 aid。请在匹配结果中选择一个搜 FanCaps。`);
+      } catch (err) {
+        console.error(err);
+        setProgress(0, false);
+        setStatus("AniDB 匹配失败：" + err.message);
+        if (panel) {
+          panel.innerHTML = `
+            <div class="empty" style="margin-top: 8px;">AniDB 匹配失败：${escapeHtml(err.message)}</div>
+            <div class="fineprint">可打开“更新 AniDB 标题库”，下载最新 GZ 后上传。</div>
+          `;
+        }
+      }
+    }
+
+    async function loadAniDbTitleIndex() {
+      if (anidbTitleIndex) return anidbTitleIndex;
+      if (anidbTitleIndexPromise) return await anidbTitleIndexPromise;
+
+      anidbTitleIndexPromise = (async () => {
+        const loaded = await fetchAniDbTitlesXmlPreferLocal();
+        setStatus(`AniDB title dump 已加载（${loaded.sourceLabel}），正在解析标题索引...`);
+        const index = buildAniDbTitleIndex(loaded.xmlText);
+        anidbTitleIndex = index;
+        anidbTitleIndexSource = loaded.sourceLabel;
+        return index;
+      })();
+
+      try {
+        return await anidbTitleIndexPromise;
+      } catch (err) {
+        anidbTitleIndexPromise = null;
+        throw err;
+      }
+    }
+
+    async function fetchAniDbTitlesXmlPreferLocal() {
+      const failures = [];
+
+      try {
+        return await fetchAniDbTitlesXmlFromSameDir();
+      } catch (err) {
+        failures.push(`同目录文件：${err.message}`);
+      }
+
+      throw new Error(
+        `无法加载 AniDB title dump。${failures.join("；")}。` +
+        `请确认网站同目录存在 anime-titles.xml 或 anime-titles.xml.gz；如果默认文件不可用，请打开“更新 AniDB 标题库”，下载最新 GZ 后上传。`
+      );
+    }
+
+    async function fetchAniDbTitlesXmlFromSameDir() {
+      const failures = [];
+
+      for (const path of ANIDB_LOCAL_TITLE_PATHS) {
+        try {
+          const res = await fetch(path, { method: "GET", cache: "force-cache" });
+          if (!res.ok) {
+            failures.push(`${path}: HTTP ${res.status}`);
+            continue;
+          }
+
+          const buffer = await res.arrayBuffer();
+          const xmlText = await decodeMaybeGzipText(buffer);
+          return { xmlText, sourceLabel: `同目录 ${path.replace(/^\.\//, "")}` };
+        } catch (err) {
+          failures.push(`${path}: ${err.message}`);
+        }
+      }
+
+      throw new Error(failures.join("；") || "未找到同目录 AniDB 文件");
+    }
+
+    async function fetchAniDbTitlesXmlViaProxy() {
+      const proxy = proxyInput.value.trim();
+      if (!proxy) throw new Error("没有设置 CORS 代理。");
+
+      const url = proxy + encodeURIComponent(ANIDB_TITLES_URL);
+      const res = await fetch(url, { method: "GET" });
+      if (!res.ok) throw new Error(`AniDB title dump 请求失败：HTTP ${res.status}`);
+
+      const buffer = await res.arrayBuffer();
+      return {
+        xmlText: await decodeMaybeGzipText(buffer),
+        sourceLabel: "远程 AniDB title dump"
+      };
+    }
+
+    async function loadAniDbTitleIndexFromFile(file) {
+      if (!file) return;
+
+      const panel = document.getElementById("anidbMatchResults");
+      if (panel) {
+        panel.innerHTML = `<div style="margin-top: 8px;">正在读取本地文件：${escapeHtml(file.name)}</div>`;
+      }
+      setProgress(12, true);
+      setStatus(`正在读取本地 AniDB 文件：${file.name}`);
+
+      try {
+        const buffer = await file.arrayBuffer();
+        const xmlText = await decodeMaybeGzipText(buffer);
+        setProgress(55, true);
+        const index = buildAniDbTitleIndex(xmlText);
+        anidbTitleIndex = index;
+        anidbTitleIndexPromise = null;
+        anidbTitleIndexSource = `用户上传文件 ${file.name}`;
+        setProgress(100, false);
+
+        if (panel) {
+          panel.innerHTML = `
+            <div style="margin-top: 8px;">已加载上传的 AniDB 标题索引：${escapeHtml(file.name)}</div>
+            <div class="fineprint">动画数：${index.animeCount}；标题记录：${index.titleCount}。现在可以点击“用 AniDB ID 搜 FanCaps”。</div>
+          `;
+        }
+        setStatus(`已加载上传的 AniDB 标题索引：${file.name}。`);
+      } catch (err) {
+        console.error(err);
+        setProgress(0, false);
+        if (panel) {
+          panel.innerHTML = `<div class="empty" style="margin-top: 8px;">读取本地 AniDB 文件失败：${escapeHtml(err.message)}</div>`;
+        }
+        setStatus("读取本地 AniDB 文件失败：" + err.message);
+      }
+    }
+
+    async function decodeMaybeGzipText(buffer) {
+      const bytes = new Uint8Array(buffer);
+      const decoded = new TextDecoder("utf-8").decode(buffer);
+      if (decoded.trimStart().startsWith("<")) return decoded;
+
+      const isGzip = bytes.length >= 2 && bytes[0] === 0x1f && bytes[1] === 0x8b;
+      if (!isGzip) {
+        throw new Error("返回内容不像 XML，也不像 gzip。请检查代理是否正确返回 AniDB dump。");
+      }
+
+      if (typeof DecompressionStream === "undefined") {
+        throw new Error("当前浏览器不支持 DecompressionStream，无法直接解压 .gz。请换用新版 Chrome/Edge，或让代理在服务端解压。");
+      }
+
+      const stream = new Blob([buffer]).stream().pipeThrough(new DecompressionStream("gzip"));
+      return await new Response(stream).text();
+    }
+
+    function buildAniDbTitleIndex(xmlText) {
+      const xml = new DOMParser().parseFromString(xmlText, "application/xml");
+      const parseError = xml.querySelector("parsererror");
+      if (parseError) throw new Error("AniDB title dump XML 解析失败。");
+
+      const titleMap = new Map();
+      const aidMap = new Map();
+      const animeNodes = [...xml.querySelectorAll("anime")];
+
+      for (const anime of animeNodes) {
+        const aid = anime.getAttribute("aid");
+        if (!aid) continue;
+
+        const titles = [];
+        for (const titleNode of [...anime.querySelectorAll("title")]) {
+          const title = clean(titleNode.textContent);
+          if (!title) continue;
+
+          const type = titleNode.getAttribute("type") || "";
+          const lang = titleNode.getAttribute("xml:lang") ||
+            titleNode.getAttributeNS("http://www.w3.org/XML/1998/namespace", "lang") ||
+            titleNode.getAttribute("lang") || "";
+          const record = { aid, title, type, lang };
+          titles.push(record);
+
+          const key = normalizeTitleForFullMatch(title);
+          if (!key) continue;
+          if (!titleMap.has(key)) titleMap.set(key, []);
+          titleMap.get(key).push(record);
+        }
+
+        if (titles.length) {
+          aidMap.set(aid, { aid, titles });
+        }
+      }
+
+      return {
+        titleMap,
+        aidMap,
+        animeCount: aidMap.size,
+        titleCount: [...titleMap.values()].reduce((sum, items) => sum + items.length, 0)
+      };
+    }
+
+    function findAniDbMatchesByTitles(bangumiTitles, index) {
+      const matchesByAid = new Map();
+
+      for (const queryTitle of bangumiTitles) {
+        const key = normalizeTitleForFullMatch(queryTitle);
+        if (!key) continue;
+
+        const hits = index.titleMap.get(key) || [];
+        for (const hit of hits) {
+          if (!matchesByAid.has(hit.aid)) {
+            matchesByAid.set(hit.aid, {
+              aid: hit.aid,
+              matched: [],
+              score: 0
+            });
+          }
+
+          const item = matchesByAid.get(hit.aid);
+          const duplicated = item.matched.some(x =>
+            x.queryTitle === queryTitle && x.anidbTitle === hit.title && x.type === hit.type && x.lang === hit.lang
+          );
+          if (!duplicated) {
+            item.matched.push({
+              queryTitle,
+              anidbTitle: hit.title,
+              type: hit.type,
+              lang: hit.lang
+            });
+          }
+          item.score = Math.max(item.score, scoreAniDbHit(hit, queryTitle));
+        }
+      }
+
+      return [...matchesByAid.values()].sort((a, b) => {
+        if (b.score !== a.score) return b.score - a.score;
+        return Number(a.aid) - Number(b.aid);
+      });
+    }
+
+    function scoreAniDbHit(hit, queryTitle) {
+      let score = 0;
+      if (hit.type === "main") score += 10;
+      if (hit.type === "official") score += 7;
+      if (hit.type === "synonym" || hit.type === "short") score += 4;
+      if (["ja", "zh-Hans", "zh-Hant", "zh", "x-jat", "en"].includes(hit.lang)) score += 2;
+      if (hit.title === queryTitle) score += 3;
+      return score;
+    }
+
+    function renderAniDbMatchResults(matches, bangumiTitles) {
+      const panel = document.getElementById("anidbMatchResults");
+      if (!panel) return;
+
+      if (!matches.length) {
+        panel.innerHTML = `
+          <div class="empty" style="margin-top: 8px;">AniDB full match 未命中。</div>
+          <div class="fineprint">已尝试标题：${escapeHtml(bangumiTitles.join(" / "))}</div>
+        `;
+        return;
+      }
+
+      panel.innerHTML = `
+        <div style="margin-top: 10px;"><b>AniDB full match 结果</b></div>
+        <div class="fineprint">命中 ${matches.length} 个 aid。只有命中唯一 aid 时会自动搜 FanCaps；多个 aid 时需要手动选择。</div>
+        <div style="margin-top: 8px;">
+          ${matches.map(match => renderAniDbMatchItem(match)).join("")}
+        </div>
+      `;
+    }
+
+    function renderAniDbMatchItem(match) {
+      const first = match.matched[0] || {};
+      const matchedLines = match.matched.slice(0, 4).map(item => {
+        const meta = [item.type, item.lang].filter(Boolean).join(" / ");
+        return `${item.queryTitle} → ${item.anidbTitle}${meta ? ` (${meta})` : ""}`;
+      });
+      const more = match.matched.length > matchedLines.length ? `；另有 ${match.matched.length - matchedLines.length} 条匹配` : "";
+      const aidQuery = `${match.aid}`;
+      const searchUrl = buildFanCapsSearchUrl(aidQuery);
+
+      return `
+        <div class="tag" style="align-items: flex-start; border-radius: 12px;">
+          <span>
+            <b>aid=${escapeHtml(match.aid)}</b>
+            <span class="sub">${escapeHtml(first.anidbTitle || "AniDB title")}</span>
+            <br><span class="sub">${escapeHtml(matchedLines.join("；") + more)}</span>
+          </span>
+          <button onclick="searchFanCaps('${escapeJsString(aidQuery)}')">搜 FanCaps</button>
+          <a class="button secondary" href="${escapeHtml(searchUrl)}" target="_blank" rel="noopener noreferrer">打开搜索页</a>
+        </div>
+      `;
     }
 
     function buildFanCapsSearchUrl(query) {
@@ -2047,11 +2694,57 @@
       return new DOMParser().parseFromString(html, "text/html");
     }
 
+    function getBangumiAllTitleCandidates(subject) {
+      const titles = [subject?.name, subject?.name_cn];
+
+      for (const item of subject?.infobox || []) {
+        const key = String(item?.key || "").trim();
+        if (!isBangumiTitleLikeKey(key)) continue;
+        titles.push(...flattenInfoboxValue(item.value));
+      }
+
+      // Bangumi 的“别名”通常已经包含英文名、日文名、罗马字、简称等子字段。
+      titles.push(...extractAliases(subject));
+      return unique(titles.map(x => clean(x)).filter(Boolean));
+    }
+
+    function isBangumiTitleLikeKey(key) {
+      if (!key) return false;
+      return (
+        key === "别名" ||
+        key.includes("别名") ||
+        key.includes("中文名") ||
+        key.includes("日文名") ||
+        key.includes("英文名") ||
+        key.includes("原名") ||
+        key.includes("罗马") ||
+        key.includes("简体") ||
+        key.includes("繁体") ||
+        key.toLowerCase().includes("title")
+      );
+    }
+
     function extractAliases(subject) {
-      const infobox = subject.infobox || [];
-      const aliasItem = infobox.find(item => item.key === "别名");
-      if (!aliasItem) return [];
-      return flattenInfoboxValue(aliasItem.value).map(x => String(x).trim()).filter(Boolean);
+      const infobox = subject?.infobox || [];
+      const aliasItems = infobox.filter(item => String(item?.key || "").includes("别名"));
+      if (!aliasItems.length) return [];
+      return aliasItems
+        .flatMap(item => flattenInfoboxValue(item.value))
+        .map(x => String(x).trim())
+        .filter(Boolean);
+    }
+
+    function normalizeTitleForFullMatch(text) {
+      return String(text || "")
+        .normalize("NFKC")
+        .replace(/[\u0000-\u001f\u007f]/g, " ")
+        .replace(/[\u3000]/g, " ")
+        .replace(/[‐‑‒–—―]/g, "-")
+        .replace(/[‘’]/g, "'")
+        .replace(/[“”]/g, '"')
+        .replace(/\s+/g, " ")
+        .trim()
+        .toLowerCase();
     }
 
     function flattenInfoboxValue(value) {
@@ -2139,7 +2832,9 @@
 
     function titleFromFanCapsUrl(url) {
       const decoded = decodeURIComponentSafe(url);
-      const match = decoded.match(/showimages\.php\?\d+-([^=&#]+)/i);
+      const showMatch = decoded.match(/showimages\.php\?\d+-([^=&#]+)/i);
+      const movieMatch = decoded.match(/[?&]name=([^&#]+)/i);
+      const match = showMatch || movieMatch;
       if (!match) return "";
       return match[1]
         .replaceAll("__", ": ")
