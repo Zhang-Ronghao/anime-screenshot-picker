@@ -1,0 +1,13 @@
+{
+  "name": "anime-screenshot-picker",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Anime screenshot picker for quiz/game assets, powered by Bangumi and FanCaps.",
+  "scripts": {
+    "dev": "wrangler pages dev public --compatibility-date=2026-05-23",
+    "deploy": "wrangler pages deploy public"
+  },
+  "devDependencies": {
+    "wrangler": "^4.0.0"
+  }
+}

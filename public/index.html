@@ -1,0 +1,2253 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Anime Screenshot Picker</title>
+  <style>
+    :root {
+      --bg: #f7f7f8;
+      --panel: #ffffff;
+      --text: #222222;
+      --muted: #666666;
+      --border: #e2e2e2;
+      --soft: #f1f1f1;
+      --dark: #333333;
+      --dark-hover: #111111;
+      --secondary: #777777;
+      --selected: #111111;
+    }
+
+    * { box-sizing: border-box; }
+
+    body {
+      font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      max-width: 1200px;
+      margin: 32px auto;
+      padding: 0 18px 56px;
+      background: var(--bg);
+      color: var(--text);
+    }
+
+    h1 {
+      font-size: 23px;
+      margin: 0 0 14px;
+    }
+
+    h2 {
+      font-size: 18px;
+      margin: 0 0 14px;
+    }
+
+    h3 {
+      font-size: 16px;
+      margin: 0 0 10px;
+    }
+
+    .panel {
+      background: var(--panel);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 16px;
+      margin-top: 16px;
+    }
+
+    .row,
+    .toolbar {
+      display: flex;
+      gap: 8px;
+      align-items: center;
+      flex-wrap: wrap;
+    }
+
+    input {
+      padding: 10px 12px;
+      border: 1px solid #cccccc;
+      border-radius: 8px;
+      font-size: 15px;
+      background: #ffffff;
+    }
+
+    input:focus {
+      outline: 2px solid #d8d8d8;
+      border-color: #999999;
+    }
+
+    #keyword {
+      flex: 1;
+      min-width: 260px;
+    }
+
+    #proxyInput {
+      width: 100%;
+      margin-top: 8px;
+    }
+
+    button,
+    a.button {
+      padding: 9px 12px;
+      border: none;
+      border-radius: 8px;
+      background: var(--dark);
+      color: white;
+      cursor: pointer;
+      font-size: 14px;
+      text-decoration: none;
+      display: inline-block;
+      line-height: 1.2;
+    }
+
+    button:hover,
+    a.button:hover {
+      background: var(--dark-hover);
+    }
+
+    button:disabled {
+      opacity: 0.55;
+      cursor: not-allowed;
+    }
+
+    button.secondary,
+    a.secondary {
+      background: var(--secondary);
+    }
+
+    button.light,
+    a.light {
+      background: #e7e7e7;
+      color: #222222;
+      border: 1px solid #cccccc;
+    }
+
+    button.light:hover,
+    a.light:hover {
+      background: #dcdcdc;
+    }
+
+    .status {
+      margin: 12px 0 0;
+      color: var(--muted);
+      font-size: 14px;
+      min-height: 20px;
+    }
+
+    details {
+      margin-top: 10px;
+    }
+
+    summary {
+      cursor: pointer;
+      color: var(--muted);
+      font-size: 13px;
+      user-select: none;
+    }
+
+    .grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(255px, 1fr));
+      gap: 12px;
+    }
+
+    .card {
+      background: #ffffff;
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 12px;
+      cursor: pointer;
+      display: flex;
+      gap: 12px;
+      align-items: flex-start;
+      min-height: 112px;
+    }
+
+    .card:hover,
+    .result-card:hover,
+    .image-card:hover {
+      border-color: #999999;
+    }
+
+    .cover {
+      width: 64px;
+      height: 90px;
+      object-fit: cover;
+      border-radius: 6px;
+      background: #eeeeee;
+      flex-shrink: 0;
+    }
+
+    .title {
+      font-weight: 700;
+      margin-bottom: 4px;
+      line-height: 1.35;
+    }
+
+    .sub {
+      color: var(--muted);
+      font-size: 13px;
+      line-height: 1.45;
+    }
+
+    .tag {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      background: var(--soft);
+      border-radius: 999px;
+      padding: 6px 8px 6px 10px;
+      margin: 4px;
+      font-size: 14px;
+    }
+
+    .tag button,
+    .tag a.button {
+      padding: 4px 8px;
+      font-size: 12px;
+      border-radius: 999px;
+    }
+
+    .result-list {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(340px, 1fr));
+      gap: 12px;
+    }
+
+    .result-card {
+      background: #ffffff;
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 10px;
+      display: grid;
+      grid-template-columns: 116px 1fr;
+      gap: 12px;
+      min-height: 124px;
+    }
+
+    .preview-grid {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 4px;
+    }
+
+    .preview-grid img {
+      width: 100%;
+      height: 52px;
+      object-fit: cover;
+      border-radius: 5px;
+      background: #eeeeee;
+      display: block;
+    }
+
+    .preview-empty {
+      width: 116px;
+      height: 108px;
+      border-radius: 8px;
+      background: #eeeeee;
+      color: #888888;
+      font-size: 12px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      text-align: center;
+      padding: 8px;
+    }
+
+    .episode-block {
+      margin-top: 18px;
+      padding-top: 14px;
+      border-top: 1px solid #eeeeee;
+    }
+
+    .episode-detail {
+      display: none;
+      margin-top: 12px;
+      padding: 12px;
+      border: 1px solid #eeeeee;
+      border-radius: 10px;
+      background: #fafafa;
+    }
+
+    .episode-detail-head {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 10px;
+      flex-wrap: wrap;
+      margin-bottom: 10px;
+    }
+
+    .episode-detail-page {
+      margin-top: 12px;
+      padding-top: 12px;
+      border-top: 1px solid #eeeeee;
+    }
+
+    .page-selector {
+      display: flex;
+      gap: 6px;
+      flex-wrap: wrap;
+      align-items: center;
+      margin: 10px 0 12px;
+    }
+
+    .page-btn {
+      min-width: 34px;
+      padding: 6px 9px;
+      border-radius: 8px;
+    }
+
+    .page-btn.active {
+      background: var(--selected);
+      color: #ffffff;
+      border-color: var(--selected);
+    }
+
+
+    .episode-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      gap: 12px;
+      flex-wrap: wrap;
+      margin-bottom: 10px;
+    }
+
+    .episode-title {
+      font-size: 16px;
+      font-weight: 700;
+    }
+
+    .image-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+      gap: 12px;
+    }
+
+    .image-card {
+      background: #ffffff;
+      border: 1px solid #dddddd;
+      border-radius: 10px;
+      padding: 8px;
+      display: block;
+      cursor: pointer;
+      transition: border-color 0.12s ease, box-shadow 0.12s ease;
+    }
+
+    .image-card.selected {
+      border-color: var(--selected);
+      box-shadow: 0 0 0 2px rgba(0,0,0,0.08);
+    }
+
+    .image-card img {
+      width: 100%;
+      height: 118px;
+      object-fit: cover;
+      border-radius: 6px;
+      background: #eeeeee;
+      display: block;
+      margin-bottom: 7px;
+    }
+
+    .image-card input {
+      margin-right: 6px;
+    }
+
+    .stats {
+      display: flex;
+      gap: 8px;
+      flex-wrap: wrap;
+      margin: 10px 0 12px;
+    }
+
+    .pill {
+      background: #eeeeee;
+      border: 1px solid #dddddd;
+      border-radius: 999px;
+      padding: 5px 10px;
+      font-size: 13px;
+      color: #444444;
+    }
+
+
+    .basket-panel {
+      border-color: #d6d6d6;
+    }
+
+    .basket-head {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      gap: 12px;
+      flex-wrap: wrap;
+    }
+
+    .basket-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(118px, 1fr));
+      gap: 10px;
+      margin-top: 12px;
+    }
+
+    .basket-card {
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      padding: 7px;
+      background: #ffffff;
+      position: relative;
+    }
+
+    .basket-card img {
+      width: 100%;
+      height: 78px;
+      object-fit: cover;
+      border-radius: 6px;
+      background: #eeeeee;
+      display: block;
+      margin-bottom: 6px;
+    }
+
+    .basket-remove {
+      position: absolute;
+      top: 5px;
+      right: 5px;
+      padding: 3px 6px;
+      border-radius: 999px;
+      font-size: 12px;
+      background: rgba(0,0,0,0.72);
+      color: #ffffff;
+    }
+
+    .basket-remove:hover {
+      background: rgba(0,0,0,0.9);
+    }
+
+    .loading-line {
+      height: 6px;
+      border-radius: 999px;
+      background: #eeeeee;
+      overflow: hidden;
+      margin-top: 12px;
+    }
+
+    .loading-line > div {
+      height: 100%;
+      width: 0%;
+      background: #333333;
+      transition: width 0.2s ease;
+    }
+
+    .empty {
+      color: var(--muted);
+      font-size: 14px;
+      padding: 8px 0;
+    }
+
+    .fineprint {
+      color: var(--muted);
+      font-size: 12px;
+      line-height: 1.5;
+      margin-top: 8px;
+    }
+
+
+
+    .floating-nav {
+      position: fixed;
+      right: 18px;
+      bottom: 18px;
+      z-index: 999;
+      display: flex;
+      gap: 8px;
+      align-items: center;
+      flex-wrap: wrap;
+      padding: 10px;
+      border: 1px solid #d8d8d8;
+      border-radius: 14px;
+      background: rgba(255,255,255,0.94);
+      box-shadow: 0 8px 28px rgba(0,0,0,0.12);
+      backdrop-filter: blur(8px);
+    }
+
+    .floating-nav button {
+      padding: 8px 10px;
+      font-size: 13px;
+    }
+
+    .step-note {
+      margin-top: 10px;
+      color: var(--muted);
+      font-size: 13px;
+      line-height: 1.45;
+    }
+
+    .hint {
+      margin: 10px 0 8px;
+      color: #444444;
+      font-size: 14px;
+      line-height: 1.45;
+    }
+
+    button.quiet,
+    a.quiet {
+      background: transparent;
+      color: #555555;
+      border: 1px solid #d4d4d4;
+    }
+
+    button.quiet:hover,
+    a.quiet:hover {
+      background: #f0f0f0;
+      color: #111111;
+    }
+
+    @media (max-width: 640px) {
+      body {
+        margin-top: 22px;
+        padding-left: 12px;
+        padding-right: 12px;
+      }
+
+      .grid,
+      .result-list,
+      .basket-grid {
+        grid-template-columns: 1fr;
+      }
+
+      .result-card {
+        grid-template-columns: 100px 1fr;
+      }
+
+      .preview-empty {
+        width: 100px;
+      }
+
+      .image-grid {
+        grid-template-columns: repeat(auto-fill, minmax(145px, 1fr));
+      }
+
+      .floating-nav {
+        left: 12px;
+        right: 12px;
+        bottom: 12px;
+        justify-content: space-between;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div id="topAnchor"></div>
+  <h1>Anime Screenshot Picker</h1>
+
+  <div id="selectedBasket"></div>
+
+  <div id="searchPanel" class="panel">
+    <div class="row">
+      <input id="keyword" placeholder="输入中文名，例如：芙莉莲、金牌得主、孤独摇滚" />
+      <button id="searchBangumiBtn">搜索 Bangumi</button>
+      <button class="light" onclick="clearAll()">清空</button>
+    </div>
+
+    <details>
+      <summary>代理设置</summary>
+      <input id="proxyInput" />
+      <div class="fineprint">用于读取 FanCaps 页面。部署到 Cloudflare Pages 后默认走本站 /proxy。</div>
+    </details>
+
+    <div id="status" class="status"></div>
+    <div id="progressWrap" class="loading-line" style="display: none;">
+      <div id="progressBar"></div>
+    </div>
+  </div>
+  <div id="bangumiResults" class="grid"></div>
+  <div id="subjectDetail"></div>
+  <div id="fanCapsResults"></div>
+  <div id="imagePanel"></div>
+
+  <div class="floating-nav" id="floatingNav">
+    <button onclick="scrollToTopSearch()">返回顶部搜索</button>
+    <button onclick="scrollToBasket()">查看/导出已选（<span id="floatSelectedCount" class="selectedCount">0</span>）</button>
+  </div>
+
+  <script>
+    const BGM_API = "https://api.bgm.tv";
+    const FANCAPS_BASE = "https://fancaps.net";
+    const DEFAULT_PROXY = "/proxy?url=";
+    const TOP_IMAGES_PER_EPISODE = 4;
+    const MAX_SHOW_PAGES = 30;
+
+    const keywordInput = document.getElementById("keyword");
+    const proxyInput = document.getElementById("proxyInput");
+    const statusEl = document.getElementById("status");
+    const progressWrapEl = document.getElementById("progressWrap");
+    const progressBarEl = document.getElementById("progressBar");
+    const bangumiResultsEl = document.getElementById("bangumiResults");
+    const subjectDetailEl = document.getElementById("subjectDetail");
+    const fanCapsResultsEl = document.getElementById("fanCapsResults");
+    const imagePanelEl = document.getElementById("imagePanel");
+    const selectedBasketEl = document.getElementById("selectedBasket");
+    const searchPanelEl = document.getElementById("searchPanel");
+
+    let selectedImages = new Map();
+    let imageItemsById = new Map();
+    let episodeDetailStates = new Map();
+
+    proxyInput.value = DEFAULT_PROXY;
+    renderSelectedBasket();
+
+    document.getElementById("searchBangumiBtn").addEventListener("click", searchBangumi);
+    keywordInput.addEventListener("keydown", (e) => {
+      if (e.key === "Enter") searchBangumi();
+    });
+
+    function clearAll() {
+      keywordInput.value = "";
+      bangumiResultsEl.innerHTML = "";
+      subjectDetailEl.innerHTML = "";
+      fanCapsResultsEl.innerHTML = "";
+      imagePanelEl.innerHTML = "";
+      hideElement(fanCapsResultsEl);
+      hideElement(imagePanelEl);
+      selectedImages.clear();
+      imageItemsById.clear();
+      episodeDetailStates.clear();
+      renderSelectedBasket();
+      showElement(bangumiResultsEl);
+      showElement(subjectDetailEl);
+      showElement(fanCapsResultsEl);
+      showElement(imagePanelEl);
+      setProgress(0, false);
+      setStatus("已清空。");
+      window.scrollTo({ top: 0, behavior: "smooth" });
+    }
+
+    async function searchBangumi() {
+      const keyword = keywordInput.value.trim();
+      if (!keyword) {
+        setStatus("请输入关键词。");
+        return;
+      }
+
+      bangumiResultsEl.innerHTML = "";
+      subjectDetailEl.innerHTML = "";
+      fanCapsResultsEl.innerHTML = "";
+      imagePanelEl.innerHTML = "";
+      hideElement(fanCapsResultsEl);
+      hideElement(imagePanelEl);
+      imageItemsById.clear();
+      episodeDetailStates.clear();
+      setProgress(0, false);
+      setStatus("正在搜索 Bangumi...");
+
+      try {
+        const res = await fetch(`${BGM_API}/v0/search/subjects?limit=12&offset=0`, {
+          method: "POST",
+          headers: {
+            "Accept": "application/json",
+            "Content-Type": "application/json"
+          },
+          body: JSON.stringify({
+            keyword,
+            sort: "rank",
+            filter: {
+              type: [2],
+              nsfw: false
+            }
+          })
+        });
+
+        if (!res.ok) throw new Error(`Bangumi 搜索失败：HTTP ${res.status}`);
+
+        const data = await res.json();
+        const items = data.data || [];
+
+        if (!items.length) {
+          setStatus("没有搜到 Bangumi 结果。可以换成更短关键词或日文名。");
+          return;
+        }
+
+        renderBangumiResults(items);
+        showElement(bangumiResultsEl);
+        setStatus(`找到 ${items.length} 个 Bangumi 候选条目。`);
+        scrollToElement(bangumiResultsEl);
+      } catch (err) {
+        console.error(err);
+        setStatus("Bangumi 请求失败：" + err.message);
+      }
+    }
+
+    function renderBangumiResults(items) {
+      bangumiResultsEl.innerHTML = items.map(item => {
+        const img = item.images?.small || item.images?.grid || item.images?.common || "";
+        const nameCn = item.name_cn || "无中文名";
+        const rawName = item.name || "";
+        const date = item.date || "未知日期";
+        const score = item.rating?.score ? `评分：${item.rating.score}` : "暂无评分";
+
+        return `
+          <div class="card" onclick="loadSubject(${Number(item.id)})">
+            ${img ? `<img class="cover" src="${escapeHtml(img)}" alt="">` : `<div class="cover"></div>`}
+            <div>
+              <div class="title">${escapeHtml(nameCn)}</div>
+              <div class="sub">${escapeHtml(rawName)}</div>
+              <div class="sub">${escapeHtml(date)} · ${escapeHtml(score)}</div>
+            </div>
+          </div>
+        `;
+      }).join("");
+    }
+
+    async function loadSubject(id) {
+      subjectDetailEl.innerHTML = "";
+      fanCapsResultsEl.innerHTML = "";
+      imagePanelEl.innerHTML = "";
+      hideElement(fanCapsResultsEl);
+      hideElement(imagePanelEl);
+      imageItemsById.clear();
+      episodeDetailStates.clear();
+      setProgress(0, false);
+      setStatus("正在读取 Bangumi 条目...");
+
+      try {
+        const res = await fetch(`${BGM_API}/v0/subjects/${id}`, {
+          headers: { "Accept": "application/json" }
+        });
+
+        if (!res.ok) throw new Error(`读取条目失败：HTTP ${res.status}`);
+
+        const subject = await res.json();
+        renderSubjectDetail(subject);
+        hideElement(bangumiResultsEl);
+        showElement(subjectDetailEl);
+        setStatus("已选择 Bangumi 条目。下一步：搜 FanCaps。");
+        scrollToElement(subjectDetailEl);
+      } catch (err) {
+        console.error(err);
+        setStatus("读取条目失败：" + err.message);
+      }
+    }
+
+    function renderSubjectDetail(subject) {
+      const aliases = extractAliases(subject);
+      const allTitles = unique([
+        subject.name,
+        subject.name_cn,
+        ...aliases
+      ].filter(Boolean));
+
+      const latinCandidates = rankFanCapsCandidates(
+        allTitles.filter(isLatinTitle)
+      );
+
+      subjectDetailEl.innerHTML = `
+        <div class="panel">
+          <h2>${escapeHtml(subject.name_cn || subject.name || "已选择条目")}</h2>
+          <div class="sub">${escapeHtml(subject.name || "")}</div>
+
+          <div class="hint">下一步：选择一个标题，点击“搜 FanCaps”。</div>
+
+          <div style="margin-top: 8px;">
+            ${
+              latinCandidates.length
+                ? renderFanCapsCandidateTags(latinCandidates)
+                : `<span class="empty">没有提取到拉丁字母标题。</span>`
+            }
+          </div>
+          <div class="toolbar" style="margin-top: 12px;">
+            <button class="quiet" onclick="showBangumiResults()">重新选择 Bangumi 条目</button>
+          </div>
+        </div>
+      `;
+    }
+
+    function renderFanCapsCandidateTags(items) {
+      return items.map(text => {
+        const searchUrl = buildFanCapsSearchUrl(text);
+        return `
+          <span class="tag">
+            <span>${escapeHtml(text)}</span>
+            <button onclick="searchFanCaps('${escapeJsString(text)}')">搜 FanCaps</button>
+            <a class="button secondary" href="${escapeHtml(searchUrl)}" target="_blank" rel="noopener noreferrer">打开搜索页</a>
+          </span>
+        `;
+      }).join("");
+    }
+
+    function buildFanCapsSearchUrl(query) {
+      const q = encodeURIComponent(query.trim());
+      return `${FANCAPS_BASE}/search.php?q=${q}&animeCB=Anime&submit=Submit`;
+    }
+
+    async function searchFanCaps(query) {
+      const searchUrl = buildFanCapsSearchUrl(query);
+
+      fanCapsResultsEl.innerHTML = "";
+      imagePanelEl.innerHTML = "";
+      showElement(fanCapsResultsEl);
+      hideElement(imagePanelEl);
+      imageItemsById.clear();
+      episodeDetailStates.clear();
+      setProgress(0, false);
+      setStatus(`正在搜索 FanCaps：${query}`);
+
+      try {
+        const html = await fetchViaProxy(searchUrl);
+        const doc = parseHtml(html);
+        const results = parseFanCapsAnimeResults(doc, searchUrl);
+
+        renderFanCapsResults(query, searchUrl, results);
+        showElement(subjectDetailEl);
+        showElement(fanCapsResultsEl);
+        setStatus(`FanCaps 搜索完成：${results.length} 个结果。可继续换标题搜索，或加载正确条目。`);
+        scrollToElement(fanCapsResultsEl);
+      } catch (err) {
+        console.error(err);
+        setStatus("FanCaps 解析失败：" + err.message);
+        showElement(fanCapsResultsEl);
+        fanCapsResultsEl.innerHTML = `
+          <div class="panel">
+            <h2>FanCaps 解析失败</h2>
+            <div class="sub">当前代理没有成功返回 FanCaps 页面。</div>
+            <div class="toolbar" style="margin-top: 12px;">
+              <a class="button" href="${escapeHtml(searchUrl)}" target="_blank" rel="noopener noreferrer">打开 FanCaps 搜索页</a>
+            </div>
+          </div>
+        `;
+        scrollToElement(fanCapsResultsEl);
+      }
+    }
+
+    function parseFanCapsAnimeResults(doc, baseUrl) {
+      const map = new Map();
+      const links = [...doc.querySelectorAll("a")];
+
+      for (const a of links) {
+        const href = a.getAttribute("href") || "";
+        const lowerHref = href.toLowerCase();
+        if (!lowerHref.includes("anime/showimages.php") && !lowerHref.includes("/anime/showimages.php")) continue;
+
+        const url = toAbsoluteUrl(href, baseUrl);
+        const title = clean(a.textContent) || titleFromFanCapsUrl(url) || "Anime Result";
+        if (!url || !title) continue;
+        if (isBadResultTitle(title)) continue;
+
+        const previews = extractSearchResultPreviews(a, baseUrl);
+
+        if (!map.has(url)) {
+          map.set(url, {
+            title,
+            url,
+            previews
+          });
+        } else {
+          const item = map.get(url);
+          if (title.length > item.title.length && !isBadResultTitle(title)) item.title = title;
+          item.previews = unique([...item.previews, ...previews]).slice(0, 4);
+        }
+      }
+
+      return [...map.values()]
+        .filter(item => !isBadResultTitle(item.title))
+        .map(item => ({
+          ...item,
+          previews: unique(item.previews).slice(0, 4)
+        }));
+    }
+
+    function extractSearchResultPreviews(anchor, baseUrl) {
+      const collected = [];
+
+      // 先向上找局部结果块。限制图片数量，避免拿到整个页面的广告或导航图。
+      let node = anchor.parentElement;
+      for (let depth = 0; depth < 8 && node; depth++) {
+        const imgs = collectImageUrlsFromRoot(node, baseUrl).filter(url => !isBadUiImage(url));
+        const showLinks = [...node.querySelectorAll("a")].filter(a => {
+          const href = (a.getAttribute("href") || "").toLowerCase();
+          return href.includes("anime/showimages.php") || href.includes("/anime/showimages.php");
+        });
+
+        if (imgs.length >= 1 && imgs.length <= 16 && showLinks.length <= 4) {
+          collected.push(...imgs);
+          break;
+        }
+
+        node = node.parentElement;
+      }
+
+      // 兜底：从当前链接后面的少量相邻节点里找图，直到下一个 showimages 标题出现。
+      if (!collected.length) {
+        let block = anchor.closest("div,td,li,section,article,p") || anchor.parentElement;
+        let next = block ? block.nextElementSibling : null;
+        let guard = 0;
+
+        while (next && guard < 8 && collected.length < 4) {
+          const hasOtherShow = [...next.querySelectorAll("a")].some(a => {
+            const href = (a.getAttribute("href") || "").toLowerCase();
+            return href.includes("anime/showimages.php") || href.includes("/anime/showimages.php");
+          });
+
+          if (hasOtherShow && collected.length) break;
+
+          collected.push(...collectImageUrlsFromRoot(next, baseUrl).filter(url => !isBadUiImage(url)));
+          next = next.nextElementSibling;
+          guard += 1;
+        }
+      }
+
+      return unique(collected).slice(0, 4);
+    }
+
+    function collectImageUrlsFromRoot(root, baseUrl) {
+      const urls = [];
+
+      for (const img of [...root.querySelectorAll("img")]) {
+        const src =
+          img.getAttribute("data-src") ||
+          img.getAttribute("data-original") ||
+          img.getAttribute("data-lazy-src") ||
+          img.getAttribute("src") ||
+          "";
+
+        if (!src) continue;
+        const url = toAbsoluteUrl(src, baseUrl);
+        if (!looksLikeFanCapsImage(url)) continue;
+        urls.push(url);
+      }
+
+      return unique(urls);
+    }
+
+    function renderFanCapsResults(query, searchUrl, results) {
+      fanCapsResultsEl.innerHTML = `
+        <div class="panel">
+          <h2>Anime Results：${escapeHtml(query)}</h2>
+          <div class="hint">下一步：选择正确条目，点击“加载图片”。</div>
+
+          <div class="result-list">
+            ${
+              results.length
+                ? results.map(renderFanCapsItem).join("")
+                : `<div class="empty">没有解析到 Anime Results。可以换一个候选标题。</div>`
+            }
+          </div>
+          <div class="toolbar" style="margin-top: 12px;">
+            <button class="quiet" onclick="showSubjectDetail()">返回标题候选</button>
+            <a class="button quiet" href="${escapeHtml(searchUrl)}" target="_blank" rel="noopener noreferrer">打开 FanCaps 搜索页</a>
+          </div>
+        </div>
+      `;
+    }
+
+    function renderFanCapsItem(item) {
+      return `
+        <div class="result-card">
+          ${renderPreviewThumbs(item.previews)}
+          <div>
+            <div class="title">${escapeHtml(item.title)}</div>
+            <div class="toolbar" style="margin-top: 12px;">
+              <button onclick="loadFanCapsImages('${escapeJsString(item.url)}', '${escapeJsString(item.title)}')">加载图片</button>
+              <a class="button quiet" href="${escapeHtml(item.url)}" target="_blank" rel="noopener noreferrer">打开 FanCaps</a>
+            </div>
+          </div>
+        </div>
+      `;
+    }
+
+    function renderPreviewThumbs(previews) {
+      if (!previews || !previews.length) {
+        return `<div class="preview-empty">无预览图</div>`;
+      }
+
+      return `
+        <div class="preview-grid">
+          ${previews.slice(0, 4).map(url => `
+            <img src="${escapeHtml(url)}" loading="lazy" referrerpolicy="no-referrer" onerror="this.style.visibility='hidden'">
+          `).join("")}
+        </div>
+      `;
+    }
+
+    async function loadFanCapsImages(pageUrl, title = "") {
+      imagePanelEl.innerHTML = "";
+      showElement(imagePanelEl);
+      imageItemsById.clear();
+      episodeDetailStates.clear();
+      setProgress(0, false);
+      setStatus("正在读取 FanCaps 作品页图片...");
+
+      try {
+        const episodeGroups = await collectEpisodeTopImages(pageUrl);
+        renderEpisodeImagePanel(pageUrl, title, episodeGroups);
+        hideElement(subjectDetailEl);
+        hideElement(fanCapsResultsEl);
+        showElement(imagePanelEl);
+        const imageCount = episodeGroups.reduce((sum, ep) => sum + ep.images.length, 0);
+        setProgress(100, false);
+        setStatus(`加载完成：${episodeGroups.length} 个分组，${imageCount} 张图片。`);
+        scrollToElement(imagePanelEl);
+      } catch (err) {
+        console.error(err);
+        setProgress(0, false);
+        setStatus("图片解析失败：" + err.message);
+        showElement(imagePanelEl);
+        imagePanelEl.innerHTML = `
+          <div class="panel">
+            <h2>图片解析失败</h2>
+            <div class="sub">可能是代理失败、FanCaps 页面结构变化，或请求被限制。</div>
+            <div class="toolbar" style="margin-top: 12px;">
+              <a class="button" href="${escapeHtml(pageUrl)}" target="_blank" rel="noopener noreferrer">打开 FanCaps 条目页</a>
+            </div>
+          </div>
+        `;
+        scrollToElement(imagePanelEl);
+      }
+    }
+
+    async function collectEpisodeTopImages(pageUrl) {
+      const allGroups = [];
+      const visitedPages = new Set();
+      let currentUrl = pageUrl;
+      let pageIndex = 1;
+
+      while (currentUrl && !visitedPages.has(currentUrl) && pageIndex <= MAX_SHOW_PAGES) {
+        visitedPages.add(currentUrl);
+        setStatus(`正在读取 FanCaps 第 ${pageIndex} 页，已解析 ${allGroups.length} 个分组...`);
+
+        const html = await fetchViaProxy(currentUrl);
+        const doc = parseHtml(html);
+
+        const isEpisodeOrMovieImagePage =
+          currentUrl.includes("episodeimages.php") ||
+          currentUrl.includes("MovieImages.php") ||
+          currentUrl.includes("movieimages.php");
+
+        if (isEpisodeOrMovieImagePage) {
+          const group = parseSingleEpisodeTopImages(doc, currentUrl, "Current Page", 1);
+          return group.images.length ? [group] : [];
+        }
+
+        const pageGroups = parseShowPageEpisodeTopImagesSequential(doc, currentUrl, allGroups.length);
+        allGroups.push(...pageGroups);
+
+        const nextPageUrl = findNextShowImagesPageUrl(doc, currentUrl);
+        if (!nextPageUrl || visitedPages.has(nextPageUrl)) break;
+
+        currentUrl = nextPageUrl;
+        pageIndex += 1;
+        setProgress(Math.min(95, pageIndex * 8), true);
+        await sleep(300);
+      }
+
+      if (allGroups.length) return allGroups;
+
+      const html = await fetchViaProxy(pageUrl);
+      const doc = parseHtml(html);
+      const group = parseSingleEpisodeTopImages(doc, pageUrl, "Current Page", 1);
+      return group.images.length ? [group] : [];
+    }
+
+    function parseShowPageEpisodeTopImagesSequential(doc, baseUrl, startIndex = 0) {
+      const links = [...doc.querySelectorAll("a")];
+      const groups = [];
+      const seenEpisodeUrls = new Set();
+      let currentGroup = null;
+
+      function flushCurrentGroup() {
+        if (!currentGroup) return;
+
+        currentGroup.images = dedupeImageCandidates(currentGroup.images)
+          .filter(item => !isBadUiImage(item.thumbUrl))
+          .slice(0, TOP_IMAGES_PER_EPISODE);
+
+        if (currentGroup.images.length) {
+          currentGroup.index = startIndex + groups.length + 1;
+          groups.push(currentGroup);
+        }
+
+        currentGroup = null;
+      }
+
+      for (const a of links) {
+        const href = a.getAttribute("href") || "";
+        const text = clean(a.textContent);
+        const lowerHref = href.toLowerCase();
+
+        if (isShowPageStopLinkOrSection(a)) break;
+
+        const isEpisodeLink =
+          lowerHref.includes("episodeimages.php") ||
+          lowerHref.includes("movieimages.php");
+
+        if (isEpisodeLink) {
+          const episodeUrl = toAbsoluteUrl(href, baseUrl);
+          if (!episodeUrl || episodeUrl.toLowerCase().includes("search.php")) continue;
+
+          if (currentGroup && currentGroup.url === episodeUrl) continue;
+          if (seenEpisodeUrls.has(episodeUrl)) continue;
+
+          flushCurrentGroup();
+
+          seenEpisodeUrls.add(episodeUrl);
+          currentGroup = {
+            title: normalizeEpisodeTitle(text, episodeUrl),
+            url: episodeUrl,
+            index: 0,
+            images: []
+          };
+
+          continue;
+        }
+
+        if (!currentGroup) continue;
+        if (currentGroup.images.length >= TOP_IMAGES_PER_EPISODE) continue;
+
+        const imageItem = parseImageCandidateFromAnchor(a, baseUrl);
+        if (!imageItem) continue;
+
+        imageItem.sourcePage = baseUrl;
+        imageItem.episodePageUrl = currentGroup.url;
+        currentGroup.images.push(imageItem);
+      }
+
+      flushCurrentGroup();
+      return groups;
+    }
+
+    function parseImageCandidateFromAnchor(a, baseUrl) {
+      const href = a.getAttribute("href") || "";
+      const img = a.querySelector("img");
+      if (!img) return null;
+
+      const src =
+        img.getAttribute("data-src") ||
+        img.getAttribute("data-original") ||
+        img.getAttribute("data-lazy-src") ||
+        img.getAttribute("src") ||
+        "";
+
+      if (!src) return null;
+
+      const thumbUrl = toAbsoluteUrl(src, baseUrl);
+      if (!looksLikeFanCapsImage(thumbUrl)) return null;
+      if (isBadUiImage(thumbUrl)) return null;
+
+      const picturePageUrl = href.toLowerCase().includes("picture.php")
+        ? toAbsoluteUrl(href, baseUrl)
+        : "";
+
+      return {
+        id: "",
+        episodeTitle: "",
+        thumbUrl,
+        picturePageUrl,
+        originalUrl: "",
+        sourcePage: baseUrl
+      };
+    }
+
+    function findNextShowImagesPageUrl(doc, baseUrl) {
+      const links = [...doc.querySelectorAll("a")];
+
+      for (const a of links) {
+        const text = clean(a.textContent).toLowerCase();
+        const href = a.getAttribute("href") || "";
+        const lowerHref = href.toLowerCase();
+        if (!href) continue;
+
+        const isNextText = text === "next >" || text === "next" || text.includes("next");
+        if (!isNextText) continue;
+
+        if ((lowerHref.includes("showimages.php") || lowerHref.includes("movieimages.php")) && !lowerHref.includes("episodeimages.php")) {
+          return toAbsoluteUrl(href, baseUrl);
+        }
+      }
+
+      return "";
+    }
+
+    function isShowPageStopLinkOrSection(a) {
+      const text = clean(a.textContent).toLowerCase();
+      if (!text) return false;
+
+      return (
+        text.includes("more popular images") ||
+        text.includes("banning media") ||
+        text.includes("privacy policy") ||
+        text.includes("support us") ||
+        text.includes("advertising")
+      );
+    }
+
+    function normalizeEpisodeTitle(text, url) {
+      let title = clean(text);
+      const decoded = decodeURIComponentSafe(url);
+
+      if (!title || title.length < 2 || /see more|images|view/i.test(title)) {
+        const m1 = decoded.match(/Episode[_\s-]*(\d+)/i);
+        if (m1) title = `Episode ${m1[1]}`;
+      }
+
+      if (!title) title = "Episode";
+      return title;
+    }
+
+    function parseSingleEpisodeTopImages(doc, pageUrl, episodeTitle, episodeIndex) {
+      const images = parseImageCandidatesFromRoot(doc.body || doc, pageUrl)
+        .filter(item => !isBadUiImage(item.thumbUrl))
+        .slice(0, TOP_IMAGES_PER_EPISODE);
+
+      return {
+        title: episodeTitle,
+        url: pageUrl,
+        index: episodeIndex,
+        images
+      };
+    }
+
+    function parseImageCandidatesFromRoot(root, baseUrl) {
+      const images = [];
+
+      for (const a of [...root.querySelectorAll("a")]) {
+        const item = parseImageCandidateFromAnchor(a, baseUrl);
+        if (item) images.push(item);
+      }
+
+      return dedupeImageCandidates(images);
+    }
+
+    function renderEpisodeImagePanel(sourceUrl, title, episodeGroups) {
+      imageItemsById.clear();
+
+      for (const group of episodeGroups) {
+        for (const item of group.images) {
+          const id = makeImageId(item, "top");
+          item.id = id;
+          item.episodeTitle = group.title;
+          item.kind = "top";
+          const existing = selectedImages.get(id);
+          if (existing && existing.originalUrl) item.originalUrl = existing.originalUrl;
+          imageItemsById.set(id, item);
+        }
+      }
+
+      const imageCount = episodeGroups.reduce((sum, ep) => sum + ep.images.length, 0);
+
+      imagePanelEl.innerHTML = `
+        <div class="panel">
+          <h2>${escapeHtml(title || "FanCaps 图片")}</h2>
+
+          <div class="stats">
+            <span class="pill">分组：${episodeGroups.length}</span>
+            <span class="pill">候选图：${imageCount}</span>
+            <span class="pill">全局已选：<span class="selectedCount">${selectedImages.size}</span></span>
+          </div>
+
+          <div class="hint">勾选截图。已选图片会保留在顶部“已选截图”。</div>
+
+          <div class="toolbar">
+            <a class="button quiet" href="${escapeHtml(sourceUrl)}" target="_blank" rel="noopener noreferrer">打开 FanCaps</a>
+          </div>
+
+          ${
+            episodeGroups.length
+              ? episodeGroups.map(renderEpisodeGroup).join("")
+              : `<div class="empty">没有解析到图片。</div>`
+          }
+          <div class="toolbar" style="margin-top: 14px;">
+            <a class="button quiet" href="${escapeHtml(sourceUrl)}" target="_blank" rel="noopener noreferrer">打开 FanCaps</a>
+          </div>
+        </div>
+      `;
+    }
+
+    function renderEpisodeGroup(group) {
+      const detailId = `episode_detail_${group.index}`;
+
+      return `
+        <div class="episode-block">
+          <div class="episode-header">
+            <div class="episode-title">${escapeHtml(group.title)}</div>
+            <div class="toolbar" style="margin-top: 0;">
+              <button onclick="selectEpisodeTop('${escapeJsString(group.title)}')">选择 Top 图</button>
+              <button id="btn_${escapeHtml(detailId)}" onclick="toggleEpisodeDetail('${escapeJsString(detailId)}', '${escapeJsString(group.url)}', '${escapeJsString(group.title)}')">展开本集截图</button>
+            </div>
+          </div>
+          <div class="image-grid">
+            ${
+              group.images.length
+                ? group.images.map(item => renderEpisodeImageCard(item)).join("")
+                : `<div class="empty">本组没有图片。</div>`
+            }
+          </div>
+          <div id="${escapeHtml(detailId)}" class="episode-detail"></div>
+        </div>
+      `;
+    }
+
+    function renderEpisodeImageCard(item) {
+      const selected = selectedImages.has(item.id);
+      const stateText = selected ? "已选择" : "未选择";
+
+      return `
+        <label class="image-card ${selected ? "selected" : ""}" id="card_${escapeHtml(item.id)}">
+          <img src="${escapeHtml(item.thumbUrl)}" loading="lazy" referrerpolicy="no-referrer" onerror="this.style.display='none'">
+          <div>
+            <input
+              type="checkbox"
+              class="imageCheck"
+              value="${escapeHtml(item.id)}"
+              data-episode="${escapeHtml(item.episodeTitle)}"
+              data-kind="${escapeHtml(item.kind || "")}" 
+              ${selected ? "checked" : ""}
+              onchange="toggleImageById('${escapeJsString(item.id)}', this.checked)"
+            >
+            <span class="sub" id="state_${escapeHtml(item.id)}">${stateText}</span>
+          </div>
+        </label>
+      `;
+    }
+
+    async function toggleImageById(id, checked) {
+      const item = imageItemsById.get(id);
+      if (!item) return;
+
+      const card = document.getElementById(`card_${id}`);
+
+      if (!checked) {
+        selectedImages.delete(id);
+        updateImageState(id, "未选择");
+        if (card) card.classList.remove("selected");
+        updateSelectedCount();
+        renderSelectedBasket();
+        return;
+      }
+
+      selectedImages.set(id, item);
+      if (card) card.classList.add("selected");
+      updateSelectedCount();
+      renderSelectedBasket();
+
+      if (item.originalUrl) {
+        updateImageState(id, "已选择");
+        return;
+      }
+
+      updateImageState(id, "解析原图...");
+
+      try {
+        item.originalUrl = await resolveOriginalImageUrl(item);
+        selectedImages.set(id, item);
+        updateImageState(id, "已选择");
+        renderSelectedBasket();
+      } catch (err) {
+        console.warn("resolve original failed:", err);
+        item.originalUrl = upgradeFanCapsThumbUrl(item.thumbUrl) || item.thumbUrl;
+        selectedImages.set(id, item);
+        updateImageState(id, "已选择");
+        renderSelectedBasket();
+      }
+
+      updateSelectedCount();
+    }
+
+    async function resolveOriginalImageUrl(item) {
+      if (item.picturePageUrl) {
+        const html = await fetchViaProxy(item.picturePageUrl);
+        const doc = parseHtml(html);
+
+        const fromMeta = parseOriginalFromPicturePageMeta(doc, item.picturePageUrl);
+        if (fromMeta) return fromMeta;
+
+        const fromImgs = parseOriginalFromPicturePageImages(doc, item.picturePageUrl, item.thumbUrl);
+        if (fromImgs) return fromImgs;
+
+        const fromLinks = parseOriginalFromPicturePageLinks(doc, item.picturePageUrl, item.thumbUrl);
+        if (fromLinks) return fromLinks;
+      }
+
+      return upgradeFanCapsThumbUrl(item.thumbUrl) || item.thumbUrl;
+    }
+
+    function parseOriginalFromPicturePageMeta(doc, baseUrl) {
+      const metaSelectors = [
+        'meta[property="og:image"]',
+        'meta[name="twitter:image"]',
+        'link[rel="image_src"]'
+      ];
+
+      for (const selector of metaSelectors) {
+        const el = doc.querySelector(selector);
+        if (!el) continue;
+
+        const raw = el.getAttribute("content") || el.getAttribute("href") || "";
+        if (!raw) continue;
+
+        const url = toAbsoluteUrl(raw, baseUrl);
+        if (looksLikeFanCapsImage(url)) return url;
+      }
+
+      return "";
+    }
+
+    function parseOriginalFromPicturePageImages(doc, baseUrl, thumbUrl) {
+      const candidates = [];
+
+      for (const img of [...doc.querySelectorAll("img")]) {
+        const src =
+          img.getAttribute("data-src") ||
+          img.getAttribute("data-original") ||
+          img.getAttribute("data-lazy-src") ||
+          img.getAttribute("src") ||
+          "";
+
+        if (!src) continue;
+        const url = toAbsoluteUrl(src, baseUrl);
+        if (!looksLikeFanCapsImage(url)) continue;
+        if (isBadUiImage(url)) continue;
+        candidates.push(url);
+      }
+
+      return pickBestOriginalCandidate(candidates, thumbUrl);
+    }
+
+    function parseOriginalFromPicturePageLinks(doc, baseUrl, thumbUrl) {
+      const candidates = [];
+
+      for (const a of [...doc.querySelectorAll("a")]) {
+        const href = a.getAttribute("href") || "";
+        if (!href) continue;
+        const url = toAbsoluteUrl(href, baseUrl);
+        if (!looksLikeFanCapsImage(url)) continue;
+        if (isBadUiImage(url)) continue;
+        candidates.push(url);
+      }
+
+      return pickBestOriginalCandidate(candidates, thumbUrl);
+    }
+
+    function pickBestOriginalCandidate(candidates, thumbUrl) {
+      const uniqueCandidates = unique(candidates);
+      if (!uniqueCandidates.length) return "";
+
+      const nonThumb = uniqueCandidates.find(url => !isLikelyThumbnailUrl(url));
+      if (nonThumb) return nonThumb;
+
+      const different = uniqueCandidates.find(url => url !== thumbUrl);
+      if (different) return different;
+
+      return uniqueCandidates[0];
+    }
+
+    function isLikelyThumbnailUrl(url) {
+      const u = String(url).toLowerCase();
+      return (
+        u.includes("/thumb") ||
+        u.includes("thumb_") ||
+        u.includes("_thumb") ||
+        u.includes("small") ||
+        u.includes("thumbnail") ||
+        u.includes("/mini")
+      );
+    }
+
+    function upgradeFanCapsThumbUrl(url) {
+      if (!url) return "";
+      let u = String(url);
+      const replacements = [
+        ["/thumbs/", "/"],
+        ["/thumb/", "/"],
+        ["/thumbnail/", "/"],
+        ["/thumbnails/", "/"],
+        ["_thumb.", "."],
+        ["-thumb.", "."],
+        ["_small.", "."],
+        ["-small.", "."],
+        ["_mini.", "."],
+        ["-mini.", "."]
+      ];
+
+      for (const [from, to] of replacements) {
+        if (u.includes(from)) return u.replace(from, to);
+      }
+
+      return u;
+    }
+
+    function updateImageState(id, text) {
+      const el = document.getElementById(`state_${id}`);
+      if (el) el.textContent = text;
+    }
+
+    function updateSelectedCount() {
+      for (const el of [...document.querySelectorAll(".selectedCount")]) {
+        el.textContent = selectedImages.size;
+      }
+      const basketCount = document.getElementById("basketCount");
+      if (basketCount) basketCount.textContent = selectedImages.size;
+      const floatCount = document.getElementById("floatSelectedCount");
+      if (floatCount) floatCount.textContent = selectedImages.size;
+    }
+
+    async function selectEpisodeTop(episodeTitle) {
+      const checks = [...document.querySelectorAll(".imageCheck")]
+        .filter(input => input.dataset.episode === episodeTitle && input.dataset.kind === "top");
+
+      for (const input of checks) {
+        if (!input.checked) {
+          input.checked = true;
+          await toggleImageById(input.value, true);
+          await sleep(100);
+        }
+      }
+    }
+
+    async function toggleEpisodeDetail(detailId, episodeUrl, episodeTitle) {
+      const container = document.getElementById(detailId);
+      const button = document.getElementById(`btn_${detailId}`);
+      if (!container) return;
+
+      if (container.dataset.open === "1") {
+        hideEpisodeDetail(detailId);
+        return;
+      }
+
+      container.style.display = "block";
+      container.dataset.open = "1";
+      if (button) button.textContent = "隐藏本集截图";
+
+      if (!episodeDetailStates.has(detailId)) {
+        const pageUrl = buildEpisodeDetailPageUrl(episodeUrl, 1);
+        episodeDetailStates.set(detailId, {
+          detailId,
+          episodeTitle,
+          baseEpisodeUrl: stripFanCapsPageParam(episodeUrl),
+          currentPage: 1,
+          totalPages: null,
+          knownPages: new Set([1]),
+          pageUrls: new Map([[1, pageUrl]]),
+          pageCache: new Map(),
+          loadingPage: null,
+          error: ""
+        });
+      }
+
+      scrollToElement(container);
+      await goEpisodeDetailPage(detailId, 1);
+    }
+
+    function hideEpisodeDetail(detailId) {
+      const container = document.getElementById(detailId);
+      const button = document.getElementById(`btn_${detailId}`);
+      if (!container) return;
+      container.style.display = "none";
+      container.dataset.open = "0";
+      if (button) button.textContent = "展开本集截图";
+    }
+
+    async function goEpisodeDetailPage(detailId, pageNum) {
+      const state = episodeDetailStates.get(detailId);
+      const container = document.getElementById(detailId);
+      if (!state || !container) return;
+
+      pageNum = Math.max(1, Number(pageNum) || 1);
+      state.currentPage = pageNum;
+      state.error = "";
+
+      if (state.pageCache.has(pageNum)) {
+        episodeDetailStates.set(detailId, state);
+        renderEpisodeDetail(detailId);
+        scrollToElement(container);
+        return;
+      }
+
+      state.loadingPage = pageNum;
+      episodeDetailStates.set(detailId, state);
+      renderEpisodeDetail(detailId, `正在读取第 ${pageNum} 页...`);
+
+      try {
+        const pageUrl = state.pageUrls.get(pageNum) || buildEpisodeDetailPageUrl(state.baseEpisodeUrl, pageNum);
+        const html = await fetchViaProxy(pageUrl);
+        const doc = parseHtml(html);
+        const images = parseDetailedEpisodeImages(doc, pageUrl, state.episodeTitle);
+
+        for (let i = 0; i < images.length; i++) {
+          const item = images[i];
+          const id = makeImageId(item, "detail");
+          item.id = id;
+          item.episodeTitle = state.episodeTitle;
+          item.kind = "detail";
+          item.pageNumber = pageNum;
+          const existing = selectedImages.get(id);
+          if (existing && existing.originalUrl) item.originalUrl = existing.originalUrl;
+          imageItemsById.set(id, item);
+        }
+
+        const pagination = parseEpisodePagination(doc, pageUrl, state.baseEpisodeUrl);
+        for (const [num, url] of pagination.pageUrls.entries()) {
+          state.knownPages.add(num);
+          state.pageUrls.set(num, url);
+        }
+
+        if (pagination.totalPages) {
+          state.totalPages = Math.max(state.totalPages || 1, pagination.totalPages);
+          for (let n = 1; n <= state.totalPages; n++) {
+            state.knownPages.add(n);
+            if (!state.pageUrls.has(n)) {
+              state.pageUrls.set(n, buildEpisodeDetailPageUrl(state.baseEpisodeUrl, n));
+            }
+          }
+        } else {
+          state.knownPages.add(pageNum);
+          state.pageUrls.set(pageNum, pageUrl);
+        }
+
+        state.pageCache.set(pageNum, {
+          index: pageNum,
+          url: pageUrl,
+          images
+        });
+        state.loadingPage = null;
+        state.error = "";
+        episodeDetailStates.set(detailId, state);
+        renderEpisodeDetail(detailId);
+        scrollToElement(container);
+      } catch (err) {
+        console.error(err);
+        state.loadingPage = null;
+        state.error = err.message;
+        episodeDetailStates.set(detailId, state);
+        renderEpisodeDetail(detailId, `读取失败：${err.message}`);
+      }
+    }
+
+    function renderEpisodeDetail(detailId, message = "") {
+      const state = episodeDetailStates.get(detailId);
+      const container = document.getElementById(detailId);
+      if (!state || !container) return;
+
+      const current = state.pageCache.get(state.currentPage);
+      const currentCount = current ? current.images.length : 0;
+      const pageButtons = renderEpisodePageButtons(state);
+
+      container.innerHTML = `
+        <div class="episode-detail-head">
+          <div>
+            <b>${escapeHtml(state.episodeTitle)} 详细截图</b>
+            <span class="sub">当前第 ${state.currentPage} 页${current ? ` / ${currentCount} 张` : ""}</span>
+          </div>
+          <button onclick="hideEpisodeDetail('${escapeJsString(detailId)}')">隐藏</button>
+        </div>
+
+        ${pageButtons}
+        ${message ? `<div class="sub" style="margin-bottom: 8px;">${escapeHtml(message)}</div>` : ""}
+
+        ${
+          current
+            ? renderEpisodeDetailPage(current)
+            : `<div class="empty">${state.loadingPage ? "正在加载本页..." : "还没有加载到截图。"}</div>`
+        }
+
+        <div class="episode-detail-bottom">
+          ${pageButtons}
+          <button onclick="hideEpisodeDetail('${escapeJsString(detailId)}')">隐藏</button>
+        </div>
+      `;
+    }
+
+    function renderEpisodePageButtons(state) {
+      const pages = getEpisodePageList(state);
+      if (!pages.length) return "";
+
+      return `
+        <div class="page-selector">
+          <span class="sub">页数：</span>
+          ${pages.map(num => `
+            <button
+              class="page-btn light ${num === state.currentPage ? "active" : ""}"
+              onclick="goEpisodeDetailPage('${escapeJsString(state.detailId)}', ${num})"
+              ${state.loadingPage ? "disabled" : ""}
+            >${num}</button>
+          `).join("")}
+        </div>
+      `;
+    }
+
+    function getEpisodePageList(state) {
+      if (state.totalPages && state.totalPages > 0) {
+        return Array.from({ length: state.totalPages }, (_, i) => i + 1);
+      }
+
+      const known = [...state.knownPages].filter(n => Number.isFinite(n) && n > 0);
+      if (!known.includes(1)) known.push(1);
+      return known.sort((a, b) => a - b);
+    }
+
+    function renderEpisodeDetailPage(page) {
+      return `
+        <div class="episode-detail-page">
+          <div class="sub" style="margin-bottom: 8px;">第 ${page.index} 页 · ${page.images.length} 张</div>
+          <div class="image-grid">
+            ${
+              page.images.length
+                ? page.images.map(item => renderEpisodeImageCard(item)).join("")
+                : `<div class="empty">本页没有解析到图片。</div>`
+            }
+          </div>
+        </div>
+      `;
+    }
+
+    function parseDetailedEpisodeImages(doc, pageUrl, episodeTitle) {
+      const images = [];
+      let collecting = false;
+
+      const walker = document.createTreeWalker(doc.body || doc, NodeFilter.SHOW_ELEMENT);
+      let node;
+
+      while ((node = walker.nextNode())) {
+        const tag = (node.tagName || "").toLowerCase();
+        const text = clean(node.textContent).toLowerCase();
+
+        if (/^h[1-4]$/.test(tag) && text.includes("episode screencaps")) {
+          collecting = true;
+          continue;
+        }
+
+        if (collecting) {
+          const shouldStop =
+            (tag === "a" && text.includes("next episode")) ||
+            (/^h[1-4]$/.test(tag) && (
+              text.includes("more popular images") ||
+              text === "ad" ||
+              text.includes("top images")
+            ));
+
+          if (shouldStop) break;
+
+          if (tag === "a") {
+            const href = (node.getAttribute("href") || "").toLowerCase();
+            if (!href.includes("picture.php")) continue;
+
+            const item = parseImageCandidateFromAnchor(node, pageUrl);
+            if (!item) continue;
+
+            item.sourcePage = pageUrl;
+            item.episodePageUrl = pageUrl;
+            item.episodeTitle = episodeTitle;
+            images.push(item);
+          }
+        }
+      }
+
+      // 兜底：如果页面结构变化导致没命中 Episode Screencaps，就退回到旧解析，
+      // 但跳过前 4 张 Top Images，避免每页重复显示同一组 Top 图。
+      if (!images.length) {
+        const all = [];
+        for (const a of [...doc.querySelectorAll("a")]) {
+          const href = (a.getAttribute("href") || "").toLowerCase();
+          if (!href.includes("picture.php")) continue;
+          const item = parseImageCandidateFromAnchor(a, pageUrl);
+          if (!item) continue;
+          item.sourcePage = pageUrl;
+          item.episodePageUrl = pageUrl;
+          item.episodeTitle = episodeTitle;
+          all.push(item);
+        }
+        return dedupeImageCandidates(all)
+          .filter(item => !isBadUiImage(item.thumbUrl))
+          .slice(TOP_IMAGES_PER_EPISODE);
+      }
+
+      return dedupeImageCandidates(images).filter(item => !isBadUiImage(item.thumbUrl));
+    }
+
+    function parseEpisodePagination(doc, pageUrl, baseEpisodeUrl) {
+      const pageUrls = new Map();
+      const currentPage = getFanCapsPageNumber(pageUrl);
+      pageUrls.set(1, buildEpisodeDetailPageUrl(baseEpisodeUrl, 1));
+      pageUrls.set(currentPage, pageUrl);
+
+      for (const a of [...doc.querySelectorAll("a")]) {
+        const text = clean(a.textContent);
+        const href = a.getAttribute("href") || "";
+        const lowerHref = href.toLowerCase();
+
+        if (!/^\d+$/.test(text)) continue;
+        if (!lowerHref.includes("episodeimages.php") && !lowerHref.includes("movieimages.php")) continue;
+
+        const num = Number(text);
+        if (!Number.isFinite(num) || num < 1) continue;
+
+        pageUrls.set(num, normalizeFanCapsPageUrl(toAbsoluteUrl(href, pageUrl)));
+      }
+
+      // FanCaps 的当前页通常是纯文本，不是链接；从 URL 补进去。
+      pageUrls.set(currentPage, buildEpisodeDetailPageUrl(baseEpisodeUrl, currentPage));
+
+      const totalPages = pageUrls.size ? Math.max(...pageUrls.keys()) : currentPage;
+
+      return {
+        pageUrls,
+        totalPages
+      };
+    }
+
+    function buildEpisodeDetailPageUrl(baseEpisodeUrl, pageNum) {
+      const cleaned = stripFanCapsPageParam(baseEpisodeUrl);
+      if (pageNum <= 1) return cleaned;
+
+      try {
+        const u = new URL(cleaned);
+        u.searchParams.set("page", String(pageNum));
+        return u.toString();
+      } catch {
+        const joiner = cleaned.includes("?") ? "&" : "?";
+        return `${cleaned}${joiner}page=${pageNum}`;
+      }
+    }
+
+    function stripFanCapsPageParam(url) {
+      try {
+        const u = new URL(url);
+        u.searchParams.delete("page");
+        return u.toString();
+      } catch {
+        return String(url).replace(/([?&])page=\d+/i, "").replace(/[?&]$/, "");
+      }
+    }
+
+    function normalizeFanCapsPageUrl(url) {
+      const page = getFanCapsPageNumber(url);
+      return buildEpisodeDetailPageUrl(url, page);
+    }
+
+    function getFanCapsPageNumber(url) {
+      try {
+        const u = new URL(url);
+        const page = Number(u.searchParams.get("page") || "1");
+        return Number.isFinite(page) && page > 0 ? page : 1;
+      } catch {
+        const m = String(url).match(/[?&]page=(\d+)/i);
+        return m ? Number(m[1]) : 1;
+      }
+    }
+
+
+    function makeImageId(item, prefix = "img") {
+      const key = item.picturePageUrl || item.originalUrl || item.thumbUrl || `${prefix}_${Math.random()}`;
+      return `${prefix}_${hashString(key)}`;
+    }
+
+    function hashString(str) {
+      let h = 2166136261;
+      const s = String(str);
+      for (let i = 0; i < s.length; i++) {
+        h ^= s.charCodeAt(i);
+        h = Math.imul(h, 16777619);
+      }
+      return (h >>> 0).toString(36);
+    }
+
+    function renderSelectedBasket() {
+      const items = [...selectedImages.entries()].map(([id, item]) => ({ id, item }));
+
+      selectedBasketEl.innerHTML = `
+        <div class="panel basket-panel">
+          <div class="basket-head">
+            <div>
+              <h2>已选截图</h2>
+              <div class="sub">跨动画保留，最后在这里复制或导出。</div>
+            </div>
+            <div class="toolbar">
+              <button onclick="copySelectedUrls()" ${items.length ? "" : "disabled"}>复制已有 URL</button>
+              <button onclick="exportTxt()" ${items.length ? "" : "disabled"}>导出 TXT</button>
+              <button onclick="clearSelectedImages()" ${items.length ? "" : "disabled"}>清空选择</button>
+              <button class="quiet" onclick="scrollToTopSearch()">继续搜索</button>
+              <span class="pill">已选：<span id="basketCount" class="selectedCount">${items.length}</span></span>
+            </div>
+          </div>
+
+          ${
+            items.length
+              ? `<div class="basket-grid">${items.map(({ id, item }) => renderBasketCard(id, item)).join("")}</div>`
+              : `<div class="empty">还没有选择图片。先在下方搜索动画，进入 FanCaps 结果后勾选截图。</div>`
+          }
+        </div>
+      `;
+      updateSelectedCount();
+    }
+
+    function renderBasketCard(id, item) {
+      const finalUrl = item.originalUrl || item.thumbUrl || "";
+      return `
+        <div class="basket-card" id="basket_${escapeHtml(id)}">
+          <button class="basket-remove" onclick="removeSelectedImage('${escapeJsString(id)}')">×</button>
+          <img src="${escapeHtml(item.thumbUrl || finalUrl)}" loading="lazy" referrerpolicy="no-referrer" onerror="this.style.display='none'">
+          <div class="sub">${escapeHtml(item.episodeTitle || "已选图片")}</div>
+        </div>
+      `;
+    }
+
+    function removeSelectedImage(id) {
+      selectedImages.delete(id);
+      const input = document.querySelector(`.imageCheck[value="${cssEscape(id)}"]`);
+      if (input) input.checked = false;
+      updateImageState(id, "未选择");
+      const card = document.getElementById(`card_${id}`);
+      if (card) card.classList.remove("selected");
+      updateSelectedCount();
+      renderSelectedBasket();
+    }
+
+    async function copySelectedUrls() {
+      if (!selectedImages.size) {
+        setStatus("还没有选择图片。");
+        return;
+      }
+
+      await resolveAllSelectedOriginals();
+      const text = getSelectedUrlList().join("\n");
+
+      try {
+        await navigator.clipboard.writeText(text);
+        setStatus(`已复制 ${selectedImages.size} 个 URL。`);
+      } catch {
+        fallbackCopyText(text);
+        setStatus(`已复制 ${selectedImages.size} 个 URL。`);
+      }
+    }
+
+    function getSelectedUrlList() {
+      return [...selectedImages.values()].map(item => item.originalUrl || item.thumbUrl).filter(Boolean);
+    }
+
+    function fallbackCopyText(text) {
+      const textarea = document.createElement("textarea");
+      textarea.value = text;
+      textarea.setAttribute("readonly", "");
+      textarea.style.position = "fixed";
+      textarea.style.left = "-9999px";
+      document.body.appendChild(textarea);
+      textarea.select();
+      document.execCommand("copy");
+      textarea.remove();
+    }
+
+    function cssEscape(value) {
+      if (window.CSS && typeof window.CSS.escape === "function") {
+        return window.CSS.escape(value);
+      }
+      return String(value).replace(/(["\\])/g, "\\$1");
+    }
+
+    async function selectAllImages() {
+      const checks = [...document.querySelectorAll(".imageCheck")];
+
+      for (const input of checks) {
+        if (!input.checked) {
+          input.checked = true;
+          await toggleImageById(input.value, true);
+          await sleep(100);
+        }
+      }
+    }
+
+    function clearSelectedImages() {
+      selectedImages.clear();
+      document.querySelectorAll(".imageCheck").forEach(input => { input.checked = false; });
+
+      for (const id of imageItemsById.keys()) {
+        updateImageState(id, "未选择");
+        const card = document.getElementById(`card_${id}`);
+        if (card) card.classList.remove("selected");
+      }
+
+      updateSelectedCount();
+      renderSelectedBasket();
+    }
+
+    async function exportTxt() {
+      if (!selectedImages.size) {
+        setStatus("还没有选择图片。");
+        return;
+      }
+
+      await resolveAllSelectedOriginals();
+      const text = getSelectedUrlList().join("\n");
+      downloadBlob(new Blob([text], { type: "text/plain" }), "fancaps-selected-images.txt");
+    }
+
+    async function exportJson() {
+      if (!selectedImages.size) {
+        setStatus("还没有选择图片。");
+        return;
+      }
+
+      await resolveAllSelectedOriginals();
+      const data = [...selectedImages.values()].map(item => ({
+        episode: item.episodeTitle,
+        url: item.originalUrl || item.thumbUrl,
+        thumbnailUrl: item.thumbUrl,
+        picturePageUrl: item.picturePageUrl,
+        sourcePage: item.sourcePage
+      }));
+
+      downloadBlob(
+        new Blob([JSON.stringify(data, null, 2)], { type: "application/json" }),
+        "fancaps-original-images.json"
+      );
+    }
+
+    async function resolveAllSelectedOriginals() {
+      const entries = [...selectedImages.entries()];
+      setProgress(0, true);
+
+      for (let i = 0; i < entries.length; i++) {
+        const [id, item] = entries[i];
+        setProgress(Math.round((i / entries.length) * 100), true);
+
+        if (!item.originalUrl) {
+          updateImageState(id, "解析原图...");
+          try {
+            item.originalUrl = await resolveOriginalImageUrl(item);
+          } catch {
+            item.originalUrl = upgradeFanCapsThumbUrl(item.thumbUrl) || item.thumbUrl;
+          }
+          selectedImages.set(id, item);
+          updateImageState(id, "已选择");
+          await sleep(100);
+        }
+      }
+
+      setProgress(100, false);
+      renderSelectedBasket();
+    }
+
+    function downloadBlob(blob, filename) {
+      const a = document.createElement("a");
+      const url = URL.createObjectURL(blob);
+      a.href = url;
+      a.download = filename;
+      document.body.appendChild(a);
+      a.click();
+      a.remove();
+      URL.revokeObjectURL(url);
+      setStatus(`已导出：${filename}`);
+    }
+
+    async function fetchViaProxy(targetUrl) {
+      const proxy = proxyInput.value.trim();
+      if (!proxy) throw new Error("没有设置 CORS 代理。");
+
+      const url = proxy + encodeURIComponent(targetUrl);
+      const res = await fetch(url, { method: "GET" });
+      if (!res.ok) throw new Error(`代理请求失败：HTTP ${res.status}`);
+      return await res.text();
+    }
+
+    function parseHtml(html) {
+      return new DOMParser().parseFromString(html, "text/html");
+    }
+
+    function extractAliases(subject) {
+      const infobox = subject.infobox || [];
+      const aliasItem = infobox.find(item => item.key === "别名");
+      if (!aliasItem) return [];
+      return flattenInfoboxValue(aliasItem.value).map(x => String(x).trim()).filter(Boolean);
+    }
+
+    function flattenInfoboxValue(value) {
+      if (!value) return [];
+      if (typeof value === "string") return [value];
+      if (Array.isArray(value)) return value.flatMap(flattenInfoboxValue);
+      if (typeof value === "object") {
+        const out = [];
+        if (value.v) out.push(value.v);
+        if (value.value) out.push(...flattenInfoboxValue(value.value));
+        if (value.name) out.push(value.name);
+        return out;
+      }
+      return [];
+    }
+
+    function isLatinTitle(text) {
+      if (!text) return false;
+      const hasLatin = /[A-Za-z]/.test(text);
+      const hasCJK = /[\u3400-\u9FFF]/.test(text);
+      const hasKana = /[\u3040-\u30FF]/.test(text);
+      return hasLatin && !hasCJK && !hasKana;
+    }
+
+    function rankFanCapsCandidates(titles) {
+      return unique(titles).sort((a, b) => scoreFanCapsTitle(b) - scoreFanCapsTitle(a));
+    }
+
+    function scoreFanCapsTitle(title) {
+      let score = 0;
+      if (title.length <= 24) score += 2;
+      if (title.length <= 14) score += 1;
+      if (/\b(no|wa|wo|to|ni|de|ga|o|e|kara|made|yori|soshite|mono|hito)\b/i.test(title)) score += 3;
+      if (title.includes(":")) score -= 1;
+      if (title.length >= 45) score -= 2;
+      return score;
+    }
+
+    function dedupeImageCandidates(items) {
+      const map = new Map();
+      for (const item of items) {
+        const key = item.picturePageUrl || item.thumbUrl;
+        if (!map.has(key)) map.set(key, item);
+      }
+      return [...map.values()];
+    }
+
+    function looksLikeFanCapsImage(url) {
+      const u = String(url).toLowerCase();
+      if (!u.match(/\.(jpg|jpeg|png|webp)(\?|$)/)) return false;
+      return (
+        u.includes("fancaps") ||
+        u.includes("cdni.") ||
+        u.includes("moviestillsdb") ||
+        u.includes("fanart")
+      );
+    }
+
+    function isBadUiImage(url) {
+      const u = String(url).toLowerCase();
+      return (
+        u.includes("logo") ||
+        u.includes("icon") ||
+        u.includes("avatar") ||
+        u.includes("button") ||
+        u.includes("ads") ||
+        u.includes("banner") ||
+        u.includes("spacer") ||
+        u.includes("loading")
+      );
+    }
+
+    function isBadResultTitle(title) {
+      const t = clean(title).toLowerCase();
+      if (!t) return true;
+      return (
+        t === "anime" ||
+        t === "images" ||
+        t === "see more images" ||
+        t.includes("search") ||
+        t.includes("privacy") ||
+        t.includes("advert")
+      );
+    }
+
+    function titleFromFanCapsUrl(url) {
+      const decoded = decodeURIComponentSafe(url);
+      const match = decoded.match(/showimages\.php\?\d+-([^=&#]+)/i);
+      if (!match) return "";
+      return match[1]
+        .replaceAll("__", ": ")
+        .replaceAll("_", " ")
+        .replace(/\s+/g, " ")
+        .trim();
+    }
+
+    function toAbsoluteUrl(href, base) {
+      try { return new URL(href, base).toString(); }
+      catch { return href; }
+    }
+
+    function unique(arr) {
+      return [...new Set(arr.map(x => String(x).trim()).filter(Boolean))];
+    }
+
+    function clean(s) {
+      return String(s).replace(/\s+/g, " ").trim();
+    }
+
+    function sleep(ms) {
+      return new Promise(resolve => setTimeout(resolve, ms));
+    }
+
+    function decodeURIComponentSafe(s) {
+      try { return decodeURIComponent(s); }
+      catch { return s; }
+    }
+
+    function setStatus(text) {
+      statusEl.textContent = text;
+    }
+
+    function setProgress(percent, show) {
+      if (!show) {
+        progressWrapEl.style.display = "none";
+        progressBarEl.style.width = "0%";
+        return;
+      }
+      progressWrapEl.style.display = "block";
+      progressBarEl.style.width = `${Math.max(0, Math.min(100, percent))}%`;
+    }
+
+
+    function showElement(el) {
+      if (!el) return;
+      el.style.display = "";
+    }
+
+    function hideElement(el) {
+      if (!el) return;
+      el.style.display = "none";
+    }
+
+    function showBangumiResults() {
+      if (!bangumiResultsEl.innerHTML.trim()) {
+        setStatus("当前没有可显示的 Bangumi 候选。请重新搜索。");
+        scrollToTopSearch();
+        return;
+      }
+      showElement(bangumiResultsEl);
+      scrollToElement(bangumiResultsEl);
+    }
+
+    function showSubjectDetail() {
+      if (!subjectDetailEl.innerHTML.trim()) return;
+      showElement(subjectDetailEl);
+      scrollToElement(subjectDetailEl);
+    }
+
+    function showFanCapsResults() {
+      if (!fanCapsResultsEl.innerHTML.trim()) return;
+      showElement(fanCapsResultsEl);
+      scrollToElement(fanCapsResultsEl);
+    }
+
+    function scrollToTopSearch() {
+      scrollToElement(searchPanelEl || document.getElementById("topAnchor"));
+    }
+
+    function scrollToBasket() {
+      scrollToElement(selectedBasketEl);
+    }
+
+    function scrollToElement(el) {
+      if (!el) return;
+      setTimeout(() => {
+        el.scrollIntoView({ behavior: "smooth", block: "start" });
+      }, 80);
+    }
+
+    function escapeHtml(str) {
+      return String(str)
+        .replaceAll("&", "&amp;")
+        .replaceAll("<", "&lt;")
+        .replaceAll(">", "&gt;")
+        .replaceAll('"', "&quot;")
+        .replaceAll("'", "&#039;");
+    }
+
+    function escapeJsString(str) {
+      return String(str)
+        .replaceAll("\\", "\\\\")
+        .replaceAll("'", "\\'")
+        .replaceAll("\n", "\\n")
+        .replaceAll("\r", "\\r");
+    }
+  </script>
+</body>
+</html>
