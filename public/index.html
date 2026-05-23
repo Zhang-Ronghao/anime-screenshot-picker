@@ -811,6 +811,7 @@
     let imageItemsById = new Map();
     let episodeDetailStates = new Map();
     let currentSubject = null;
+    let currentLoadedAnimeLabel = "";
     let anidbTitleIndex = null;
     let anidbTitleIndexPromise = null;
     let anidbTitleIndexSource = "";
@@ -898,6 +899,7 @@
       imageItemsById.clear();
       episodeDetailStates.clear();
       currentSubject = null;
+      currentLoadedAnimeLabel = "";
       renderSelectedBasket();
       showElement(bangumiResultsEl);
       showElement(subjectDetailEl);
@@ -924,6 +926,7 @@
       imageItemsById.clear();
       episodeDetailStates.clear();
       currentSubject = null;
+      currentLoadedAnimeLabel = "";
       setProgress(0, false);
       setStatus("正在搜索 Bangumi...");
 
@@ -994,6 +997,7 @@
       imageItemsById.clear();
       episodeDetailStates.clear();
       currentSubject = null;
+      currentLoadedAnimeLabel = "";
       setProgress(0, false);
       setStatus("正在读取 Bangumi 条目...");
 
@@ -1613,6 +1617,8 @@
     }
 
     async function loadFanCapsImages(pageUrl, title = "") {
+      const labelText = getAnimationLabelText(title);
+      currentLoadedAnimeLabel = labelText;
       imagePanelEl.innerHTML = "";
       showElement(imagePanelEl);
       imageItemsById.clear();
@@ -1622,7 +1628,7 @@
 
       try {
         const episodeGroups = await collectEpisodeTopImages(pageUrl);
-        renderEpisodeImagePanel(pageUrl, title, episodeGroups);
+        renderEpisodeImagePanel(pageUrl, title, episodeGroups, labelText);
         hideElement(subjectDetailEl);
         hideElement(fanCapsResultsEl);
         showElement(imagePanelEl);
@@ -1860,17 +1866,23 @@
       return dedupeImageCandidates(images);
     }
 
-    function renderEpisodeImagePanel(sourceUrl, title, episodeGroups) {
+    function renderEpisodeImagePanel(sourceUrl, title, episodeGroups, labelText = "") {
       imageItemsById.clear();
+      const finalLabelText = labelText || getAnimationLabelText(title);
 
       for (const group of episodeGroups) {
+        group.labelText = finalLabelText;
         for (const item of group.images) {
           const id = makeImageId(item, "top");
           item.id = id;
           item.episodeTitle = group.title;
+          item.labelText = finalLabelText;
           item.kind = "top";
           const existing = selectedImages.get(id);
-          if (existing && existing.originalUrl) item.originalUrl = existing.originalUrl;
+          if (existing) {
+            if (existing.originalUrl) item.originalUrl = existing.originalUrl;
+            if (existing.labelText) item.labelText = existing.labelText;
+          }
           imageItemsById.set(id, item);
         }
       }
@@ -1914,7 +1926,7 @@
             <div class="episode-title">${escapeHtml(group.title)}</div>
             <div class="toolbar" style="margin-top: 0;">
               <button onclick="selectEpisodeTop('${escapeJsString(group.title)}')">选择 Top 图</button>
-              <button id="btn_${escapeHtml(detailId)}" onclick="toggleEpisodeDetail('${escapeJsString(detailId)}', '${escapeJsString(group.url)}', '${escapeJsString(group.title)}')">展开本集截图</button>
+              <button id="btn_${escapeHtml(detailId)}" onclick="toggleEpisodeDetail('${escapeJsString(detailId)}', '${escapeJsString(group.url)}', '${escapeJsString(group.title)}', '${escapeJsString(group.labelText || currentLoadedAnimeLabel || "")}')">展开本集截图</button>
             </div>
           </div>
           <div class="image-grid">
@@ -2146,7 +2158,7 @@
       }
     }
 
-    async function toggleEpisodeDetail(detailId, episodeUrl, episodeTitle) {
+    async function toggleEpisodeDetail(detailId, episodeUrl, episodeTitle, labelText = "") {
       const container = document.getElementById(detailId);
       const button = document.getElementById(`btn_${detailId}`);
       if (!container) return;
@@ -2165,6 +2177,7 @@
         episodeDetailStates.set(detailId, {
           detailId,
           episodeTitle,
+          labelText: labelText || currentLoadedAnimeLabel || getAnimationLabelText(""),
           baseEpisodeUrl: stripFanCapsPageParam(episodeUrl),
           currentPage: 1,
           totalPages: null,
@@ -2220,10 +2233,14 @@
           const id = makeImageId(item, "detail");
           item.id = id;
           item.episodeTitle = state.episodeTitle;
+          item.labelText = state.labelText || currentLoadedAnimeLabel || getAnimationLabelText("");
           item.kind = "detail";
           item.pageNumber = pageNum;
           const existing = selectedImages.get(id);
-          if (existing && existing.originalUrl) item.originalUrl = existing.originalUrl;
+          if (existing) {
+            if (existing.originalUrl) item.originalUrl = existing.originalUrl;
+            if (existing.labelText) item.labelText = existing.labelText;
+          }
           imageItemsById.set(id, item);
         }
 
@@ -2478,6 +2495,16 @@
     }
 
 
+    function getAnimationLabelText(fallbackTitle = "") {
+      return clean(
+        currentSubject?.name_cn ||
+        currentSubject?.name ||
+        fallbackTitle ||
+        currentLoadedAnimeLabel ||
+        ""
+      );
+    }
+
     function makeImageId(item, prefix = "img") {
       const key = item.picturePageUrl || item.originalUrl || item.thumbUrl || `${prefix}_${Math.random()}`;
       return `${prefix}_${hashString(key)}`;
@@ -2504,8 +2531,8 @@
               <div class="sub">跨动画保留，最后在这里复制或导出。</div>
             </div>
             <div class="toolbar">
-              <button onclick="copySelectedUrls()" ${items.length ? "" : "disabled"}>复制已有 URL</button>
-              <button onclick="exportTxt()" ${items.length ? "" : "disabled"}>导出 TXT</button>
+              <button onclick="copySelectedJsonl()" ${items.length ? "" : "disabled"}>复制 JSONL</button>
+              <button onclick="exportJsonl()" ${items.length ? "" : "disabled"}>导出 JSONL</button>
               <button onclick="clearSelectedImages()" ${items.length ? "" : "disabled"}>清空选择</button>
               <button class="quiet" onclick="scrollToTopSearch()">继续搜索</button>
               <span class="pill">已选：<span id="basketCount" class="selectedCount">${items.length}</span></span>
@@ -2528,7 +2555,7 @@
         <div class="basket-card" id="basket_${escapeHtml(id)}">
           <button class="basket-remove" onclick="removeSelectedImage('${escapeJsString(id)}')">×</button>
           <img src="${escapeHtml(item.thumbUrl || finalUrl)}" loading="lazy" referrerpolicy="no-referrer" onerror="this.style.display='none'">
-          <div class="sub">${escapeHtml(item.episodeTitle || "已选图片")}</div>
+          <div class="sub">${escapeHtml(item.labelText || "已选图片")}</div>
         </div>
       `;
     }
@@ -2544,26 +2571,37 @@
       renderSelectedBasket();
     }
 
-    async function copySelectedUrls() {
+    async function copySelectedJsonl() {
       if (!selectedImages.size) {
         setStatus("还没有选择图片。");
         return;
       }
 
       await resolveAllSelectedOriginals();
-      const text = getSelectedUrlList().join("\n");
+      const text = getSelectedJsonlText();
 
       try {
         await navigator.clipboard.writeText(text);
-        setStatus(`已复制 ${selectedImages.size} 个 URL。`);
+        setStatus(`已复制 ${selectedImages.size} 条 JSONL。`);
       } catch {
         fallbackCopyText(text);
-        setStatus(`已复制 ${selectedImages.size} 个 URL。`);
+        setStatus(`已复制 ${selectedImages.size} 条 JSONL。`);
       }
     }
 
-    function getSelectedUrlList() {
-      return [...selectedImages.values()].map(item => item.originalUrl || item.thumbUrl).filter(Boolean);
+    function getSelectedJsonlText() {
+      return getSelectedJsonlRecords()
+        .map(record => JSON.stringify(record))
+        .join("\n");
+    }
+
+    function getSelectedJsonlRecords() {
+      return [...selectedImages.values()]
+        .map(item => ({
+          image_url: item.originalUrl || item.thumbUrl || "",
+          label_text: item.labelText || getAnimationLabelText("") || ""
+        }))
+        .filter(record => record.image_url);
     }
 
     function fallbackCopyText(text) {
@@ -2611,15 +2649,15 @@
       renderSelectedBasket();
     }
 
-    async function exportTxt() {
+    async function exportJsonl() {
       if (!selectedImages.size) {
         setStatus("还没有选择图片。");
         return;
       }
 
       await resolveAllSelectedOriginals();
-      const text = getSelectedUrlList().join("\n");
-      downloadBlob(new Blob([text], { type: "text/plain" }), "fancaps-selected-images.txt");
+      const text = getSelectedJsonlText();
+      downloadBlob(new Blob([text], { type: "application/x-ndjson" }), "fancaps-selected-images.jsonl");
     }
 
     async function exportJson() {
@@ -2629,17 +2667,11 @@
       }
 
       await resolveAllSelectedOriginals();
-      const data = [...selectedImages.values()].map(item => ({
-        episode: item.episodeTitle,
-        url: item.originalUrl || item.thumbUrl,
-        thumbnailUrl: item.thumbUrl,
-        picturePageUrl: item.picturePageUrl,
-        sourcePage: item.sourcePage
-      }));
+      const data = getSelectedJsonlRecords();
 
       downloadBlob(
-        new Blob([JSON.stringify(data, null, 2)], { type: "application/json" }),
-        "fancaps-original-images.json"
+        new Blob([data.map(record => JSON.stringify(record)).join("\n")], { type: "application/x-ndjson" }),
+        "fancaps-selected-images.jsonl"
       );
     }
 
