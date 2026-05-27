@@ -723,6 +723,315 @@
         justify-content: space-between;
       }
     }
+
+
+    .mode-panel {
+      display: flex;
+      gap: 10px;
+      align-items: center;
+      flex-wrap: wrap;
+      margin-top: 16px;
+    }
+
+    .mode-button {
+      min-width: 120px;
+    }
+
+    .mode-button.active {
+      background: var(--selected);
+      color: #ffffff;
+    }
+
+    .auto-form-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+      gap: 10px;
+      align-items: end;
+      margin-top: 12px;
+    }
+
+    .auto-field label {
+      display: block;
+      color: var(--muted);
+      font-size: 12px;
+      margin-bottom: 5px;
+    }
+
+    .auto-field input,
+    .auto-field select {
+      width: 100%;
+    }
+
+    .auto-draft-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(190px, 1fr));
+      gap: 12px;
+      margin-top: 14px;
+    }
+
+    .auto-draft-bottom-actions {
+      display: flex;
+      gap: 8px;
+      align-items: center;
+      justify-content: flex-start;
+      flex-wrap: wrap;
+      margin-top: 14px;
+      padding-top: 12px;
+      border-top: 1px solid #eeeeee;
+    }
+
+    .auto-loading-pill {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      color: var(--muted);
+    }
+
+    .auto-loading-pill::before {
+      content: "";
+      width: 10px;
+      height: 10px;
+      border: 2px solid #d0d0d0;
+      border-top-color: #333333;
+      border-radius: 999px;
+      display: inline-block;
+      animation: auto-spin 0.85s linear infinite;
+    }
+
+    @keyframes auto-spin {
+      to { transform: rotate(360deg); }
+    }
+
+
+    .draft-card {
+      background: #ffffff;
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 10px;
+    }
+
+    .draft-card img {
+      width: 100%;
+      height: 120px;
+      object-fit: cover;
+      border-radius: 7px;
+      background: #eeeeee;
+      display: block;
+      margin-bottom: 8px;
+    }
+
+    .draft-title {
+      font-weight: 700;
+      font-size: 14px;
+      line-height: 1.35;
+      min-height: 38px;
+      margin-bottom: 6px;
+    }
+
+    .draft-meta {
+      color: var(--muted);
+      font-size: 12px;
+      line-height: 1.4;
+      margin-bottom: 8px;
+    }
+
+    .draft-actions {
+      display: flex;
+      gap: 6px;
+      flex-wrap: wrap;
+    }
+
+    .draft-actions button {
+      padding: 6px 8px;
+      font-size: 12px;
+    }
+
+    .modal-backdrop {
+      position: fixed;
+      inset: 0;
+      z-index: 1200;
+      background: rgba(0,0,0,0.38);
+      display: none;
+      align-items: center;
+      justify-content: center;
+      padding: 18px;
+    }
+
+    .modal-backdrop.show {
+      display: flex;
+    }
+
+    .modal-box {
+      width: min(980px, 100%);
+      max-height: min(760px, 92vh);
+      overflow: auto;
+      background: #ffffff;
+      border-radius: 14px;
+      padding: 16px;
+      box-shadow: 0 18px 50px rgba(0,0,0,0.22);
+    }
+
+    .modal-head {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      gap: 10px;
+      margin-bottom: 12px;
+    }
+
+    .modal-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
+      gap: 10px;
+    }
+
+    .modal-choice {
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 8px;
+      background: #ffffff;
+    }
+
+    .modal-choice img {
+      width: 100%;
+      height: 105px;
+      object-fit: cover;
+      border-radius: 7px;
+      background: #eeeeee;
+      display: block;
+      margin-bottom: 8px;
+    }
+
+    .modal-choice-title {
+      font-size: 13px;
+      font-weight: 700;
+      line-height: 1.35;
+      min-height: 36px;
+      margin-bottom: 6px;
+    }
+
+    .modal-choice button {
+      width: 100%;
+      padding: 7px 8px;
+      font-size: 12px;
+    }
+
+
+    .mode-prompt {
+      color: var(--muted);
+      font-size: 13px;
+    }
+
+    .auto-year-range {
+      grid-column: span 3;
+      min-width: min(100%, 520px);
+    }
+
+    .year-range-line {
+      display: grid;
+      grid-template-columns: auto minmax(220px, 1fr) auto;
+      gap: 12px;
+      align-items: center;
+      margin-top: 8px;
+    }
+
+    .year-range-label {
+      white-space: nowrap;
+      color: var(--muted);
+      font-size: 13px;
+      line-height: 1.3;
+    }
+
+    .year-range-label strong {
+      color: #222222;
+      font-weight: 700;
+    }
+
+    .dual-range-wrap {
+      position: relative;
+      height: 28px;
+    }
+
+    .dual-range-track,
+    .dual-range-active {
+      position: absolute;
+      left: 0;
+      right: 0;
+      top: 13px;
+      height: 3px;
+      border-radius: 999px;
+      background: #dddddd;
+      pointer-events: none;
+    }
+
+    .dual-range-active {
+      left: var(--year-active-left, 0%);
+      right: var(--year-active-right, 0%);
+      background: #333333;
+    }
+
+    .dual-range-input {
+      position: absolute;
+      inset: 0;
+      width: 100%;
+      height: 28px;
+      padding: 0;
+      border: none;
+      background: transparent;
+      pointer-events: none;
+      appearance: none;
+      -webkit-appearance: none;
+    }
+
+    .dual-range-input::-webkit-slider-runnable-track {
+      height: 3px;
+      background: transparent;
+    }
+
+    .dual-range-input::-webkit-slider-thumb {
+      width: 15px;
+      height: 15px;
+      border-radius: 999px;
+      border: 2px solid #333333;
+      background: #ffffff;
+      cursor: pointer;
+      pointer-events: auto;
+      appearance: none;
+      -webkit-appearance: none;
+      margin-top: -6px;
+    }
+
+    .dual-range-input::-moz-range-track {
+      height: 3px;
+      background: transparent;
+    }
+
+    .dual-range-input::-moz-range-thumb {
+      width: 15px;
+      height: 15px;
+      border-radius: 999px;
+      border: 2px solid #333333;
+      background: #ffffff;
+      cursor: pointer;
+      pointer-events: auto;
+    }
+
+    #autoYearFromRange { z-index: 2; }
+    #autoYearToRange { z-index: 3; }
+
+    @media (max-width: 640px) {
+      .auto-year-range {
+        grid-column: span 1;
+      }
+      .year-range-line {
+        grid-template-columns: 1fr;
+        gap: 6px;
+      }
+      .year-range-label:last-child {
+        text-align: right;
+      }
+    }
+
   </style>
 </head>
 <body>
@@ -731,7 +1040,72 @@
 
   <div id="selectedBasket"></div>
 
-  <div id="searchPanel" class="panel">
+  <div id="modePanel" class="panel mode-panel">
+    <button id="manualModeBtn" class="mode-button light" onclick="switchMode('manual')">手动出题</button>
+    <button id="autoModeBtn" class="mode-button light" onclick="switchMode('auto')">自动出题</button>
+    <span class="mode-prompt">请选择出题方式。</span>
+  </div>
+
+  <div id="autoPanel" class="panel" style="display: none;">
+    <h2>自动出题</h2>
+    <div class="sub">从 FanCaps 动画截图中随机生成题单。填写 Bangumi 用户 ID 后，只从该用户看过的动画中随机；留空则从全部范围随机。</div>
+
+    <div class="auto-form-grid">
+      <div class="auto-field">
+        <label for="autoBangumiUser">Bangumi 用户 ID（可选）</label>
+        <input id="autoBangumiUser" placeholder="例如：123456" />
+      </div>
+      <div class="auto-field auto-year-range">
+        <label>年份范围</label>
+        <div class="year-range-line">
+          <span class="year-range-label">起始：<strong id="autoYearFromLabel">2010</strong></span>
+          <div class="dual-range-wrap" id="autoYearRangeWrap">
+            <div class="dual-range-track"></div>
+            <div class="dual-range-active" id="autoYearActiveTrack"></div>
+            <input id="autoYearFromRange" class="dual-range-input" type="range" min="1999" max="2026" step="1" value="2010" oninput="syncAutoYearRangeLabels('from')" aria-label="起始年份" />
+            <input id="autoYearToRange" class="dual-range-input" type="range" min="2000" max="2027" step="1" value="2027" oninput="syncAutoYearRangeLabels('to')" aria-label="结束年份" />
+          </div>
+          <span class="year-range-label">结束：<strong id="autoYearToLabel">不限</strong></span>
+        </div>
+      </div>
+      <div class="auto-field">
+        <label for="autoMinDone">最低看过人数</label>
+        <input id="autoMinDone" type="number" min="0" step="1000" placeholder="不限" />
+      </div>
+      <div class="auto-field">
+        <label for="autoQuestionCount">题目数量</label>
+        <input id="autoQuestionCount" type="number" min="1" max="100" value="20" />
+      </div>
+    </div>
+
+    <div class="toolbar" style="margin-top: 12px;">
+      <button id="generateAutoDraftBtn" onclick="generateAutoDraft()">生成题单</button>
+      <button class="light" onclick="addAutoDraftToSelected()" id="addAutoDraftBtn" disabled>加入已选截图</button>
+      <span class="pill" id="autoPoolInfo">尚未生成</span>
+      <span class="pill auto-loading-pill" id="autoGenerateStatus" style="display: none;">正在生成题单...</span>
+    </div>
+
+    <div id="autoDraftArea"></div>
+  </div>
+
+  <div id="autoChoiceModal" class="modal-backdrop" onclick="handleModalBackdropClick(event)">
+    <div class="modal-box">
+      <div class="modal-head">
+        <div>
+          <h2 id="autoModalTitle">选择</h2>
+          <div class="sub" id="autoModalHint"></div>
+        </div>
+        <div class="toolbar">
+          <button class="quiet" onclick="refreshAutoModalBatch()">换一批</button>
+          <button onclick="closeAutoModal()">关闭</button>
+        </div>
+      </div>
+      <div id="autoModalChoices" class="modal-grid"></div>
+    </div>
+  </div>
+
+
+  <div id="searchPanel" class="panel" style="display: none;">
     <div class="row">
       <input id="keyword" placeholder="输入中文名，例如：芙莉莲、金牌得主、孤独摇滚" />
       <button id="searchBangumiBtn">搜索 Bangumi</button>
@@ -789,6 +1163,8 @@
       "./anime-titles.xml",
       "./anime-titles.xml.gz"
     ];
+    const ANIME_MAP_PATH = "./anime_map.json";
+    const FANCAPS_AUTO_DATA_PATH = "./fancaps_anime_images.jsonl";
     const DEFAULT_PROXY = "/proxy?url=";
     const TOP_IMAGES_PER_EPISODE = 4;
     const MAX_SHOW_PAGES = 30;
@@ -806,6 +1182,23 @@
     const imagePanelEl = document.getElementById("imagePanel");
     const selectedBasketEl = document.getElementById("selectedBasket");
     const searchPanelEl = document.getElementById("searchPanel");
+    const modePanelEl = document.getElementById("modePanel");
+    const manualModeBtn = document.getElementById("manualModeBtn");
+    const autoModeBtn = document.getElementById("autoModeBtn");
+    const autoPanelEl = document.getElementById("autoPanel");
+    const autoDraftAreaEl = document.getElementById("autoDraftArea");
+    const autoPoolInfoEl = document.getElementById("autoPoolInfo");
+    const generateAutoDraftBtn = document.getElementById("generateAutoDraftBtn");
+    const autoGenerateStatusEl = document.getElementById("autoGenerateStatus");
+    const addAutoDraftBtn = document.getElementById("addAutoDraftBtn");
+    const autoChoiceModalEl = document.getElementById("autoChoiceModal");
+    const autoModalTitleEl = document.getElementById("autoModalTitle");
+    const autoModalHintEl = document.getElementById("autoModalHint");
+    const autoModalChoicesEl = document.getElementById("autoModalChoices");
+    const autoYearFromRangeEl = document.getElementById("autoYearFromRange");
+    const autoYearToRangeEl = document.getElementById("autoYearToRange");
+    const autoYearFromLabelEl = document.getElementById("autoYearFromLabel");
+    const autoYearToLabelEl = document.getElementById("autoYearToLabel");
 
     let selectedImages = new Map();
     let imageItemsById = new Map();
@@ -815,6 +1208,15 @@
     let anidbTitleIndex = null;
     let anidbTitleIndexPromise = null;
     let anidbTitleIndexSource = "";
+    let animeMapIndex = null;
+    let animeMapIndexPromise = null;
+    let animeMapIndexSource = "";
+    let autoDataset = null;
+    let autoDatasetPromise = null;
+    let autoFilteredPool = [];
+    let autoDraft = [];
+    let autoModalState = null;
+    let autoGenerating = false;
 
     proxyInput.value = DEFAULT_PROXY;
     proxyPreset.value = DEFAULT_PROXY;
@@ -822,11 +1224,584 @@
     proxyPreset.addEventListener("change", handleProxyPresetChange);
     proxyInput.addEventListener("input", syncProxyPresetByInput);
     renderSelectedBasket();
+    syncAutoYearRangeLabels("init");
 
     document.getElementById("searchBangumiBtn").addEventListener("click", searchBangumi);
     keywordInput.addEventListener("keydown", (e) => {
       if (e.key === "Enter") searchBangumi();
     });
+
+
+    function switchMode(mode) {
+      const isAuto = mode === "auto";
+
+      autoPanelEl.style.display = isAuto ? "block" : "none";
+      searchPanelEl.style.display = isAuto ? "none" : "block";
+
+      const manualEls = [bangumiResultsEl, subjectDetailEl, fanCapsResultsEl, imagePanelEl];
+      for (const el of manualEls) {
+        if (isAuto) hideElement(el);
+        else showElement(el);
+      }
+
+      manualModeBtn.className = isAuto ? "mode-button light" : "mode-button active";
+      autoModeBtn.className = isAuto ? "mode-button active" : "mode-button light";
+
+      setStatus(isAuto ? "已切换到自动出题。" : "已切换到手动出题。");
+      scrollToElement(isAuto ? autoPanelEl : searchPanelEl);
+    }
+
+
+    function syncAutoYearRangeLabels(changed = "") {
+      if (!autoYearFromRangeEl || !autoYearToRangeEl) return;
+
+      let from = Number(autoYearFromRangeEl.value || 1999);
+      let to = Number(autoYearToRangeEl.value || 2027);
+      const fromLimit = from === 1999 ? 0 : from;
+      const toLimit = to === 2027 ? 0 : to;
+
+      if (fromLimit && toLimit && fromLimit > toLimit) {
+        if (changed === "from") {
+          autoYearToRangeEl.value = String(fromLimit);
+          to = fromLimit;
+        } else {
+          autoYearFromRangeEl.value = String(toLimit);
+          from = toLimit;
+        }
+      }
+
+      if (autoYearFromLabelEl) autoYearFromLabelEl.textContent = from === 1999 ? "不限" : String(from);
+      if (autoYearToLabelEl) autoYearToLabelEl.textContent = to === 2027 ? "不限" : String(to);
+
+      updateAutoYearActiveTrack();
+    }
+
+    function updateAutoYearActiveTrack() {
+      const track = document.getElementById("autoYearActiveTrack");
+      if (!track || !autoYearFromRangeEl || !autoYearToRangeEl) return;
+
+      const min = 1999;
+      const max = 2027;
+      const fromRaw = Number(autoYearFromRangeEl.value || min);
+      const toRaw = Number(autoYearToRangeEl.value || max);
+      const fromForTrack = fromRaw === 1999 ? min : fromRaw;
+      const toForTrack = toRaw === 2027 ? max : toRaw;
+      const left = ((fromForTrack - min) / (max - min)) * 100;
+      const right = 100 - ((toForTrack - min) / (max - min)) * 100;
+
+      track.style.setProperty("--year-active-left", `${Math.max(0, Math.min(100, left))}%`);
+      track.style.setProperty("--year-active-right", `${Math.max(0, Math.min(100, right))}%`);
+    }
+
+    function getAutoYearFromValue() {
+      const value = Number(autoYearFromRangeEl?.value || 1999);
+      return value === 1999 ? 0 : value;
+    }
+
+    function getAutoYearToValue() {
+      const value = Number(autoYearToRangeEl?.value || 2027);
+      return value === 2027 ? 0 : value;
+    }
+
+    async function loadAutoDataset() {
+      if (autoDataset) return autoDataset;
+      if (autoDatasetPromise) return autoDatasetPromise;
+
+      autoDatasetPromise = (async () => {
+        const res = await fetch(FANCAPS_AUTO_DATA_PATH, { cache: "force-cache" });
+        if (!res.ok) throw new Error(`FanCaps 截图读取失败：HTTP ${res.status}`);
+
+        const text = await res.text();
+        const records = [];
+        const lines = text.split(/\r?\n/).filter(line => line.trim());
+
+        for (let i = 0; i < lines.length; i++) {
+          try {
+            const raw = JSON.parse(lines[i]);
+            const images = Array.isArray(raw.images)
+              ? raw.images.map(x => String(x || "").trim()).filter(Boolean)
+              : [];
+            if (!images.length) continue;
+
+            const bgmId = String(raw.bgm_id || raw.bangumi_id || "").trim();
+            if (!bgmId) continue;
+
+            const year = extractYear(raw.date);
+            const doneCount = Number(raw.done_count || 0) || 0;
+
+            records.push({
+              bgmId,
+              anidbId: raw.anidb_id ? String(raw.anidb_id) : "",
+              title: clean(raw.label_text || raw.name_cn || raw.name || `Bangumi ${bgmId}`),
+              date: raw.date || "",
+              year,
+              doneCount,
+              ratingCount: Number(raw.rating_count || 0) || 0,
+              imageCount: images.length,
+              images
+            });
+          } catch (err) {
+            console.warn("skip bad jsonl line", i + 1, err);
+          }
+        }
+
+        autoDataset = records;
+        return records;
+      })();
+
+      return autoDatasetPromise;
+    }
+
+    function extractYear(dateText) {
+      const m = String(dateText || "").match(/(19|20)\d{2}/);
+      return m ? Number(m[0]) : 0;
+    }
+
+    function setAutoGenerating(isGenerating) {
+      autoGenerating = Boolean(isGenerating);
+      if (generateAutoDraftBtn) {
+        generateAutoDraftBtn.disabled = autoGenerating;
+        generateAutoDraftBtn.textContent = autoGenerating ? "生成中..." : "生成题单";
+      }
+      if (autoGenerateStatusEl) {
+        autoGenerateStatusEl.style.display = autoGenerating ? "inline-flex" : "none";
+      }
+    }
+
+    async function generateAutoDraft() {
+      if (autoGenerating) return;
+
+      setAutoGenerating(true);
+      setStatus("正在生成题单...");
+      setProgress(8, true);
+
+      try {
+        const dataset = await loadAutoDataset();
+        setProgress(32, true);
+
+        const pool = await buildAutoCandidatePool(dataset);
+        autoFilteredPool = pool;
+
+        const count = clampNumber(Number(document.getElementById("autoQuestionCount").value || 20), 1, 100);
+        const sampleCount = Math.min(count, pool.length);
+
+        if (!pool.length) {
+          autoDraft = [];
+          renderAutoDraft();
+          setStatus("当前筛选条件下没有可用截图。请放宽条件。");
+          setProgress(100, false);
+          return;
+        }
+
+        setProgress(72, true);
+        autoDraft = sampleUnique(pool, sampleCount).map(record => makeAutoDraftItem(record));
+        renderAutoDraft();
+        setStatus(`已生成 ${autoDraft.length} 题。`);
+        setProgress(100, false);
+        scrollToElement(autoDraftAreaEl);
+      } catch (err) {
+        console.error(err);
+        setProgress(0, false);
+        setStatus("自动出题失败：" + err.message);
+      } finally {
+        setAutoGenerating(false);
+      }
+    }
+
+    async function buildAutoCandidatePool(dataset) {
+      const yearFrom = getAutoYearFromValue();
+      const yearTo = getAutoYearToValue();
+      const minDone = Number(document.getElementById("autoMinDone").value || 0) || 0;
+      const user = clean(document.getElementById("autoBangumiUser").value || "");
+
+      let allowedIds = null;
+      if (user) {
+        setStatus("正在读取 Bangumi 用户收藏...");
+        allowedIds = await fetchBangumiWatchedIds(user);
+      }
+
+      const pool = dataset.filter(record => {
+        if (allowedIds && !allowedIds.has(record.bgmId)) return false;
+        if (minDone && record.doneCount < minDone) return false;
+        if (yearFrom && (!record.year || record.year < yearFrom)) return false;
+        if (yearTo && (!record.year || record.year > yearTo)) return false;
+        return record.images && record.images.length;
+      });
+
+      const scope = user ? `用户收藏交集：${pool.length} 部` : `可用动画：${pool.length} 部`;
+      if (autoPoolInfoEl) autoPoolInfoEl.textContent = scope;
+      return pool;
+    }
+
+    async function fetchBangumiWatchedIds(username) {
+      const ids = new Set();
+      const limit = 50;
+      let offset = 0;
+      let guard = 0;
+
+      while (guard < 80) {
+        guard += 1;
+        const url = `${BGM_API}/v0/users/${encodeURIComponent(username)}/collections?subject_type=2&type=2&limit=${limit}&offset=${offset}`;
+        const res = await fetch(url, { headers: { "Accept": "application/json" } });
+        if (!res.ok) throw new Error(`读取用户收藏失败：HTTP ${res.status}`);
+        const json = await res.json();
+        const data = Array.isArray(json.data) ? json.data : [];
+
+        for (const item of data) {
+          const id = item.subject_id || item.subject?.id || item.id;
+          if (id) ids.add(String(id));
+        }
+
+        if (data.length < limit) break;
+        offset += limit;
+        await sleep(160);
+      }
+
+      return ids;
+    }
+
+    function makeAutoDraftItem(record, imageUrl = "") {
+      const chosen = imageUrl || randomOne(record.images) || "";
+      return {
+        uid: `draft_${record.bgmId}_${hashString(chosen)}_${Math.random().toString(36).slice(2, 7)}`,
+        bgmId: record.bgmId,
+        title: record.title,
+        date: record.date,
+        year: record.year,
+        doneCount: record.doneCount,
+        imageUrl: chosen,
+        record
+      };
+    }
+
+    function renderAutoDraft() {
+      if (addAutoDraftBtn) addAutoDraftBtn.disabled = !autoDraft.length;
+
+      if (!autoDraft.length) {
+        autoDraftAreaEl.innerHTML = `<div class="empty" style="margin-top: 12px;">还没有题单。设置条件后点击“生成题单”。</div>`;
+        return;
+      }
+
+      autoDraftAreaEl.innerHTML = `
+        <div class="result-section">
+          <div class="section-headline">
+            <div>
+              <h2>题单草稿</h2>
+            </div>
+            <span class="pill">${autoDraft.length} 题</span>
+          </div>
+          <div class="auto-draft-grid">
+            ${autoDraft.map((item, idx) => renderAutoDraftCard(item, idx)).join("")}
+          </div>
+          <div class="auto-draft-bottom-actions">
+            <button type="button" class="light" onclick="addAutoDraftToSelected()">加入已选截图</button>
+            <button type="button" onclick="copyAutoDraftJsonl()">复制当前题单 JSONL</button>
+            <button type="button" onclick="exportAutoDraftJsonl()">导出当前题单 JSONL</button>
+          </div>
+        </div>
+      `;
+      updateSelectedCount();
+    }
+
+    function renderAutoDraftCard(item, idx) {
+      return `
+        <div class="draft-card" id="${escapeHtml(item.uid)}">
+          <img src="${escapeHtml(originalToFanCapsThumbnailUrl(item.imageUrl))}" loading="lazy" referrerpolicy="no-referrer" onerror="this.style.display='none'">
+          <div class="draft-title">${idx + 1}. ${escapeHtml(item.title)}</div>
+          <div class="draft-meta">${escapeHtml(item.date || "日期未知")} · 看过 ${Number(item.doneCount || 0).toLocaleString()}</div>
+          <div class="draft-actions">
+            <button onclick="openChangeImageModal('${escapeJsString(item.uid)}')">换图</button>
+            <button class="quiet" onclick="openChangeAnimeModal('${escapeJsString(item.uid)}')">换动画</button>
+            <button class="quiet" onclick="removeAutoDraftItem('${escapeJsString(item.uid)}')">移除</button>
+          </div>
+        </div>
+      `;
+    }
+
+    function regenerateAutoDraft() {
+      if (!autoFilteredPool.length) {
+        generateAutoDraft();
+        return;
+      }
+      const count = clampNumber(Number(document.getElementById("autoQuestionCount").value || 20), 1, 100);
+      autoDraft = sampleUnique(autoFilteredPool, Math.min(count, autoFilteredPool.length)).map(record => makeAutoDraftItem(record));
+      renderAutoDraft();
+      setStatus("已重新随机。");
+    }
+
+    function removeAutoDraftItem(uid) {
+      autoDraft = autoDraft.filter(item => item.uid !== uid);
+      renderAutoDraft();
+      setStatus("已移除 1 题。");
+    }
+
+    function openChangeImageModal(uid) {
+      const item = autoDraft.find(x => x.uid === uid);
+      if (!item) return;
+
+      autoModalState = {
+        type: "image",
+        uid,
+        shownImageUrls: new Set([item.imageUrl])
+      };
+      autoModalTitleEl.textContent = "选择一张图";
+      autoModalHintEl.textContent = item.title;
+      renderChangeImageChoices(item);
+      showAutoModal();
+    }
+
+    function renderChangeImageChoices(item) {
+      const state = autoModalState && autoModalState.type === "image" && autoModalState.uid === item.uid
+        ? autoModalState
+        : null;
+      const allImages = unique((item.record.images || []).map(url => String(url || "").trim()).filter(Boolean));
+      const candidates = allImages.filter(url => url !== item.imageUrl);
+
+      if (!candidates.length) {
+        autoModalHintEl.textContent = item.title;
+        autoModalChoicesEl.innerHTML = `<div class="empty">这部动画没有其它可换图片。</div>`;
+        return;
+      }
+
+      let unseen = candidates.filter(url => !state || !state.shownImageUrls.has(url));
+      let restarted = false;
+      if (!unseen.length) {
+        restarted = true;
+        if (state) state.shownImageUrls = new Set([item.imageUrl]);
+        unseen = candidates;
+      }
+
+      const finalChoices = sampleUnique(unseen, Math.min(5, unseen.length));
+      if (state) {
+        for (const url of finalChoices) state.shownImageUrls.add(url);
+      }
+
+      autoModalHintEl.textContent = restarted
+        ? `${item.title} · 所有图片都随机完了，开始重新随机。`
+        : item.title;
+
+      autoModalChoicesEl.innerHTML = finalChoices.map(url => `
+        <div class="modal-choice">
+          <img src="${escapeHtml(originalToFanCapsThumbnailUrl(url))}" loading="lazy" referrerpolicy="no-referrer" onerror="this.style.display='none'">
+          <div class="modal-choice-title">${escapeHtml(item.title)}</div>
+          <button onclick="chooseAutoImage('${escapeJsString(item.uid)}', '${escapeJsString(url)}')">选择这张</button>
+        </div>
+      `).join("");
+    }
+
+    function chooseAutoImage(uid, url) {
+      const idx = autoDraft.findIndex(x => x.uid === uid);
+      if (idx < 0) return;
+      const record = autoDraft[idx].record;
+      autoDraft[idx] = makeAutoDraftItem(record, url);
+      renderAutoDraft();
+      closeAutoModal();
+      setStatus("已更换图片。");
+    }
+
+    function openChangeAnimeModal(uid) {
+      const item = autoDraft.find(x => x.uid === uid);
+      if (!item) return;
+
+      autoModalState = {
+        type: "anime",
+        uid,
+        currentBgmId: item.bgmId,
+        shownAnimeIds: new Set([item.bgmId])
+      };
+      autoModalTitleEl.textContent = "选择一部动画";
+      autoModalHintEl.textContent = "从当前筛选范围中随机给出 5 部。";
+      renderChangeAnimeChoices(uid);
+      showAutoModal();
+    }
+
+    function renderChangeAnimeChoices(uid) {
+      const state = autoModalState && autoModalState.type === "anime" && autoModalState.uid === uid
+        ? autoModalState
+        : null;
+      const currentBgmId = state?.currentBgmId || "";
+      const used = new Set(autoDraft.filter(item => item.uid !== uid).map(item => item.bgmId));
+      const pool = autoFilteredPool.filter(record => !used.has(record.bgmId) && record.bgmId !== currentBgmId);
+
+      if (!pool.length) {
+        autoModalHintEl.textContent = "当前筛选范围没有更多动画。";
+        autoModalChoicesEl.innerHTML = `<div class="empty">当前筛选范围没有更多动画。</div>`;
+        return;
+      }
+
+      let unseen = pool.filter(record => !state || !state.shownAnimeIds.has(record.bgmId));
+      let restarted = false;
+      if (!unseen.length) {
+        restarted = true;
+        if (state) state.shownAnimeIds = new Set([currentBgmId].filter(Boolean));
+        unseen = pool;
+      }
+
+      const choices = sampleUnique(unseen, Math.min(5, unseen.length));
+      if (state) {
+        for (const record of choices) state.shownAnimeIds.add(record.bgmId);
+      }
+
+      autoModalHintEl.textContent = restarted
+        ? "所有动画都随机完了，开始重新随机。"
+        : "从当前筛选范围中随机给出 5 部。";
+
+      autoModalChoicesEl.innerHTML = choices.map(record => {
+        const image = randomOne(record.images);
+        return `
+          <div class="modal-choice">
+            <img src="${escapeHtml(originalToFanCapsThumbnailUrl(image))}" loading="lazy" referrerpolicy="no-referrer" onerror="this.style.display='none'">
+            <div class="modal-choice-title">${escapeHtml(record.title)}</div>
+            <div class="draft-meta">${escapeHtml(record.date || "日期未知")} · 看过 ${Number(record.doneCount || 0).toLocaleString()}</div>
+            <button onclick="chooseAutoAnime('${escapeJsString(uid)}', '${escapeJsString(record.bgmId)}', '${escapeJsString(image)}')">选择这部</button>
+          </div>
+        `;
+      }).join("");
+    }
+
+    function chooseAutoAnime(uid, bgmId, imageUrl) {
+      const idx = autoDraft.findIndex(x => x.uid === uid);
+      const record = autoFilteredPool.find(x => x.bgmId === bgmId);
+      if (idx < 0 || !record) return;
+      autoDraft[idx] = makeAutoDraftItem(record, imageUrl || randomOne(record.images));
+      renderAutoDraft();
+      closeAutoModal();
+      setStatus("已更换动画。 ");
+    }
+
+    function refreshAutoModalBatch() {
+      if (!autoModalState) return;
+      if (autoModalState.type === "image") {
+        const item = autoDraft.find(x => x.uid === autoModalState.uid);
+        if (item) renderChangeImageChoices(item);
+      } else if (autoModalState.type === "anime") {
+        renderChangeAnimeChoices(autoModalState.uid);
+      }
+    }
+
+    function showAutoModal() {
+      autoChoiceModalEl.classList.add("show");
+    }
+
+    function closeAutoModal() {
+      autoChoiceModalEl.classList.remove("show");
+      autoModalState = null;
+    }
+
+    function handleModalBackdropClick(event) {
+      if (event.target === autoChoiceModalEl) closeAutoModal();
+    }
+
+
+    function getAutoDraftJsonlRecords() {
+      return autoDraft
+        .map(item => ({
+          image_url: item.imageUrl || "",
+          label_text: item.title || ""
+        }))
+        .filter(record => record.image_url);
+    }
+
+    function getAutoDraftJsonlText() {
+      return getAutoDraftJsonlRecords()
+        .map(record => JSON.stringify(record))
+        .join("\n");
+    }
+
+    async function copyAutoDraftJsonl() {
+      if (!autoDraft.length) {
+        setStatus("当前没有题单。 ");
+        return;
+      }
+      const text = getAutoDraftJsonlText();
+      try {
+        await navigator.clipboard.writeText(text);
+      } catch {
+        fallbackCopyText(text);
+      }
+      setStatus(`已复制 ${autoDraft.length} 条当前题单 JSONL。`);
+    }
+
+    function exportAutoDraftJsonl() {
+      if (!autoDraft.length) {
+        setStatus("当前没有题单。 ");
+        return;
+      }
+      const text = getAutoDraftJsonlText();
+      downloadBlob(new Blob([text], { type: "application/x-ndjson" }), "fancaps-auto-question-list.jsonl");
+      setStatus(`已导出 ${autoDraft.length} 条当前题单 JSONL。`);
+    }
+
+    function addAutoDraftToSelected() {
+      if (!autoDraft.length) {
+        setStatus("当前没有题单草稿。 ");
+        return;
+      }
+
+      for (const item of autoDraft) {
+        const id = `auto_${item.bgmId}_${hashString(item.imageUrl)}`;
+        selectedImages.set(id, {
+          id,
+          episodeTitle: "",
+          thumbUrl: originalToFanCapsThumbnailUrl(item.imageUrl),
+          originalUrl: item.imageUrl,
+          picturePageUrl: "",
+          sourcePage: FANCAPS_AUTO_DATA_PATH,
+          labelText: item.title,
+          kind: "auto"
+        });
+      }
+
+      renderSelectedBasket();
+      renderAutoDraft();
+      setStatus(`已加入 ${autoDraft.length} 张截图到已选。`);
+      scrollToBasket();
+    }
+
+    function originalToFanCapsThumbnailUrl(url) {
+      const text = String(url || "").trim();
+      if (!text) return "";
+      if (/^https?:\/\/ant\.fancaps\.net\/\d+\.jpg(?:[?#].*)?$/i.test(text)) return text;
+
+      const id = getFanCapsImageIdFromUrl(text);
+      if (id) return `https://ant.fancaps.net/${id}.jpg`;
+
+      return text;
+    }
+
+    function getFanCapsImageIdFromUrl(url) {
+      const text = String(url || "");
+      const direct = text.match(/\/([0-9]{4,})\.jpg(?:[?#].*)?$/i);
+      if (direct) return direct[1];
+
+      const encoded = decodeURIComponentSafe(text);
+      const decoded = encoded.match(/\/([0-9]{4,})\.jpg(?:[?#].*)?$/i);
+      return decoded ? decoded[1] : "";
+    }
+
+    function sampleUnique(items, count) {
+      const arr = [...items];
+      shuffleArray(arr);
+      return arr.slice(0, Math.max(0, count));
+    }
+
+    function shuffleArray(arr) {
+      for (let i = arr.length - 1; i > 0; i--) {
+        const j = Math.floor(Math.random() * (i + 1));
+        [arr[i], arr[j]] = [arr[j], arr[i]];
+      }
+      return arr;
+    }
+
+    function randomOne(items) {
+      if (!items || !items.length) return "";
+      return items[Math.floor(Math.random() * items.length)];
+    }
+
+    function clampNumber(value, min, max) {
+      if (!Number.isFinite(value)) return min;
+      return Math.max(min, Math.min(max, value));
+    }
 
     function toggleProxyPanel() {
       const panel = document.getElementById("proxyDetails");
@@ -1013,8 +1988,9 @@
         renderSubjectDetail(subject);
         hideElement(bangumiResultsEl);
         showElement(subjectDetailEl);
-        setStatus("已选择 Bangumi 条目。下一步：搜 FanCaps。");
+        setStatus("已选择 Bangumi 条目，正在自动匹配 AniDB ID...");
         scrollToElement(subjectDetailEl);
+        autoResolveAndSearchFanCaps(subject);
       } catch (err) {
         console.error(err);
         setStatus("读取条目失败：" + err.message);
@@ -1024,9 +2000,6 @@
     function renderSubjectDetail(subject) {
       const allTitles = getBangumiAllTitleCandidates(subject);
       const latinCandidates = rankFanCapsCandidates(allTitles.filter(isLatinTitle));
-      const anidbSourceLabel = anidbTitleIndexSource
-        ? `当前库：${anidbTitleIndexSource}`
-        : `默认库：${ANIDB_LOCAL_DUMP_MONTH}`;
 
       subjectDetailEl.innerHTML = `
         <div class="panel">
@@ -1037,58 +2010,48 @@
             <section class="subject-main-flow">
               <div class="section-headline">
                 <div>
-                  <div class="side-title">1. AniDB ID 检索（推荐）</div>
-                  <div class="source-note">${escapeHtml(anidbSourceLabel)}；full match Bangumi 全部标题。</div>
+                  <div class="side-title">正在查找截图</div>
+                  <div class="source-note">会自动尝试匹配 FanCaps。</div>
                 </div>
-                <button class="quiet" type="button" onclick="toggleAniDbUpdatePanel()">更新标题库</button>
+                <button class="quiet" type="button" onclick="autoResolveAndSearchFanCaps(currentSubject)">重新查找</button>
               </div>
 
-              <div class="side-action-stack">
-                <button onclick="matchAniDbAndSearchFanCaps()">用 AniDB ID 搜 FanCaps</button>
+              <div id="anidbMatchResults" class="fineprint" style="margin-top: 10px;">
+                正在自动查找...
               </div>
-
-              <div id="anidbUpdatePanel" style="display: none; margin-top: 10px; padding-top: 10px; border-top: 1px solid #e2e2e2;">
-                <div class="source-note">需要新版时，下载 GZ 后上传。</div>
-                <div class="side-action-stack">
-                  <a class="button quiet" href="${escapeHtml(ANIDB_TITLES_URL)}" target="_blank" rel="noopener noreferrer">下载最新 GZ</a>
-                  <label class="button secondary" for="anidbLocalFileInput">上传 XML/GZ</label>
-                  <input
-                    id="anidbLocalFileInput"
-                    type="file"
-                    accept=".xml,.gz,.gzip,text/xml,application/xml,application/gzip"
-                    style="display: none;"
-                    onchange="loadAniDbTitleIndexFromFile(this.files && this.files[0])"
-                  >
-                </div>
-              </div>
-
-              <div id="anidbMatchResults" class="fineprint"></div>
             </section>
 
-            <section class="subject-side-flow">
-              <div class="side-title">2. 标题/别名检索</div>
-              <div class="source-note">AniDB 未命中时，用 Bangumi 的英文、罗马音或别名搜索。</div>
+            <section id="manualTitleSearch" class="subject-side-flow" style="display: none;">
+              <div class="side-title">手动搜索</div>
+              <div class="source-note">没有自动找到时，可以换一个标题搜索。</div>
 
               <div style="margin-top: 8px;">
                 ${
                   latinCandidates.length
                     ? renderFanCapsCandidateTags(latinCandidates)
-                    : `<span class="empty">没有提取到拉丁字母标题。</span>`
+                    : `<span class="empty">没有可用的标题候选。</span>`
                 }
               </div>
-
-              <details class="compact-details">
-                <summary>查看全部匹配标题（${allTitles.length}）</summary>
-                <div class="fineprint">${escapeHtml(allTitles.join(" / "))}</div>
-              </details>
             </section>
           </div>
 
           <div class="toolbar" style="margin-top: 12px;">
-            <button class="quiet" onclick="showBangumiResults()">重新选择 Bangumi 条目</button>
+            <button class="quiet" onclick="showBangumiResults()">重新选择动画</button>
           </div>
         </div>
       `;
+    }
+
+    function showManualTitleSearch() {
+      const manual = document.getElementById("manualTitleSearch");
+      if (manual) manual.style.display = "";
+    }
+
+    function setAutoMatchMessage(message, type = "normal") {
+      const panel = document.getElementById("anidbMatchResults");
+      if (!panel) return;
+      const className = type === "empty" ? "empty" : "fineprint";
+      panel.innerHTML = `<div class="${className}">${escapeHtml(message)}</div>`;
     }
 
     function renderFanCapsCandidateTags(items) {
@@ -1105,56 +2068,225 @@
     }
 
     async function matchAniDbAndSearchFanCaps() {
-      if (!currentSubject) {
+      return await autoResolveAndSearchFanCaps(currentSubject);
+    }
+
+    async function autoResolveAndSearchFanCaps(subject) {
+      if (!subject) {
         setStatus("请先选择一个 Bangumi 条目。");
-        return;
+        return false;
       }
 
-      const panel = document.getElementById("anidbMatchResults");
-      const bangumiTitles = getBangumiAllTitleCandidates(currentSubject);
-      if (!bangumiTitles.length) {
-        setStatus("当前 Bangumi 条目没有可用于 AniDB 匹配的标题。");
-        if (panel) panel.innerHTML = `<div class="empty">没有可匹配标题。</div>`;
-        return;
-      }
+      const bangumiTitles = getBangumiAllTitleCandidates(subject);
 
-      if (panel) {
-        panel.innerHTML = `<div style="margin-top: 8px;">正在加载并匹配 AniDB title dump...</div>`;
-      }
       setProgress(8, true);
-      setStatus("正在加载 AniDB 标题 dump，用 Bangumi 标题做 full match...");
+      setStatus("正在自动查找截图...");
+      setAutoMatchMessage("正在自动查找...");
 
       try {
+        const mapHit = await findAniDbIdFromAnimeMap(subject);
+
+        if (mapHit && mapHit.anidbId) {
+          setAutoMatchMessage("已找到匹配，正在搜索截图...");
+          setStatus("已找到匹配，正在搜索 FanCaps...");
+
+          const results = await searchFanCaps(String(mapHit.anidbId), {
+            auto: true,
+            autoLoadImages: true,
+            quiet: true,
+            sourceLabel: "auto-map"
+          });
+
+          if (Array.isArray(results) && results.length > 0) {
+            setProgress(100, false);
+            return true;
+          }
+
+          setAutoMatchMessage("继续尝试其它匹配方式...");
+        } else {
+          setAutoMatchMessage("继续尝试其它匹配方式...");
+        }
+      } catch (err) {
+        console.warn("anime_map match failed:", err);
+        setAutoMatchMessage("继续尝试其它匹配方式...");
+      }
+
+      if (!bangumiTitles.length) {
+        setProgress(0, false);
+        setStatus("未自动找到截图，请手动搜索。");
+        setAutoMatchMessage("未自动找到截图。请选择一个标题手动搜索。", "empty");
+        showManualTitleSearch();
+        return false;
+      }
+
+      try {
+        setProgress(38, true);
+        setStatus("正在尝试备用匹配...");
         const index = await loadAniDbTitleIndex();
-        setProgress(75, true);
-        const matches = findAniDbMatchesByTitles(bangumiTitles, index);
-        renderAniDbMatchResults(matches, bangumiTitles);
+        setProgress(72, true);
+
+        const best = findBestAniDbMatchByExactTitles(bangumiTitles, index);
+        renderAutoTitleExactMatchResult(best, bangumiTitles);
+
+        if (!best) {
+          setProgress(0, false);
+          setStatus("未自动找到截图，请手动搜索。");
+          setAutoMatchMessage("未自动找到截图。请选择一个标题手动搜索。", "empty");
+          showManualTitleSearch();
+          return false;
+        }
+
+        setStatus("已找到匹配，正在搜索 FanCaps...");
+        setAutoMatchMessage("已找到匹配，正在搜索截图...");
+
+        const results = await searchFanCaps(String(best.aid), {
+          auto: true,
+          autoLoadImages: true,
+          quiet: true,
+          sourceLabel: "auto-title"
+        });
+
         setProgress(100, false);
 
-        if (!matches.length) {
-          setStatus("AniDB full match 没有命中。可以继续使用上面的标题直接搜 FanCaps。");
-          return;
+        if (Array.isArray(results) && results.length > 0) {
+          return true;
         }
 
-        if (matches.length === 1) {
-          const aidQuery = `${matches[0].aid}`;
-          setStatus(`AniDB full match 命中 aid=${matches[0].aid}，正在用 ${aidQuery} 搜 FanCaps...`);
-          await searchFanCaps(aidQuery);
-          return;
-        }
-
-        setStatus(`AniDB full match 命中 ${matches.length} 个 aid。请在匹配结果中选择一个搜 FanCaps。`);
+        setStatus("未自动找到截图，请手动搜索。");
+        setAutoMatchMessage("未自动找到截图。请选择一个标题手动搜索。", "empty");
+        showManualTitleSearch();
+        return false;
       } catch (err) {
         console.error(err);
         setProgress(0, false);
-        setStatus("AniDB 匹配失败：" + err.message);
-        if (panel) {
-          panel.innerHTML = `
-            <div class="empty" style="margin-top: 8px;">AniDB 匹配失败：${escapeHtml(err.message)}</div>
-            <div class="fineprint">可打开“更新 AniDB 标题库”，下载最新 GZ 后上传。</div>
-          `;
+        setStatus("未自动找到截图，请手动搜索。");
+        setAutoMatchMessage("未自动找到截图。请选择一个标题手动搜索。", "empty");
+        showManualTitleSearch();
+        return false;
+      }
+    }
+
+    async function loadAnimeMapIndex() {
+      if (animeMapIndex) return animeMapIndex;
+      if (animeMapIndexPromise) return await animeMapIndexPromise;
+
+      animeMapIndexPromise = (async () => {
+        const res = await fetch(ANIME_MAP_PATH, { method: "GET", cache: "force-cache" });
+        if (!res.ok) throw new Error(`anime_map.json 请求失败：HTTP ${res.status}`);
+
+        const data = await res.json();
+        const rows = Array.isArray(data)
+          ? data
+          : Array.isArray(data?.items)
+            ? data.items
+            : Object.values(data || {});
+
+        const byBgmId = new Map();
+        for (const row of rows) {
+          if (!row) continue;
+          const bgmId = row.bgm_id ?? row.bangumi_id ?? row.bgmId ?? row.id;
+          if (bgmId === undefined || bgmId === null || bgmId === "") continue;
+          byBgmId.set(String(bgmId), row);
+        }
+
+        animeMapIndexSource = `同目录 ${ANIME_MAP_PATH.replace(/^\.\//, "")}`;
+        return {
+          byBgmId,
+          rowCount: rows.length
+        };
+      })();
+
+      try {
+        animeMapIndex = await animeMapIndexPromise;
+        return animeMapIndex;
+      } catch (err) {
+        animeMapIndexPromise = null;
+        throw err;
+      }
+    }
+
+    async function findAniDbIdFromAnimeMap(subject) {
+      const bgmId = String(subject?.id ?? "");
+      if (!bgmId) return null;
+
+      const index = await loadAnimeMapIndex();
+      const row = index.byBgmId.get(bgmId);
+      if (!row) return null;
+
+      const anidbId = row.anidb_id ?? row.anidbId ?? row.aid ?? "";
+      if (anidbId === undefined || anidbId === null || String(anidbId).trim() === "") {
+        return { bgmId, row, anidbId: "" };
+      }
+
+      return {
+        bgmId,
+        row,
+        anidbId: String(anidbId).trim()
+      };
+    }
+
+    function findBestAniDbMatchByExactTitles(bangumiTitles, index) {
+      const matchesByAid = new Map();
+
+      for (let order = 0; order < bangumiTitles.length; order++) {
+        const queryTitle = bangumiTitles[order];
+        const key = normalizeTitleForFullMatch(queryTitle);
+        if (!key) continue;
+
+        const hits = index.titleMap.get(key) || [];
+        for (const hit of hits) {
+          if (!matchesByAid.has(hit.aid)) {
+            matchesByAid.set(hit.aid, {
+              aid: hit.aid,
+              matched: [],
+              queryKeys: new Set(),
+              matchCount: 0,
+              score: 0,
+              firstOrder: order
+            });
+          }
+
+          const item = matchesByAid.get(hit.aid);
+          const duplicate = item.matched.some(x =>
+            x.queryTitle === queryTitle &&
+            x.anidbTitle === hit.title &&
+            x.type === hit.type &&
+            x.lang === hit.lang
+          );
+
+          if (!duplicate) {
+            item.matched.push({
+              queryTitle,
+              anidbTitle: hit.title,
+              type: hit.type,
+              lang: hit.lang
+            });
+          }
+
+          item.queryKeys.add(key);
+          item.matchCount = item.queryKeys.size;
+          item.score += scoreAniDbHit(hit, queryTitle);
+          item.firstOrder = Math.min(item.firstOrder, order);
         }
       }
+
+      const matches = [...matchesByAid.values()].sort((a, b) => {
+        if (b.matchCount !== a.matchCount) return b.matchCount - a.matchCount;
+        if (b.score !== a.score) return b.score - a.score;
+        if (a.firstOrder !== b.firstOrder) return a.firstOrder - b.firstOrder;
+        return Number(a.aid) - Number(b.aid);
+      });
+
+      return matches[0] || null;
+    }
+
+    function renderAutoTitleExactMatchResult(best, bangumiTitles) {
+      if (!best) {
+        setAutoMatchMessage("继续尝试手动标题搜索...", "empty");
+        return;
+      }
+
+      setAutoMatchMessage("已找到匹配，正在搜索截图...");
     }
 
     async function loadAniDbTitleIndex() {
@@ -1163,7 +2295,7 @@
 
       anidbTitleIndexPromise = (async () => {
         const loaded = await fetchAniDbTitlesXmlPreferLocal();
-        setStatus(`AniDB title dump 已加载（${loaded.sourceLabel}），正在解析标题索引...`);
+        setStatus("正在准备备用匹配...");
         const index = buildAniDbTitleIndex(loaded.xmlText);
         anidbTitleIndex = index;
         anidbTitleIndexSource = loaded.sourceLabel;
@@ -1253,7 +2385,7 @@
         if (panel) {
           panel.innerHTML = `
             <div style="margin-top: 8px;">已加载上传的 AniDB 标题索引：${escapeHtml(file.name)}</div>
-            <div class="fineprint">动画数：${index.animeCount}；标题记录：${index.titleCount}。现在可以点击“用 AniDB ID 搜 FanCaps”。</div>
+            <div class="fineprint">标题库已更新。</div>
           `;
         }
         setStatus(`已加载上传的 AniDB 标题索引：${file.name}。`);
@@ -1427,8 +2559,10 @@
       return `${FANCAPS_BASE}/search.php?q=${q}&animeCB=Anime&submit=Submit`;
     }
 
-    async function searchFanCaps(query) {
+    async function searchFanCaps(query, options = {}) {
       const searchUrl = buildFanCapsSearchUrl(query);
+      const isAuto = Boolean(options.auto);
+      const shouldAutoLoadImages = Boolean(options.autoLoadImages);
 
       fanCapsResultsEl.innerHTML = "";
       imagePanelEl.innerHTML = "";
@@ -1436,33 +2570,53 @@
       hideElement(imagePanelEl);
       imageItemsById.clear();
       episodeDetailStates.clear();
-      setProgress(0, false);
-      setStatus(`正在搜索 FanCaps：${query}`);
+      if (!isAuto) setProgress(0, false);
+      setStatus("正在搜索 FanCaps...");
 
       try {
-        const html = await fetchViaProxy(searchUrl);
-        const doc = parseHtml(html);
+        const pageHtml = await fetchViaProxy(searchUrl);
+        const doc = parseHtml(pageHtml);
         const results = parseFanCapsAnimeResults(doc, searchUrl);
 
-        renderFanCapsResults(query, searchUrl, results);
+        renderFanCapsResults(query, searchUrl, results, options);
         showElement(subjectDetailEl);
         showElement(fanCapsResultsEl);
-        setStatus(`FanCaps 搜索完成：${results.length} 个结果。可继续换标题搜索，或加载正确条目。`);
-        scrollToElement(fanCapsResultsEl);
+
+        if (results.length) {
+          if (shouldAutoLoadImages && results.length === 1) {
+            const item = results[0];
+            setStatus("已找到结果，正在加载图片...");
+            await sleep(120);
+            await loadFanCapsImages(item.url, item.title, { auto: true });
+          } else if (shouldAutoLoadImages && results.length > 1) {
+            setStatus(`找到 ${results.length} 个结果，请选择正确条目。`);
+            scrollToElement(fanCapsResultsEl);
+          } else {
+            setStatus(`找到 ${results.length} 个结果，请选择正确条目。`);
+            scrollToElement(fanCapsResultsEl);
+          }
+        } else {
+          setStatus(isAuto ? "继续尝试其它匹配方式..." : "没有找到结果，可以换一个标题搜索。");
+          scrollToElement(fanCapsResultsEl);
+        }
+
+        return results;
       } catch (err) {
         console.error(err);
         setStatus("FanCaps 解析失败：" + err.message);
         showElement(fanCapsResultsEl);
         fanCapsResultsEl.innerHTML = `
           <div class="panel">
-            <h2>FanCaps 解析失败</h2>
-            <div class="sub">当前代理没有成功返回 FanCaps 页面。</div>
+            <h2>搜索失败</h2>
+            <div class="sub">当前无法读取 FanCaps 页面，可以稍后重试或打开原页面。</div>
             <div class="toolbar" style="margin-top: 12px;">
               <a class="button" href="${escapeHtml(searchUrl)}" target="_blank" rel="noopener noreferrer">打开 FanCaps 搜索页</a>
             </div>
           </div>
         `;
         scrollToElement(fanCapsResultsEl);
+        if (isAuto) return null;
+        return null;
       }
     }
 
@@ -1566,21 +2720,25 @@
       return unique(urls);
     }
 
-    function renderFanCapsResults(query, searchUrl, results) {
+    function renderFanCapsResults(query, searchUrl, results, options = {}) {
+      const isAuto = Boolean(options.auto || options.autoLoadImages || options.quiet);
+      const hintText = isAuto
+        ? (results.length > 1 ? "找到多个结果，请选择正确条目。" : "正在加载图片...")
+        : "请选择正确条目。";
+
       fanCapsResultsEl.innerHTML = `
         <div class="panel">
-          <h2>Anime Results：${escapeHtml(query)}</h2>
-          <div class="hint">下一步：选择正确条目，点击“加载图片”。</div>
+          <h2>FanCaps 搜索结果</h2>
+          <div class="hint">${escapeHtml(hintText)}</div>
 
           <div class="result-list">
             ${
               results.length
                 ? results.map(renderFanCapsItem).join("")
-                : `<div class="empty">没有解析到 Anime Results。可以换一个候选标题。</div>`
+                : `<div class="empty">没有找到结果。可以换一个标题搜索。</div>`
             }
           </div>
           <div class="toolbar" style="margin-top: 12px;">
-            <button class="quiet" onclick="showSubjectDetail()">返回标题候选</button>
             <a class="button quiet" href="${escapeHtml(searchUrl)}" target="_blank" rel="noopener noreferrer">打开 FanCaps 搜索页</a>
           </div>
         </div>
@@ -1616,7 +2774,7 @@
       `;
     }
 
-    async function loadFanCapsImages(pageUrl, title = "") {
+    async function loadFanCapsImages(pageUrl, title = "", options = {}) {
       const labelText = getAnimationLabelText(title);
       currentLoadedAnimeLabel = labelText;
       imagePanelEl.innerHTML = "";
@@ -1634,7 +2792,7 @@
         showElement(imagePanelEl);
         const imageCount = episodeGroups.reduce((sum, ep) => sum + ep.images.length, 0);
         setProgress(100, false);
-        setStatus(`加载完成：${episodeGroups.length} 个分组，${imageCount} 张图片。`);
+        setStatus(`${options.auto ? "已自动加载图片" : "加载完成"}：${episodeGroups.length} 个分组，${imageCount} 张图片。`);
         scrollToElement(imagePanelEl);
       } catch (err) {
         console.error(err);
@@ -2143,6 +3301,16 @@
       if (basketCount) basketCount.textContent = selectedImages.size;
       const floatCount = document.getElementById("floatSelectedCount");
       if (floatCount) floatCount.textContent = selectedImages.size;
+      updateAutoActionButtons();
+    }
+
+    function updateAutoActionButtons() {
+      for (const button of [...document.querySelectorAll("[data-auto-add-selected]")]) {
+        button.disabled = !autoDraft.length;
+      }
+      for (const button of [...document.querySelectorAll("[data-auto-copy-export]")]) {
+        button.disabled = !selectedImages.size;
+      }
     }
 
     async function selectEpisodeTop(episodeTitle) {
@@ -2542,7 +3710,7 @@
           ${
             items.length
               ? `<div class="basket-grid">${items.map(({ id, item }) => renderBasketCard(id, item)).join("")}</div>`
-              : `<div class="empty">还没有选择图片。先在下方搜索动画，进入 FanCaps 结果后勾选截图。</div>`
+              : `<div class="empty">还没有选择图片。可以手动搜索挑图，也可以用自动出题生成题单。</div>`
           }
         </div>
       `;
