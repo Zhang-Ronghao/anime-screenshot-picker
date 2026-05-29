@@ -2730,6 +2730,7 @@
             <button type="button" class="light" onclick="addAutoDraftToSelected()">把草稿加入已选</button>
             <button type="button" onclick="copyAutoDraftJsonl()">复制草稿题单</button>
             <button type="button" onclick="exportAutoDraftJsonl()">导出草稿题单</button>
+            <button type="button" onclick="downloadAutoDraftImages()">下载草稿图片</button>
           </div>
         </div>
       `;
@@ -3057,6 +3058,63 @@
       const text = getAutoDraftJsonlText();
       downloadBlob(new Blob([text], { type: "application/x-ndjson" }), "fancaps-auto-question-list.jsonl");
       announceDelight("exportDraft", autoDraft.length);
+    }
+
+    async function downloadAutoDraftImages() {
+      if (!autoDraft.length) {
+        setStatus("还没有题单草稿。请先生成题单草稿。");
+        return;
+      }
+
+      const entries = autoDraft
+        .map((item, index) => ({
+          item,
+          index,
+          url: item.imageUrl || ""
+        }))
+        .filter(entry => entry.url);
+
+      if (!entries.length) {
+        setStatus("草稿里没有可下载的图片地址。");
+        return;
+      }
+
+      let successCount = 0;
+      let failCount = 0;
+      setProgress(0, true);
+
+      for (let i = 0; i < entries.length; i++) {
+        const entry = entries[i];
+        const current = i + 1;
+        setProgress(Math.round((i / entries.length) * 100), true);
+        setStatus(`正在下载草稿图片 ${current}/${entries.length}...`);
+
+        try {
+          const blob = await fetchImageBlob(entry.url);
+          const filename = makeAutoDraftImageFilename(entry.item, current, entry.url, blob);
+          downloadBlob(blob, filename, "");
+          successCount++;
+          await sleep(280);
+        } catch {
+          failCount++;
+        }
+      }
+
+      setProgress(100, false);
+
+      if (successCount && !failCount) {
+        announceDelight("downloadDraftImages", successCount);
+        return;
+      }
+
+      if (successCount) {
+        const text = `已开始下载 ${successCount} 张草稿图片，${failCount} 张失败。`;
+        setStatus(text);
+        showDelightToast(text);
+        return;
+      }
+
+      setStatus("草稿图片下载失败。请检查连接方式后重试。");
     }
 
     function addAutoDraftToSelected() {
@@ -5359,6 +5417,13 @@
       return `fancaps-selected-${padded}-${hashString(key)}.${ext}`;
     }
 
+    function makeAutoDraftImageFilename(item, index, url, blob) {
+      const padded = String(index).padStart(3, "0");
+      const key = url || item.imageUrl || padded;
+      const ext = getImageExtension(key, blob?.type);
+      return `fancaps-draft-${padded}-${hashString(key)}.${ext}`;
+    }
+
     function getImageExtension(url, contentType = "") {
       const type = String(contentType || "").split(";")[0].trim().toLowerCase();
       const byType = {
@@ -5412,6 +5477,10 @@
         exportDraft: [
           `已导出 ${safeCount} 条草稿题单。`,
           `草稿题单已落盘，${safeCount} 题可以继续复查。`
+        ],
+        downloadDraftImages: [
+          `已开始下载 ${safeCount} 张草稿图片。`,
+          `草稿图片下载已开始，${safeCount} 张已排进浏览器下载。`
         ],
         copySelected: [
           `已复制 ${safeCount} 条题单数据，可以直接粘贴使用。`,
