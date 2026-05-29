@@ -5346,7 +5346,7 @@
           const res = await fetch(proxied, { method: "GET", headers: { "Accept": "image/*,*/*;q=0.8" } });
           if (!res.ok) throw new Error(`图片下载失败：HTTP ${res.status}`);
           const blob = await res.blob();
-          if (!blob.size) throw new Error("图片下载失败：空文件");
+          await assertImageBlob(blob);
           return blob;
         } catch (err) {
           lastError = err;
@@ -5362,16 +5362,56 @@
         });
         if (!res.ok) throw new Error(`图片下载失败：HTTP ${res.status}`);
         const blob = await res.blob();
-        if (!blob.size) throw new Error("图片下载失败：空文件");
+        await assertImageBlob(blob);
         return blob;
       } catch (err) {
         throw lastError || err;
       }
     }
 
+    async function assertImageBlob(blob) {
+      if (!blob.size) throw new Error("图片下载失败：空文件");
+      const bytes = new Uint8Array(await blob.slice(0, 32).arrayBuffer());
+      if (isProbablyImageBlob(blob.type, bytes)) return;
+      throw new Error(`图片下载失败：返回的不是图片（${blob.type || "未知类型"}，${blob.size} 字节）`);
+    }
+
+    function isProbablyImageBlob(contentType, bytes) {
+      const type = String(contentType || "").split(";")[0].trim().toLowerCase();
+      if (type.startsWith("image/")) return true;
+      if (bytes.length >= 3 && bytes[0] === 0xff && bytes[1] === 0xd8 && bytes[2] === 0xff) return true;
+      if (
+        bytes.length >= 8 &&
+        bytes[0] === 0x89 &&
+        bytes[1] === 0x50 &&
+        bytes[2] === 0x4e &&
+        bytes[3] === 0x47 &&
+        bytes[4] === 0x0d &&
+        bytes[5] === 0x0a &&
+        bytes[6] === 0x1a &&
+        bytes[7] === 0x0a
+      ) return true;
+      if (bytes.length >= 6 && bytes[0] === 0x47 && bytes[1] === 0x49 && bytes[2] === 0x46) return true;
+      if (
+        bytes.length >= 12 &&
+        bytes[0] === 0x52 &&
+        bytes[1] === 0x49 &&
+        bytes[2] === 0x46 &&
+        bytes[3] === 0x46 &&
+        bytes[8] === 0x57 &&
+        bytes[9] === 0x45 &&
+        bytes[10] === 0x42 &&
+        bytes[11] === 0x50
+      ) return true;
+      return false;
+    }
+
     function getImageFetchProxyCandidates() {
       return unique([
         proxyInput.value.trim(),
+        `${window.location.origin}/proxy?url=`,
+        "http://127.0.0.1:8003/proxy?url=",
+        "http://localhost:8003/proxy?url=",
         "https://corsproxy.io/?url=",
         "https://api.allorigins.win/raw?url=",
         "https://api.codetabs.com/v1/proxy?quest="
@@ -5382,6 +5422,7 @@
       const files = [];
       let successCount = 0;
       let failCount = 0;
+      let lastFailureText = "";
       setProgress(0, true);
 
       for (let i = 0; i < entries.length; i++) {
@@ -5398,15 +5439,17 @@
             data: new Uint8Array(await blob.arrayBuffer())
           });
           successCount++;
-        } catch {
+        } catch (err) {
           failCount++;
+          lastFailureText = err?.message || String(err || "未知错误");
+          console.warn("图片打包失败", entry.url, err);
           if (typeof options.onFailure === "function") options.onFailure(entry);
         }
       }
 
       if (!files.length) {
         setProgress(100, false);
-        setStatus(options.failureText);
+        setStatus(`${options.failureText}${lastFailureText ? ` 详情：${lastFailureText}` : ""}`);
         return;
       }
 
