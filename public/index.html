@@ -2730,7 +2730,7 @@
             <button type="button" class="light" onclick="addAutoDraftToSelected()">把草稿加入已选</button>
             <button type="button" onclick="copyAutoDraftJsonl()">复制草稿题单</button>
             <button type="button" onclick="exportAutoDraftJsonl()">导出草稿题单</button>
-            <button type="button" onclick="downloadAutoDraftImages()">下载草稿图片</button>
+            <button type="button" onclick="downloadAutoDraftImages()">下载草稿图片ZIP</button>
           </div>
         </div>
       `;
@@ -3079,42 +3079,14 @@
         return;
       }
 
-      let successCount = 0;
-      let failCount = 0;
-      setProgress(0, true);
-
-      for (let i = 0; i < entries.length; i++) {
-        const entry = entries[i];
-        const current = i + 1;
-        setProgress(Math.round((i / entries.length) * 100), true);
-        setStatus(`正在下载草稿图片 ${current}/${entries.length}...`);
-
-        try {
-          const blob = await fetchImageBlob(entry.url);
-          const filename = makeAutoDraftImageFilename(entry.item, current, entry.url, blob);
-          downloadBlob(blob, filename, "");
-          successCount++;
-          await sleep(280);
-        } catch {
-          failCount++;
-        }
-      }
-
-      setProgress(100, false);
-
-      if (successCount && !failCount) {
-        announceDelight("downloadDraftImages", successCount);
-        return;
-      }
-
-      if (successCount) {
-        const text = `已开始下载 ${successCount} 张草稿图片，${failCount} 张失败。`;
-        setStatus(text);
-        showDelightToast(text);
-        return;
-      }
-
-      setStatus("草稿图片下载失败。请检查连接方式后重试。");
+      await downloadImageEntriesAsZip(entries, {
+        label: "草稿图片",
+        successType: "downloadDraftImages",
+        folderName: makeDownloadFolderName("fancaps-draft-images"),
+        makeFilename: makeAutoDraftImageFilename,
+        partialText: (successCount, failCount) => `已打包 ${successCount} 张草稿图片，${failCount} 张失败。`,
+        failureText: "草稿图片打包失败。请检查连接方式后重试。"
+      });
     }
 
     function addAutoDraftToSelected() {
@@ -5117,7 +5089,7 @@
             <div class="toolbar">
               <button onclick="copySelectedJsonl()" ${items.length ? "" : "disabled"}>复制题单</button>
               <button onclick="exportJsonl()" ${items.length ? "" : "disabled"}>导出题单</button>
-              <button onclick="downloadSelectedImages()" ${items.length ? "" : "disabled"}>下载图片</button>
+              <button onclick="downloadSelectedImages()" ${items.length ? "" : "disabled"}>下载图片ZIP</button>
               <button onclick="clearSelectedImages()" ${items.length ? "" : "disabled"}>清空已选</button>
               <button class="quiet" onclick="scrollToTopSearch()">继续搜索</button>
               <span class="pill">已选：<span id="basketCount" class="selectedCount">${items.length}</span></span>
@@ -5291,6 +5263,13 @@
         return;
       }
 
+      const currentEntries = [...selectedImages.values()]
+        .filter(item => item.originalUrl || item.thumbUrl);
+      if (!currentEntries.length) {
+        setStatus("没有找到可下载的图片地址。");
+        return;
+      }
+
       await resolveAllSelectedOriginals();
 
       const entries = [...selectedImages.entries()]
@@ -5306,43 +5285,15 @@
         return;
       }
 
-      let successCount = 0;
-      let failCount = 0;
-      setProgress(0, true);
-
-      for (let i = 0; i < entries.length; i++) {
-        const entry = entries[i];
-        const current = i + 1;
-        setProgress(Math.round((i / entries.length) * 100), true);
-        setStatus(`正在下载图片 ${current}/${entries.length}...`);
-
-        try {
-          const blob = await fetchImageBlob(entry.url);
-          const filename = makeSelectedImageFilename(entry.item, current, entry.url, blob);
-          downloadBlob(blob, filename, "");
-          successCount++;
-          await sleep(280);
-        } catch (err) {
-          failCount++;
-          updateImageState(entry.id, "下载失败");
-        }
-      }
-
-      setProgress(100, false);
-
-      if (successCount && !failCount) {
-        announceDelight("downloadSelectedImages", successCount);
-        return;
-      }
-
-      if (successCount) {
-        const text = `已开始下载 ${successCount} 张图片，${failCount} 张失败。`;
-        setStatus(text);
-        showDelightToast(text);
-        return;
-      }
-
-      setStatus("图片下载失败。请检查连接方式后重试。");
+      await downloadImageEntriesAsZip(entries, {
+        label: "图片",
+        successType: "downloadSelectedImages",
+        folderName: makeDownloadFolderName("fancaps-selected-images"),
+        makeFilename: makeSelectedImageFilename,
+        onFailure: entry => updateImageState(entry.id, "打包失败"),
+        partialText: (successCount, failCount) => `已打包 ${successCount} 张图片，${failCount} 张失败。`,
+        failureText: "图片打包失败。请检查连接方式后重试。"
+      });
     }
 
     async function exportJson() {
@@ -5387,27 +5338,216 @@
     }
 
     async function fetchImageBlob(targetUrl) {
-      const proxy = proxyInput.value.trim();
-      let proxyError = null;
+      let lastError = null;
 
-      if (proxy) {
+      for (const proxy of getImageFetchProxyCandidates()) {
         try {
           const proxied = proxy + encodeURIComponent(targetUrl);
-          const res = await fetch(proxied, { method: "GET" });
+          const res = await fetch(proxied, { method: "GET", headers: { "Accept": "image/*,*/*;q=0.8" } });
           if (!res.ok) throw new Error(`图片下载失败：HTTP ${res.status}`);
-          return await res.blob();
+          const blob = await res.blob();
+          if (!blob.size) throw new Error("图片下载失败：空文件");
+          return blob;
         } catch (err) {
-          proxyError = err;
+          lastError = err;
         }
       }
 
       try {
-        const res = await fetch(targetUrl, { method: "GET", mode: "cors", referrerPolicy: "no-referrer" });
+        const res = await fetch(targetUrl, {
+          method: "GET",
+          mode: "cors",
+          referrerPolicy: "no-referrer",
+          headers: { "Accept": "image/*,*/*;q=0.8" }
+        });
         if (!res.ok) throw new Error(`图片下载失败：HTTP ${res.status}`);
-        return await res.blob();
+        const blob = await res.blob();
+        if (!blob.size) throw new Error("图片下载失败：空文件");
+        return blob;
       } catch (err) {
-        throw proxyError || err;
+        throw lastError || err;
       }
+    }
+
+    function getImageFetchProxyCandidates() {
+      return unique([
+        proxyInput.value.trim(),
+        "https://corsproxy.io/?url=",
+        "https://api.allorigins.win/raw?url=",
+        "https://api.codetabs.com/v1/proxy?quest="
+      ]);
+    }
+
+    async function downloadImageEntriesAsZip(entries, options) {
+      const files = [];
+      let successCount = 0;
+      let failCount = 0;
+      setProgress(0, true);
+
+      for (let i = 0; i < entries.length; i++) {
+        const entry = entries[i];
+        const current = i + 1;
+        setProgress(Math.round((i / entries.length) * 82), true);
+        setStatus(`正在抓取${options.label} ${current}/${entries.length}...`);
+
+        try {
+          const blob = await fetchImageBlob(entry.url);
+          const filename = options.makeFilename(entry.item, current, entry.url, blob);
+          files.push({
+            name: `${options.folderName}/${filename}`,
+            data: new Uint8Array(await blob.arrayBuffer())
+          });
+          successCount++;
+        } catch {
+          failCount++;
+          if (typeof options.onFailure === "function") options.onFailure(entry);
+        }
+      }
+
+      if (!files.length) {
+        setProgress(100, false);
+        setStatus(options.failureText);
+        return;
+      }
+
+      setStatus(`正在生成 ZIP：${successCount} 张${options.label}...`);
+      setProgress(92, true);
+      const zipBlob = createZipBlob(files);
+      const zipFilename = options.zipFilename || `${options.folderName}.zip`;
+      downloadBlob(zipBlob, zipFilename, "");
+      setProgress(100, false);
+
+      if (!failCount) {
+        announceDelight(options.successType, successCount);
+        return;
+      }
+
+      const text = options.partialText(successCount, failCount);
+      setStatus(text);
+      showDelightToast(text);
+    }
+
+    function createZipBlob(files) {
+      const chunks = [];
+      const centralChunks = [];
+      let offset = 0;
+      const { date, time } = getZipDateTime(new Date());
+
+      for (const file of files) {
+        const nameBytes = new TextEncoder().encode(file.name.replace(/\\/g, "/"));
+        const data = file.data;
+        const crc = crc32(data);
+        const localHeader = createZipLocalHeader(nameBytes, data.length, crc, date, time);
+        const centralHeader = createZipCentralHeader(nameBytes, data.length, crc, offset, date, time);
+
+        chunks.push(localHeader, nameBytes, data);
+        centralChunks.push(centralHeader, nameBytes);
+        offset += localHeader.length + nameBytes.length + data.length;
+      }
+
+      const centralOffset = offset;
+      const centralSize = centralChunks.reduce((sum, chunk) => sum + chunk.length, 0);
+      const endRecord = createZipEndRecord(files.length, centralSize, centralOffset);
+      return new Blob([...chunks, ...centralChunks, endRecord], { type: "application/zip" });
+    }
+
+    function createZipLocalHeader(nameBytes, size, crc, date, time) {
+      const header = new Uint8Array(30);
+      const view = new DataView(header.buffer);
+      view.setUint32(0, 0x04034b50, true);
+      view.setUint16(4, 20, true);
+      view.setUint16(6, 0, true);
+      view.setUint16(8, 0, true);
+      view.setUint16(10, time, true);
+      view.setUint16(12, date, true);
+      view.setUint32(14, crc, true);
+      view.setUint32(18, size, true);
+      view.setUint32(22, size, true);
+      view.setUint16(26, nameBytes.length, true);
+      view.setUint16(28, 0, true);
+      return header;
+    }
+
+    function createZipCentralHeader(nameBytes, size, crc, offset, date, time) {
+      const header = new Uint8Array(46);
+      const view = new DataView(header.buffer);
+      view.setUint32(0, 0x02014b50, true);
+      view.setUint16(4, 20, true);
+      view.setUint16(6, 20, true);
+      view.setUint16(8, 0, true);
+      view.setUint16(10, 0, true);
+      view.setUint16(12, time, true);
+      view.setUint16(14, date, true);
+      view.setUint32(16, crc, true);
+      view.setUint32(20, size, true);
+      view.setUint32(24, size, true);
+      view.setUint16(28, nameBytes.length, true);
+      view.setUint16(30, 0, true);
+      view.setUint16(32, 0, true);
+      view.setUint16(34, 0, true);
+      view.setUint16(36, 0, true);
+      view.setUint32(38, 0, true);
+      view.setUint32(42, offset, true);
+      return header;
+    }
+
+    function createZipEndRecord(fileCount, centralSize, centralOffset) {
+      const header = new Uint8Array(22);
+      const view = new DataView(header.buffer);
+      view.setUint32(0, 0x06054b50, true);
+      view.setUint16(4, 0, true);
+      view.setUint16(6, 0, true);
+      view.setUint16(8, fileCount, true);
+      view.setUint16(10, fileCount, true);
+      view.setUint32(12, centralSize, true);
+      view.setUint32(16, centralOffset, true);
+      view.setUint16(20, 0, true);
+      return header;
+    }
+
+    function getZipDateTime(dateValue) {
+      const year = Math.max(1980, dateValue.getFullYear());
+      return {
+        date: ((year - 1980) << 9) | ((dateValue.getMonth() + 1) << 5) | dateValue.getDate(),
+        time: (dateValue.getHours() << 11) | (dateValue.getMinutes() << 5) | Math.floor(dateValue.getSeconds() / 2)
+      };
+    }
+
+    function crc32(data) {
+      const table = getCrc32Table();
+      let crc = 0xffffffff;
+      for (let i = 0; i < data.length; i++) {
+        crc = (crc >>> 8) ^ table[(crc ^ data[i]) & 0xff];
+      }
+      return (crc ^ 0xffffffff) >>> 0;
+    }
+
+    function getCrc32Table() {
+      if (getCrc32Table.table) return getCrc32Table.table;
+      const table = new Uint32Array(256);
+      for (let i = 0; i < 256; i++) {
+        let c = i;
+        for (let k = 0; k < 8; k++) {
+          c = c & 1 ? 0xedb88320 ^ (c >>> 1) : c >>> 1;
+        }
+        table[i] = c >>> 0;
+      }
+      getCrc32Table.table = table;
+      return table;
+    }
+
+    function makeDownloadFolderName(baseName) {
+      const now = new Date();
+      const parts = [
+        now.getFullYear(),
+        String(now.getMonth() + 1).padStart(2, "0"),
+        String(now.getDate()).padStart(2, "0"),
+        "-",
+        String(now.getHours()).padStart(2, "0"),
+        String(now.getMinutes()).padStart(2, "0"),
+        String(now.getSeconds()).padStart(2, "0")
+      ];
+      return `${baseName}-${parts.join("")}`;
     }
 
     function makeSelectedImageFilename(item, index, url, blob) {
@@ -5479,8 +5619,8 @@
           `草稿题单已落盘，${safeCount} 题可以继续复查。`
         ],
         downloadDraftImages: [
-          `已开始下载 ${safeCount} 张草稿图片。`,
-          `草稿图片下载已开始，${safeCount} 张已排进浏览器下载。`
+          `已下载 ${safeCount} 张草稿图片的 ZIP。`,
+          `草稿图片 ZIP 已生成，${safeCount} 张都在压缩包里。`
         ],
         copySelected: [
           `已复制 ${safeCount} 条题单数据，可以直接粘贴使用。`,
@@ -5491,8 +5631,8 @@
           `题单已导出，${safeCount} 张截图可以开局。`
         ],
         downloadSelectedImages: [
-          `已开始下载 ${safeCount} 张图片。`,
-          `图片下载已开始，${safeCount} 张已排进浏览器下载。`
+          `已下载 ${safeCount} 张图片的 ZIP。`,
+          `图片 ZIP 已生成，${safeCount} 张都在压缩包里。`
         ],
         addDraft: [
           `已把 ${safeCount} 张草稿截图放入已选，导出前再扫一眼。`,
