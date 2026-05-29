@@ -5059,6 +5059,7 @@
             <div class="toolbar">
               <button onclick="copySelectedJsonl()" ${items.length ? "" : "disabled"}>复制题单</button>
               <button onclick="exportJsonl()" ${items.length ? "" : "disabled"}>导出题单</button>
+              <button onclick="downloadSelectedImages()" ${items.length ? "" : "disabled"}>下载图片</button>
               <button onclick="clearSelectedImages()" ${items.length ? "" : "disabled"}>清空已选</button>
               <button class="quiet" onclick="scrollToTopSearch()">继续搜索</button>
               <span class="pill">已选：<span id="basketCount" class="selectedCount">${items.length}</span></span>
@@ -5226,6 +5227,66 @@
       announceDelight("exportSelected", selectedImages.size);
     }
 
+    async function downloadSelectedImages() {
+      if (!selectedImages.size) {
+        setStatus("还没有选择截图。请先勾选想下载的截图。");
+        return;
+      }
+
+      await resolveAllSelectedOriginals();
+
+      const entries = [...selectedImages.entries()]
+        .map(([id, item]) => ({
+          id,
+          item,
+          url: item.originalUrl || item.thumbUrl || ""
+        }))
+        .filter(entry => entry.url);
+
+      if (!entries.length) {
+        setStatus("没有找到可下载的图片地址。");
+        return;
+      }
+
+      let successCount = 0;
+      let failCount = 0;
+      setProgress(0, true);
+
+      for (let i = 0; i < entries.length; i++) {
+        const entry = entries[i];
+        const current = i + 1;
+        setProgress(Math.round((i / entries.length) * 100), true);
+        setStatus(`正在下载图片 ${current}/${entries.length}...`);
+
+        try {
+          const blob = await fetchImageBlob(entry.url);
+          const filename = makeSelectedImageFilename(entry.item, current, entry.url, blob);
+          downloadBlob(blob, filename, "");
+          successCount++;
+          await sleep(280);
+        } catch (err) {
+          failCount++;
+          updateImageState(entry.id, "下载失败");
+        }
+      }
+
+      setProgress(100, false);
+
+      if (successCount && !failCount) {
+        announceDelight("downloadSelectedImages", successCount);
+        return;
+      }
+
+      if (successCount) {
+        const text = `已开始下载 ${successCount} 张图片，${failCount} 张失败。`;
+        setStatus(text);
+        showDelightToast(text);
+        return;
+      }
+
+      setStatus("图片下载失败。请检查连接方式后重试。");
+    }
+
     async function exportJson() {
       if (!selectedImages.size) {
         setStatus("还没有选择截图。请先勾选想加入题单的截图。");
@@ -5267,7 +5328,62 @@
       renderSelectedBasket();
     }
 
-    function downloadBlob(blob, filename) {
+    async function fetchImageBlob(targetUrl) {
+      const proxy = proxyInput.value.trim();
+      let proxyError = null;
+
+      if (proxy) {
+        try {
+          const proxied = proxy + encodeURIComponent(targetUrl);
+          const res = await fetch(proxied, { method: "GET" });
+          if (!res.ok) throw new Error(`图片下载失败：HTTP ${res.status}`);
+          return await res.blob();
+        } catch (err) {
+          proxyError = err;
+        }
+      }
+
+      try {
+        const res = await fetch(targetUrl, { method: "GET", mode: "cors", referrerPolicy: "no-referrer" });
+        if (!res.ok) throw new Error(`图片下载失败：HTTP ${res.status}`);
+        return await res.blob();
+      } catch (err) {
+        throw proxyError || err;
+      }
+    }
+
+    function makeSelectedImageFilename(item, index, url, blob) {
+      const padded = String(index).padStart(3, "0");
+      const key = url || item.originalUrl || item.thumbUrl || padded;
+      const ext = getImageExtension(key, blob?.type);
+      return `fancaps-selected-${padded}-${hashString(key)}.${ext}`;
+    }
+
+    function getImageExtension(url, contentType = "") {
+      const type = String(contentType || "").split(";")[0].trim().toLowerCase();
+      const byType = {
+        "image/jpeg": "jpg",
+        "image/jpg": "jpg",
+        "image/png": "png",
+        "image/webp": "webp",
+        "image/gif": "gif",
+        "image/avif": "avif"
+      };
+      if (byType[type]) return byType[type];
+
+      try {
+        const pathname = new URL(url).pathname;
+        const match = pathname.match(/\.([a-z0-9]{2,5})$/i);
+        const ext = match ? match[1].toLowerCase() : "";
+        if (["jpg", "jpeg", "png", "webp", "gif", "avif"].includes(ext)) {
+          return ext === "jpeg" ? "jpg" : ext;
+        }
+      } catch {}
+
+      return "jpg";
+    }
+
+    function downloadBlob(blob, filename, statusText = `已导出题单：${filename}`) {
       const a = document.createElement("a");
       const url = URL.createObjectURL(blob);
       a.href = url;
@@ -5275,8 +5391,8 @@
       document.body.appendChild(a);
       a.click();
       a.remove();
-      URL.revokeObjectURL(url);
-      setStatus(`已导出题单：${filename}`);
+      window.setTimeout(() => URL.revokeObjectURL(url), 1000);
+      if (statusText) setStatus(statusText);
     }
 
     function announceDelight(type, count, burst = true) {
@@ -5304,6 +5420,10 @@
         exportSelected: [
           `已导出 ${safeCount} 题，截图题单装好了。`,
           `题单已导出，${safeCount} 张截图可以开局。`
+        ],
+        downloadSelectedImages: [
+          `已开始下载 ${safeCount} 张图片。`,
+          `图片下载已开始，${safeCount} 张已排进浏览器下载。`
         ],
         addDraft: [
           `已把 ${safeCount} 张草稿截图放入已选，导出前再扫一眼。`,
