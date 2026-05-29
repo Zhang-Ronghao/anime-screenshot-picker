@@ -6,15 +6,15 @@
   <title>动画截图出题工具</title>
   <style>
     :root {
-      --bg: oklch(0.976 0.012 343);
+      --bg: oklch(0.986 0.006 343);
       --panel: oklch(0.993 0.007 350);
       --panel-rgb: 255 251 252;
-      --panel-soft: oklch(0.948 0.018 340);
-      --panel-soft-hover: oklch(0.925 0.026 338);
+      --panel-soft: oklch(0.958 0.012 340);
+      --panel-soft-hover: oklch(0.938 0.018 338);
       --text: oklch(0.225 0.024 303);
       --muted: oklch(0.49 0.028 305);
       --border: oklch(0.875 0.022 330);
-      --soft: oklch(0.944 0.018 326);
+      --soft: oklch(0.956 0.012 326);
       --dark: oklch(0.31 0.075 292);
       --dark-hover: oklch(0.245 0.085 292);
       --secondary: oklch(0.36 0.065 250);
@@ -99,9 +99,9 @@
       padding: 34px 18px 112px;
       overflow-x: hidden;
       background:
-        radial-gradient(circle at 10% 0%, oklch(0.985 0.032 350 / 0.72), transparent 32rem),
-        radial-gradient(circle at 90% 16%, oklch(0.965 0.038 220 / 0.55), transparent 30rem),
-        linear-gradient(180deg, oklch(0.985 0.012 350), var(--bg) 34rem);
+        radial-gradient(circle at 10% 0%, oklch(0.992 0.018 350 / 0.42), transparent 32rem),
+        radial-gradient(circle at 90% 16%, oklch(0.982 0.022 220 / 0.30), transparent 30rem),
+        linear-gradient(180deg, oklch(0.992 0.006 350), var(--bg) 34rem);
       color: var(--text);
     }
 
@@ -116,24 +116,24 @@
       inset: 0;
       z-index: 0;
       background-image:
-        linear-gradient(90deg, oklch(0.985 0.012 350 / 0.90) 0%, oklch(0.985 0.012 350 / 0.68) 42%, oklch(0.985 0.012 350 / 0.82) 100%),
-        linear-gradient(180deg, oklch(0.985 0.012 350 / 0.62) 0%, var(--bg) 88%),
+        linear-gradient(90deg, oklch(0.992 0.006 350 / 0.94) 0%, oklch(0.992 0.006 350 / 0.80) 42%, oklch(0.992 0.006 350 / 0.90) 100%),
+        linear-gradient(180deg, oklch(0.992 0.006 350 / 0.78) 0%, var(--bg) 88%),
         var(--anime-bg-image);
       background-size: cover;
       background-position: center top;
-      opacity: 0.46;
-      filter: saturate(0.90) brightness(1.13);
+      opacity: 0.24;
+      filter: saturate(0.62) brightness(1.20);
     }
 
     body::after {
       inset: 0;
       z-index: 0;
       background:
-        linear-gradient(90deg, oklch(0.70 0.045 330 / 0.09) 1px, transparent 1px),
-        linear-gradient(180deg, oklch(0.70 0.045 330 / 0.08) 1px, transparent 1px),
-        radial-gradient(circle at 18px 18px, oklch(0.67 0.075 350 / 0.08) 1px, transparent 1.5px);
+        linear-gradient(90deg, oklch(0.74 0.026 330 / 0.06) 1px, transparent 1px),
+        linear-gradient(180deg, oklch(0.74 0.026 330 / 0.055) 1px, transparent 1px),
+        radial-gradient(circle at 18px 18px, oklch(0.70 0.044 350 / 0.055) 1px, transparent 1.5px);
       background-size: 42px 42px, 42px 42px, 84px 84px;
-      opacity: 0.42;
+      opacity: 0.24;
     }
 
     .anime-bg-art {
@@ -144,8 +144,8 @@
       height: 100vh;
       object-fit: cover;
       object-position: center top;
-      opacity: 0.12;
-      filter: saturate(0.92) brightness(1.08);
+      opacity: 0.055;
+      filter: saturate(0.62) brightness(1.18);
       pointer-events: none;
       user-select: none;
     }
@@ -213,16 +213,14 @@
 
     .app-header-title-led {
       max-width: var(--page-max);
-      min-height: 220px;
-      padding: 24px 28px 28px;
-      border: 1px solid color-mix(in oklch, var(--selected-border) 42%, var(--border));
+      min-height: 196px;
+      padding: 22px 28px 26px;
+      border: 1px solid color-mix(in oklch, var(--selected-border) 26%, var(--border));
       border-radius: 18px;
       background:
-        linear-gradient(102deg, rgb(var(--panel-rgb) / 0.94) 0%, rgb(var(--panel-rgb) / 0.80) 58%, rgb(var(--panel-rgb) / 0.54) 100%),
-        var(--anime-bg-image);
-      background-size: cover;
-      background-position: center 28%;
-      box-shadow: 0 18px 54px rgb(var(--shadow-ink) / 0.10);
+        linear-gradient(102deg, rgb(var(--panel-rgb) / 0.72) 0%, rgb(var(--panel-rgb) / 0.54) 58%, rgb(var(--panel-rgb) / 0.32) 100%),
+        radial-gradient(circle at 92% 18%, color-mix(in oklch, var(--sky-wash) 36%, transparent), transparent 16rem);
+      box-shadow: 0 14px 40px rgb(var(--shadow-ink) / 0.055);
       overflow: hidden;
       isolation: isolate;
       display: flex;
@@ -235,9 +233,9 @@
       position: absolute;
       inset: 9px;
       z-index: -1;
-      border: 1px solid color-mix(in oklch, var(--selected-border) 38%, transparent);
+      border: 1px solid color-mix(in oklch, var(--selected-border) 20%, transparent);
       border-radius: 13px;
-      opacity: 0.8;
+      opacity: 0.46;
     }
 
     .app-header-title-led::after {
@@ -1961,7 +1959,6 @@
 
     .app-header-title-led .sub {
       color: color-mix(in oklch, var(--muted) 88%, var(--text));
-      text-shadow: 0 1px 0 rgb(var(--panel-rgb) / 0.78);
     }
 
     main {
@@ -2056,8 +2053,8 @@
     .mode-panel {
       border-color: color-mix(in oklch, var(--selected-border) 36%, var(--border));
       background:
-        linear-gradient(90deg, color-mix(in oklch, var(--panel) 84%, var(--selected-wash)), color-mix(in oklch, var(--panel) 86%, var(--sky-wash)));
-      box-shadow: 0 10px 28px rgb(var(--shadow-ink) / 0.07);
+        linear-gradient(90deg, color-mix(in oklch, var(--panel) 91%, var(--selected-wash)), color-mix(in oklch, var(--panel) 92%, var(--sky-wash)));
+      box-shadow: 0 8px 22px rgb(var(--shadow-ink) / 0.045);
     }
 
     .mode-button.active {
@@ -2071,8 +2068,8 @@
       overflow: hidden;
       border-color: color-mix(in oklch, var(--info-border) 70%, var(--selected-border));
       background:
-        linear-gradient(90deg, color-mix(in oklch, var(--sky-wash) 66%, var(--panel)), color-mix(in oklch, var(--selected-wash) 38%, var(--panel)));
-      box-shadow: 0 8px 22px rgb(var(--shadow-ink) / 0.055);
+        linear-gradient(90deg, color-mix(in oklch, var(--sky-wash) 40%, var(--panel)), color-mix(in oklch, var(--selected-wash) 22%, var(--panel)));
+      box-shadow: 0 7px 18px rgb(var(--shadow-ink) / 0.04);
     }
 
     .shared-status-panel::after {
@@ -2202,11 +2199,11 @@
 
       body::before {
         background-position: 56% top;
-        opacity: 0.34;
+        opacity: 0.18;
       }
 
       .anime-bg-art {
-        opacity: 0.065;
+        opacity: 0.04;
         object-position: 56% top;
       }
 
@@ -2215,10 +2212,8 @@
         padding: 18px 16px;
         border-radius: 16px;
         background:
-          linear-gradient(115deg, rgb(var(--panel-rgb) / 0.96) 0%, rgb(var(--panel-rgb) / 0.90) 72%, rgb(var(--panel-rgb) / 0.62) 100%),
-          var(--anime-bg-image);
-        background-size: cover;
-        background-position: 58% 24%;
+          linear-gradient(115deg, rgb(var(--panel-rgb) / 0.72) 0%, rgb(var(--panel-rgb) / 0.58) 72%, rgb(var(--panel-rgb) / 0.38) 100%),
+          radial-gradient(circle at 88% 20%, color-mix(in oklch, var(--sky-wash) 30%, transparent), transparent 12rem);
       }
     }
 
