@@ -3,81 +3,440 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Anime Screenshot Picker</title>
+  <title>动画截图出题工具</title>
   <style>
     :root {
-      --bg: #f7f7f8;
-      --panel: #ffffff;
-      --text: #222222;
-      --muted: #666666;
-      --border: #e2e2e2;
-      --soft: #f1f1f1;
-      --dark: #333333;
-      --dark-hover: #111111;
-      --secondary: #777777;
-      --selected: #111111;
+      --bg: oklch(0.976 0.012 343);
+      --panel: oklch(0.993 0.007 350);
+      --panel-rgb: 255 251 252;
+      --panel-soft: oklch(0.948 0.018 340);
+      --panel-soft-hover: oklch(0.925 0.026 338);
+      --text: oklch(0.225 0.024 303);
+      --muted: oklch(0.49 0.028 305);
+      --border: oklch(0.875 0.022 330);
+      --soft: oklch(0.944 0.018 326);
+      --dark: oklch(0.31 0.075 292);
+      --dark-hover: oklch(0.245 0.085 292);
+      --secondary: oklch(0.36 0.065 250);
+      --secondary-hover: oklch(0.29 0.072 250);
+      --info: oklch(0.50 0.105 231);
+      --info-border: oklch(0.78 0.065 226);
+      --info-wash: oklch(0.958 0.03 228);
+      --success: oklch(0.46 0.088 158);
+      --success-border: oklch(0.77 0.066 158);
+      --success-wash: oklch(0.962 0.026 158);
+      --warning: oklch(0.56 0.116 76);
+      --warning-border: oklch(0.80 0.094 76);
+      --warning-wash: oklch(0.968 0.036 76);
+      --danger: oklch(0.50 0.145 24);
+      --danger-hover: oklch(0.42 0.15 24);
+      --selected: oklch(0.55 0.17 352);
+      --selected-border: oklch(0.80 0.085 352);
+      --selected-wash: oklch(0.958 0.034 352);
+      --focus-ring: oklch(0.74 0.12 352);
+      --focus-ring-soft: oklch(0.74 0.12 352 / 0.25);
+      --sky-wash: oklch(0.956 0.036 219);
+      --lilac-wash: oklch(0.955 0.036 302);
+      --mint-wash: oklch(0.961 0.03 166);
+      --anime-bg-image: url("background.jpg");
+      --shadow-ink: 42 32 50;
+      --ease-out: cubic-bezier(0.22, 1, 0.36, 1);
+      --ease-out-quart: cubic-bezier(0.25, 1, 0.5, 1);
+      --ease-out-expo: cubic-bezier(0.16, 1, 0.3, 1);
+      --motion-fast: 150ms;
+      --motion-base: 220ms;
+      --motion-slow: 340ms;
+      --control-height: 38px;
+      --touch-target: 44px;
+      --space-2xs: 4px;
+      --space-xs: 8px;
+      --space-sm: 12px;
+      --space-md: 16px;
+      --space-lg: 24px;
+      --space-xl: 32px;
+      --space-2xl: 48px;
+      --page-max: 1240px;
+      --z-floating: 40;
+      --z-modal: 80;
+      --font-ui: -apple-system, BlinkMacSystemFont, "Segoe UI", "Microsoft YaHei", "PingFang SC", system-ui, sans-serif;
+      --text-xs: 0.75rem;
+      --text-sm: 0.8125rem;
+      --text-ui: 0.875rem;
+      --text-control: 0.9375rem;
+      --text-body: 1rem;
+      --text-title: 1.125rem;
+      --text-heading: 1.375rem;
+      --text-display: 2rem;
+      --leading-tight: 1.15;
+      --leading-title: 1.25;
+      --leading-ui: 1.35;
+      --leading-body: 1.55;
+      --weight-regular: 400;
+      --weight-medium: 550;
+      --weight-semibold: 650;
+      --weight-bold: 750;
     }
 
     * { box-sizing: border-box; }
 
-    body {
-      font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
-      max-width: 1200px;
-      margin: 32px auto;
-      padding: 0 18px 56px;
+    html {
+      font-size: 100%;
+      text-size-adjust: 100%;
+      -webkit-text-size-adjust: 100%;
       background: var(--bg);
+    }
+
+    body {
+      position: relative;
+      font-family: var(--font-ui);
+      font-size: var(--text-body);
+      font-weight: var(--weight-regular);
+      line-height: var(--leading-body);
+      font-kerning: normal;
+      text-rendering: optimizeLegibility;
+      min-height: 100vh;
+      margin: 0;
+      padding: 34px 18px 112px;
+      overflow-x: hidden;
+      background:
+        radial-gradient(circle at 10% 0%, oklch(0.985 0.032 350 / 0.72), transparent 32rem),
+        radial-gradient(circle at 90% 16%, oklch(0.965 0.038 220 / 0.55), transparent 30rem),
+        linear-gradient(180deg, oklch(0.985 0.012 350), var(--bg) 34rem);
       color: var(--text);
     }
 
+    body::before,
+    body::after {
+      content: "";
+      position: fixed;
+      pointer-events: none;
+    }
+
+    body::before {
+      inset: 0;
+      z-index: 0;
+      background-image:
+        linear-gradient(90deg, oklch(0.985 0.012 350 / 0.90) 0%, oklch(0.985 0.012 350 / 0.68) 42%, oklch(0.985 0.012 350 / 0.82) 100%),
+        linear-gradient(180deg, oklch(0.985 0.012 350 / 0.62) 0%, var(--bg) 88%),
+        var(--anime-bg-image);
+      background-size: cover;
+      background-position: center top;
+      opacity: 0.46;
+      filter: saturate(0.90) brightness(1.13);
+    }
+
+    body::after {
+      inset: 0;
+      z-index: 0;
+      background:
+        linear-gradient(90deg, oklch(0.70 0.045 330 / 0.09) 1px, transparent 1px),
+        linear-gradient(180deg, oklch(0.70 0.045 330 / 0.08) 1px, transparent 1px),
+        radial-gradient(circle at 18px 18px, oklch(0.67 0.075 350 / 0.08) 1px, transparent 1.5px);
+      background-size: 42px 42px, 42px 42px, 84px 84px;
+      opacity: 0.42;
+    }
+
+    .anime-bg-art {
+      position: fixed;
+      inset: 0;
+      z-index: 0;
+      width: 100vw;
+      height: 100vh;
+      object-fit: cover;
+      object-position: center top;
+      opacity: 0.12;
+      filter: saturate(0.92) brightness(1.08);
+      pointer-events: none;
+      user-select: none;
+    }
+
+    .app-header,
+    main {
+      position: relative;
+      z-index: 1;
+    }
+
+    img {
+      max-width: 100%;
+    }
+
+    main {
+      max-width: var(--page-max);
+      margin-inline: auto;
+      margin-top: var(--space-lg);
+    }
+
     h1 {
-      font-size: 23px;
+      color: var(--text);
+      font-size: var(--text-heading);
+      font-weight: var(--weight-bold);
+      line-height: var(--leading-title);
+      letter-spacing: 0;
       margin: 0 0 14px;
     }
 
     h2 {
-      font-size: 18px;
+      color: var(--text);
+      font-size: var(--text-title);
+      font-weight: var(--weight-bold);
+      line-height: var(--leading-title);
+      letter-spacing: 0;
       margin: 0 0 14px;
     }
 
     h3 {
-      font-size: 16px;
+      color: var(--text);
+      font-size: var(--text-body);
+      font-weight: var(--weight-bold);
+      line-height: var(--leading-ui);
+      letter-spacing: 0;
       margin: 0 0 10px;
     }
 
+    p,
+    .workflow-note,
+    .hint,
+    .step-note,
+    .empty {
+      max-width: 72ch;
+    }
+
+    .app-header {
+      position: relative;
+      max-width: 760px;
+      margin: 0 auto;
+    }
+
+    .app-header .sub {
+      margin-top: -6px;
+    }
+
+    .app-header-title-led {
+      max-width: var(--page-max);
+      min-height: 220px;
+      padding: 24px 28px 28px;
+      border: 1px solid color-mix(in oklch, var(--selected-border) 42%, var(--border));
+      border-radius: 18px;
+      background:
+        linear-gradient(102deg, rgb(var(--panel-rgb) / 0.94) 0%, rgb(var(--panel-rgb) / 0.80) 58%, rgb(var(--panel-rgb) / 0.54) 100%),
+        var(--anime-bg-image);
+      background-size: cover;
+      background-position: center 28%;
+      box-shadow: 0 18px 54px rgb(var(--shadow-ink) / 0.10);
+      overflow: hidden;
+      isolation: isolate;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+    }
+
+    .app-header-title-led::before {
+      content: "";
+      position: absolute;
+      inset: 9px;
+      z-index: -1;
+      border: 1px solid color-mix(in oklch, var(--selected-border) 38%, transparent);
+      border-radius: 13px;
+      opacity: 0.8;
+    }
+
+    .app-header-title-led::after {
+      content: "";
+      position: absolute;
+      right: 22px;
+      bottom: 18px;
+      z-index: -1;
+      width: min(42vw, 340px);
+      height: 98px;
+      background:
+        radial-gradient(circle at 15% 34%, oklch(0.68 0.12 352 / 0.12) 0 3px, transparent 4px),
+        radial-gradient(circle at 50% 70%, oklch(0.62 0.10 226 / 0.12) 0 2px, transparent 3px),
+        linear-gradient(135deg, transparent 0 46%, oklch(0.80 0.08 352 / 0.20) 47% 48%, transparent 49% 100%);
+      background-size: 38px 38px, 52px 52px, 100% 100%;
+      opacity: 0.82;
+    }
+
+    .app-header-title-led .header-kicker {
+      display: inline-flex;
+      align-self: flex-start;
+      align-items: center;
+      gap: 6px;
+      margin-bottom: 8px;
+      padding: 5px 10px;
+      border: 1px solid color-mix(in oklch, var(--selected-border) 50%, transparent);
+      border-radius: 999px;
+      background: color-mix(in oklch, var(--selected-wash) 78%, var(--panel));
+      color: var(--selected);
+      font-size: var(--text-xs);
+      font-weight: var(--weight-bold);
+      line-height: var(--leading-ui);
+      letter-spacing: 0;
+    }
+
+    .app-header-title-led .header-kicker::before {
+      content: "";
+      width: 7px;
+      height: 7px;
+      border-radius: 999px;
+      background: var(--selected);
+      box-shadow: 0 0 0 4px color-mix(in oklch, var(--selected-wash) 72%, transparent), 0 0 20px color-mix(in oklch, var(--selected) 34%, transparent);
+    }
+
+    .app-header-title-led h1 {
+      margin: 0;
+      max-width: 10em;
+      color: var(--text);
+      font-size: 3rem;
+      font-weight: 800;
+      line-height: var(--leading-tight);
+      letter-spacing: 0;
+    }
+
+    .app-header-title-led .sub {
+      margin: 14px 0 0;
+      max-width: 42em;
+      color: var(--muted);
+      font-size: 1.0625rem;
+      line-height: var(--leading-body);
+    }
+
+    @media (max-width: 480px) {
+      .app-header-title-led h1 {
+        max-width: 100%;
+        font-size: 2rem;
+        line-height: var(--leading-tight);
+      }
+    }
+
     .panel {
-      background: var(--panel);
+      position: relative;
+      background:
+        linear-gradient(180deg, rgb(var(--panel-rgb) / 0.96), rgb(var(--panel-rgb) / 0.92)),
+        radial-gradient(circle at 100% 0%, color-mix(in oklch, var(--sky-wash) 58%, transparent), transparent 14rem);
       border: 1px solid var(--border);
-      border-radius: 12px;
-      padding: 16px;
-      margin-top: 16px;
+      border-radius: 14px;
+      padding: var(--space-md);
+      margin-top: 0;
+      box-shadow: 0 12px 34px rgb(var(--shadow-ink) / 0.055);
+    }
+
+    .motion-reveal {
+      animation: motion-reveal var(--motion-slow) var(--ease-out-expo) both;
+      transform-origin: top center;
+    }
+
+    @keyframes motion-reveal {
+      from {
+        opacity: 0;
+        transform: translateY(10px);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
+    main > .panel,
+    main > .shared-status-panel,
+    main > #bangumiResults:not(:empty),
+    main > #subjectDetail:not(:empty),
+    main > #fanCapsResults:not(:empty),
+    main > #imagePanel:not(:empty) {
+      margin-top: var(--space-md);
+    }
+
+    main > #selectedBasket:not(:empty) {
+      margin-top: var(--space-xl);
+    }
+
+    main > .mode-panel {
+      margin-top: 0;
     }
 
     .row,
     .toolbar {
       display: flex;
-      gap: 8px;
+      gap: var(--space-xs);
       align-items: center;
       flex-wrap: wrap;
     }
 
+    .toolbar-spaced {
+      margin-top: var(--space-sm);
+    }
+
+    .toolbar-roomy {
+      margin-top: var(--space-md);
+    }
+
+    .content-spaced-xs {
+      margin-top: var(--space-xs);
+    }
+
+    .content-spaced-sm {
+      margin-top: var(--space-sm);
+    }
+
+    .sub-spaced {
+      margin-bottom: var(--space-xs);
+    }
+
     input,
-    select {
+    select,
+    textarea {
+      min-height: var(--control-height);
       padding: 10px 12px;
-      border: 1px solid #cccccc;
+      border: 1px solid var(--border);
       border-radius: 8px;
-      font-size: 15px;
-      background: #ffffff;
+      font: inherit;
+      font-size: var(--text-control);
+      line-height: var(--leading-ui);
+      background: var(--panel);
+      color: var(--text);
+      transition: border-color 0.16s var(--ease-out), box-shadow 0.16s var(--ease-out), background-color 0.16s var(--ease-out);
     }
 
     input:focus,
-    select:focus {
-      outline: 2px solid #d8d8d8;
-      border-color: #999999;
+    select:focus,
+    textarea:focus {
+      outline: 2px solid var(--focus-ring);
+      outline-offset: 2px;
+      border-color: var(--selected);
+    }
+
+    input::placeholder,
+    textarea::placeholder {
+      color: color-mix(in oklch, var(--muted) 78%, var(--panel));
+      opacity: 1;
     }
 
     #keyword {
       flex: 1;
       min-width: 260px;
+    }
+
+    #searchPanel {
+      display: grid;
+      gap: var(--space-sm);
+    }
+
+    .search-panel-head {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: var(--space-sm);
+      flex-wrap: wrap;
+    }
+
+    #searchPanel .workflow-note {
+      margin: 0;
+    }
+
+    #searchPanel .row {
+      display: grid;
+      grid-template-columns: minmax(260px, 1fr) auto auto;
+      gap: var(--space-xs);
+      align-items: stretch;
     }
 
     #proxyInput {
@@ -91,15 +450,17 @@
     .proxy-settings-grid {
       display: grid;
       grid-template-columns: minmax(180px, 260px) 1fr;
-      gap: 10px;
-      margin-top: 10px;
+      gap: var(--space-sm);
+      margin-top: var(--space-sm);
       align-items: end;
     }
 
     .proxy-field label {
       display: block;
       color: var(--muted);
-      font-size: 12px;
+      font-size: var(--text-xs);
+      font-weight: var(--weight-semibold);
+      line-height: var(--leading-ui);
       margin-bottom: 5px;
     }
 
@@ -112,27 +473,76 @@
     button,
     a.button,
     label.button {
+      min-height: var(--control-height);
       padding: 9px 12px;
       border: none;
       border-radius: 8px;
       background: var(--dark);
-      color: white;
+      color: var(--panel);
       cursor: pointer;
-      font-size: 14px;
+      font-family: var(--font-ui);
+      font-size: var(--text-ui);
+      font-weight: var(--weight-semibold);
       text-decoration: none;
-      display: inline-block;
-      line-height: 1.2;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 6px;
+      line-height: var(--leading-title);
+      text-align: center;
+      transition: background-color 0.16s var(--ease-out), border-color 0.16s var(--ease-out), color 0.16s var(--ease-out), box-shadow 0.16s var(--ease-out), transform 0.16s var(--ease-out);
     }
 
     button:hover,
     a.button:hover,
     label.button:hover {
       background: var(--dark-hover);
+      transform: translateY(-1px);
     }
 
     button:disabled {
       opacity: 0.55;
       cursor: not-allowed;
+      transform: none;
+    }
+
+    button:disabled:hover {
+      background: var(--dark);
+    }
+
+    button.secondary:disabled:hover,
+    a.secondary:disabled:hover,
+    label.secondary:disabled:hover {
+      background: var(--secondary);
+    }
+
+    button.light:disabled:hover,
+    a.light:disabled:hover,
+    label.light:disabled:hover {
+      background: var(--panel-soft);
+    }
+
+    button.quiet:disabled:hover,
+    a.quiet:disabled:hover,
+    label.quiet:disabled:hover {
+      background: transparent;
+      border-color: var(--border);
+      color: var(--muted);
+    }
+
+    button:active:not(:disabled),
+    a.button:active,
+    label.button:active {
+      transform: translateY(1px);
+    }
+
+    button:focus-visible,
+    a.button:focus-visible,
+    label.button:focus-within,
+    .image-card:focus-within,
+    .card:focus-visible {
+      outline: 2px solid var(--focus-ring);
+      outline-offset: 2px;
     }
 
     button.secondary,
@@ -141,25 +551,39 @@
       background: var(--secondary);
     }
 
+    button.secondary:hover,
+    a.secondary:hover,
+    label.secondary:hover {
+      background: var(--secondary-hover);
+    }
+
     button.light,
     a.light,
     label.light {
-      background: #e7e7e7;
-      color: #222222;
-      border: 1px solid #cccccc;
+      background: var(--panel-soft);
+      color: var(--text);
+      border: 1px solid var(--border);
     }
 
     button.light:hover,
     a.light:hover,
     label.light:hover {
-      background: #dcdcdc;
+      background: var(--panel-soft-hover);
     }
 
     .status {
-      margin: 12px 0 0;
+      margin: var(--space-sm) 0 0;
       color: var(--muted);
-      font-size: 14px;
+      font-size: var(--text-ui);
+      line-height: var(--leading-body);
       min-height: 20px;
+      overflow-wrap: anywhere;
+      transition: color var(--motion-fast) var(--ease-out), transform var(--motion-fast) var(--ease-out);
+    }
+
+    .status.status-pulse {
+      color: var(--text);
+      transform: translateY(-1px);
     }
 
     details {
@@ -169,34 +593,40 @@
     summary {
       cursor: pointer;
       color: var(--muted);
-      font-size: 13px;
+      font-size: var(--text-sm);
+      line-height: var(--leading-ui);
       user-select: none;
     }
 
     .proxy-current {
-      margin-top: 10px;
       display: flex;
       align-items: center;
-      justify-content: space-between;
-      gap: 8px;
+      justify-content: flex-end;
+      gap: var(--space-xs);
       flex-wrap: wrap;
       color: var(--muted);
-      font-size: 13px;
-      line-height: 1.5;
-      padding: 8px 10px;
-      background: #fafafa;
-      border: 1px solid var(--border);
-      border-radius: 10px;
+      font-size: var(--text-xs);
+      line-height: var(--leading-body);
+      padding: 0;
+      background: transparent;
+      border: none;
+      border-radius: 0;
+    }
+
+    .proxy-current span {
+      min-width: 0;
+      overflow-wrap: anywhere;
     }
 
     .proxy-current strong {
-      color: #222222;
-      font-weight: 700;
+      color: var(--text);
+      font-weight: var(--weight-bold);
     }
 
     .proxy-current button {
-      padding: 5px 9px;
-      font-size: 12px;
+      min-height: 34px;
+      padding: 6px 9px;
+      font-size: var(--text-xs);
     }
 
     .proxy-summary {
@@ -206,15 +636,15 @@
       padding: 7px 11px;
       border: 1px solid var(--border);
       border-radius: 999px;
-      background: #fafafa;
-      color: #333333;
-      font-size: 13px;
-      font-weight: 600;
+      background: var(--panel-soft);
+      color: var(--text);
+      font-size: var(--text-sm);
+      font-weight: var(--weight-semibold);
       list-style: none;
     }
 
     .proxy-summary:hover {
-      background: #f0f0f0;
+      background: var(--panel-soft-hover);
     }
 
     .proxy-summary::-webkit-details-marker {
@@ -222,17 +652,18 @@
     }
 
     .proxy-details[open] .proxy-summary {
-      background: #eeeeee;
+      background: var(--soft);
     }
 
     .grid {
       display: grid;
-      grid-template-columns: repeat(auto-fill, minmax(255px, 1fr));
-      gap: 12px;
+      grid-template-columns: repeat(auto-fill, minmax(min(100%, 280px), 1fr));
+      gap: var(--space-sm);
     }
 
     .card {
-      background: #ffffff;
+      width: 100%;
+      background: var(--panel);
       border: 1px solid var(--border);
       border-radius: 12px;
       padding: 12px;
@@ -240,13 +671,26 @@
       display: flex;
       gap: 12px;
       align-items: flex-start;
+      justify-content: flex-start;
       min-height: 112px;
+      color: var(--text);
+      font: inherit;
+      text-align: left;
+      transition: background-color 0.16s var(--ease-out), border-color 0.16s var(--ease-out), box-shadow 0.16s var(--ease-out);
     }
 
     .card:hover,
-    .result-card:hover,
+    .result-card:hover {
+      border-color: var(--info-border);
+    }
+
     .image-card:hover {
-      border-color: #999999;
+      border-color: var(--selected);
+    }
+
+    .card:hover {
+      background: var(--info-wash);
+      color: var(--text);
     }
 
     .cover {
@@ -254,58 +698,80 @@
       height: 90px;
       object-fit: cover;
       border-radius: 6px;
-      background: #eeeeee;
+      background: var(--soft);
       flex-shrink: 0;
     }
 
+    .bangumi-card-copy {
+      flex: 1;
+      min-width: 0;
+      display: grid;
+      gap: 2px;
+      padding-top: 1px;
+    }
+
+    .bangumi-card-copy .sub {
+      overflow-wrap: anywhere;
+    }
+
     .title {
-      font-weight: 700;
+      font-size: var(--text-body);
+      font-weight: var(--weight-bold);
       margin-bottom: 4px;
-      line-height: 1.35;
+      line-height: var(--leading-ui);
     }
 
     .sub {
       color: var(--muted);
-      font-size: 13px;
-      line-height: 1.45;
+      font-size: var(--text-sm);
+      line-height: var(--leading-body);
     }
 
     .tag {
       display: inline-flex;
       align-items: center;
       gap: 8px;
-      background: var(--soft);
+      background: var(--panel-soft);
+      border: 1px solid var(--border);
       border-radius: 999px;
       padding: 6px 8px 6px 10px;
       margin: 4px;
-      font-size: 14px;
+      font-size: var(--text-ui);
+      line-height: var(--leading-ui);
+    }
+
+    .tag.match-item {
+      align-items: flex-start;
+      border-radius: 12px;
     }
 
     .tag button,
     .tag a.button {
       padding: 4px 8px;
-      font-size: 12px;
+      font-size: var(--text-xs);
       border-radius: 999px;
     }
 
     .result-list {
       display: grid;
-      grid-template-columns: repeat(auto-fill, minmax(340px, 1fr));
-      gap: 12px;
+      grid-template-columns: repeat(auto-fill, minmax(min(100%, 390px), 1fr));
+      gap: var(--space-md);
     }
 
     .result-section {
-      margin-top: 12px;
+      margin-top: var(--space-lg);
     }
 
     .result-section-title {
-      font-weight: 700;
-      margin: 10px 0 8px;
+      font-size: var(--text-control);
+      font-weight: var(--weight-bold);
+      line-height: var(--leading-ui);
+      margin: var(--space-sm) 0 var(--space-xs);
     }
 
     .result-details {
       margin-top: 14px;
-      border-top: 1px solid #eeeeee;
+      border-top: 1px solid var(--border);
       padding-top: 10px;
     }
 
@@ -316,10 +782,10 @@
       padding: 7px 11px;
       border: 1px solid var(--border);
       border-radius: 999px;
-      background: #fafafa;
-      color: #333333;
-      font-size: 13px;
-      font-weight: 600;
+      background: var(--panel-soft);
+      color: var(--text);
+      font-size: var(--text-sm);
+      font-weight: var(--weight-semibold);
       list-style: none;
     }
 
@@ -328,42 +794,45 @@
     }
 
     .result-details[open] summary {
-      background: #eeeeee;
+      background: var(--soft);
     }
 
     .result-card {
-      background: #ffffff;
+      background: var(--panel);
       border: 1px solid var(--border);
       border-radius: 12px;
-      padding: 10px;
+      padding: var(--space-sm);
       display: grid;
-      grid-template-columns: 116px 1fr;
-      gap: 12px;
+      grid-template-columns: 156px 1fr;
+      gap: var(--space-sm);
       min-height: 124px;
+      transition: border-color 0.16s var(--ease-out), background-color 0.16s var(--ease-out);
     }
 
     .preview-grid {
       display: grid;
       grid-template-columns: repeat(2, 1fr);
-      gap: 4px;
+      gap: 6px;
     }
 
     .preview-grid img {
       width: 100%;
-      height: 52px;
+      aspect-ratio: 16 / 9;
+      height: auto;
       object-fit: cover;
       border-radius: 5px;
-      background: #eeeeee;
+      background: var(--soft);
       display: block;
     }
 
     .preview-empty {
-      width: 116px;
-      height: 108px;
+      width: 156px;
+      height: 92px;
       border-radius: 8px;
-      background: #eeeeee;
-      color: #888888;
-      font-size: 12px;
+      background: var(--soft);
+      color: var(--muted);
+      font-size: var(--text-xs);
+      line-height: var(--leading-ui);
       display: flex;
       align-items: center;
       justify-content: center;
@@ -372,18 +841,18 @@
     }
 
     .episode-block {
-      margin-top: 18px;
-      padding-top: 14px;
-      border-top: 1px solid #eeeeee;
+      margin-top: var(--space-xl);
+      padding-top: var(--space-lg);
+      border-top: 1px solid var(--border);
     }
 
     .episode-detail {
       display: none;
       margin-top: 12px;
       padding: 12px;
-      border: 1px solid #eeeeee;
+      border: 1px solid var(--border);
       border-radius: 10px;
-      background: #fafafa;
+      background: var(--panel-soft);
     }
 
     .episode-detail-head {
@@ -398,7 +867,7 @@
     .episode-detail-page {
       margin-top: 12px;
       padding-top: 12px;
-      border-top: 1px solid #eeeeee;
+      border-top: 1px solid var(--border);
     }
 
     .page-selector {
@@ -410,14 +879,15 @@
     }
 
     .page-btn {
-      min-width: 34px;
-      padding: 6px 9px;
+      min-width: 44px;
+      min-height: 44px;
+      padding: 8px 10px;
       border-radius: 8px;
     }
 
     .page-btn.active {
       background: var(--selected);
-      color: #ffffff;
+      color: var(--panel);
       border-color: var(--selected);
     }
 
@@ -426,49 +896,80 @@
       display: flex;
       justify-content: space-between;
       align-items: flex-start;
-      gap: 12px;
+      gap: var(--space-sm);
       flex-wrap: wrap;
-      margin-bottom: 10px;
+      margin-bottom: var(--space-sm);
     }
 
     .episode-title {
-      font-size: 16px;
-      font-weight: 700;
+      font-size: var(--text-body);
+      font-weight: var(--weight-bold);
+      line-height: var(--leading-ui);
+    }
+
+    .review-helper {
+      margin: 6px 0 12px;
+      color: var(--muted);
+      font-size: var(--text-sm);
+      line-height: var(--leading-body);
     }
 
     .image-grid {
       display: grid;
-      grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
-      gap: 12px;
+      grid-template-columns: repeat(auto-fill, minmax(min(100%, 260px), 1fr));
+      gap: var(--space-md);
     }
 
     .image-card {
-      background: #ffffff;
-      border: 1px solid #dddddd;
+      background: var(--panel);
+      border: 1px solid var(--border);
       border-radius: 10px;
-      padding: 8px;
+      padding: 9px;
       display: block;
       cursor: pointer;
-      transition: border-color 0.12s ease, box-shadow 0.12s ease;
+      transition: border-color 0.16s var(--ease-out), box-shadow 0.16s var(--ease-out), background-color 0.16s var(--ease-out), transform 0.16s var(--ease-out);
+    }
+
+    .image-card:hover {
+      transform: translateY(-1px);
     }
 
     .image-card.selected {
       border-color: var(--selected);
-      box-shadow: 0 0 0 2px rgba(0,0,0,0.08);
+      background: var(--selected-wash);
+      box-shadow: 0 0 0 2px color-mix(in oklch, var(--selected-border) 35%, transparent);
     }
 
     .image-card img {
       width: 100%;
-      height: 118px;
+      aspect-ratio: 16 / 9;
+      height: auto;
       object-fit: cover;
       border-radius: 6px;
-      background: #eeeeee;
+      background: var(--soft);
       display: block;
       margin-bottom: 7px;
     }
 
     .image-card input {
       margin-right: 6px;
+      min-height: auto;
+      accent-color: var(--selected);
+    }
+
+    .image-state {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      min-height: 28px;
+      color: var(--muted);
+      font-size: var(--text-sm);
+      line-height: var(--leading-ui);
+    }
+
+    .image-card.selected .image-state {
+      color: var(--text);
+      font-weight: var(--weight-semibold);
     }
 
     .stats {
@@ -479,48 +980,139 @@
     }
 
     .pill {
-      background: #eeeeee;
-      border: 1px solid #dddddd;
+      background: var(--panel-soft);
+      border: 1px solid var(--border);
       border-radius: 999px;
       padding: 5px 10px;
-      font-size: 13px;
-      color: #444444;
+      font-size: var(--text-sm);
+      line-height: var(--leading-ui);
+      color: var(--text);
+    }
+
+    .selectedCount {
+      color: var(--selected);
+      font-weight: var(--weight-bold);
+      display: inline-block;
+      transform-origin: center;
+    }
+
+    .selectedCount.count-bump {
+      animation: count-bump 0.42s var(--ease-out);
+    }
+
+    @keyframes count-bump {
+      0% { transform: scale(1); }
+      38% { transform: scale(1.22); }
+      100% { transform: scale(1); }
     }
 
 
     .basket-panel {
-      border-color: #d6d6d6;
+      border-color: var(--border);
+      background: color-mix(in oklch, var(--panel) 88%, var(--selected-wash));
+    }
+
+    .workflow-note {
+      margin-bottom: var(--space-sm);
+      color: var(--muted);
+      font-size: var(--text-sm);
+      line-height: var(--leading-body);
+    }
+
+    .workflow-note-nowrap {
+      max-width: 100%;
+      overflow-x: auto;
+      white-space: nowrap;
+    }
+
+    .basket-quality {
+      display: flex;
+      gap: 8px;
+      flex-wrap: wrap;
+      margin-top: 10px;
+    }
+
+    .quality-pill {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      padding: 6px 10px;
+      border: 1px solid var(--border);
+      border-radius: 999px;
+      background: var(--panel-soft);
+      color: var(--text);
+      font-size: var(--text-xs);
+      font-weight: var(--weight-semibold);
+      line-height: var(--leading-ui);
+    }
+
+    .quality-pill.warning {
+      background: var(--warning-wash);
+      border-color: var(--warning-border);
+      color: var(--warning);
+    }
+
+    .quality-pill.success {
+      background: var(--success-wash);
+      border-color: var(--success-border);
+      color: var(--success);
     }
 
     .basket-head {
       display: flex;
       justify-content: space-between;
       align-items: flex-start;
-      gap: 12px;
+      gap: var(--space-md);
       flex-wrap: wrap;
     }
 
     .basket-grid {
       display: grid;
-      grid-template-columns: repeat(auto-fill, minmax(118px, 1fr));
-      gap: 10px;
-      margin-top: 12px;
+      grid-template-columns: repeat(auto-fill, minmax(min(100%, 190px), 1fr));
+      gap: var(--space-sm);
+      margin-top: var(--space-md);
+    }
+
+    .basket-empty-simple {
+      margin-top: var(--space-md);
+      color: var(--muted);
+      font-size: var(--text-ui);
+      line-height: var(--leading-body);
     }
 
     .basket-card {
       border: 1px solid var(--border);
       border-radius: 10px;
       padding: 7px;
-      background: #ffffff;
+      background: var(--panel);
       position: relative;
+      transition: border-color 0.16s var(--ease-out), background-color 0.16s var(--ease-out), box-shadow 0.16s var(--ease-out);
+    }
+
+    .basket-card.is-picked,
+    .image-card.is-picked {
+      animation: picked-card 0.58s var(--ease-out);
+    }
+
+    @keyframes picked-card {
+      0% {
+        box-shadow: 0 0 0 0 color-mix(in oklch, var(--selected-border) 0%, transparent);
+      }
+      42% {
+        box-shadow: 0 0 0 5px color-mix(in oklch, var(--selected-border) 28%, transparent);
+      }
+      100% {
+        box-shadow: 0 0 0 0 color-mix(in oklch, var(--selected-border) 0%, transparent);
+      }
     }
 
     .basket-card img {
       width: 100%;
-      height: 78px;
+      aspect-ratio: 16 / 9;
+      height: auto;
       object-fit: cover;
       border-radius: 6px;
-      background: #eeeeee;
+      background: var(--soft);
       display: block;
       margin-bottom: 6px;
     }
@@ -529,42 +1121,68 @@
       position: absolute;
       top: 5px;
       right: 5px;
-      padding: 3px 6px;
+      min-width: 26px;
+      min-height: 26px;
+      padding: 2px 7px;
       border-radius: 999px;
-      font-size: 12px;
-      background: rgba(0,0,0,0.72);
-      color: #ffffff;
+      font-size: var(--text-ui);
+      line-height: 1;
+      background: color-mix(in oklch, var(--danger) 78%, transparent);
+      color: var(--panel);
     }
 
     .basket-remove:hover {
-      background: rgba(0,0,0,0.9);
+      background: var(--danger-hover);
     }
 
     .loading-line {
       height: 6px;
       border-radius: 999px;
-      background: #eeeeee;
+      background: var(--soft);
       overflow: hidden;
-      margin-top: 12px;
+      margin-top: var(--space-sm);
     }
 
     .loading-line > div {
+      position: relative;
       height: 100%;
       width: 0%;
-      background: #333333;
-      transition: width 0.2s ease;
+      background: var(--info);
+      transition: width 0.22s var(--ease-out);
+    }
+
+    .loading-line.is-active > div::after {
+      content: "";
+      position: absolute;
+      inset: 0;
+      background: linear-gradient(
+        90deg,
+        transparent,
+        color-mix(in oklch, var(--panel) 45%, transparent),
+        transparent
+      );
+      transform: translateX(-100%);
+      animation: progress-sheen 1.05s var(--ease-out-quart) infinite;
+    }
+
+    @keyframes progress-sheen {
+      to { transform: translateX(100%); }
     }
 
     .empty {
       color: var(--muted);
-      font-size: 14px;
-      padding: 8px 0;
+      font-size: var(--text-ui);
+      line-height: var(--leading-body);
+      padding: 12px;
+      border: 1px dashed var(--info-border);
+      border-radius: 10px;
+      background: color-mix(in oklch, var(--info-wash) 72%, transparent);
     }
 
     .fineprint {
       color: var(--muted);
-      font-size: 12px;
-      line-height: 1.5;
+      font-size: var(--text-xs);
+      line-height: var(--leading-body);
       margin-top: 8px;
     }
 
@@ -574,84 +1192,182 @@
       position: fixed;
       right: 18px;
       bottom: 18px;
-      z-index: 999;
+      z-index: var(--z-floating);
       display: flex;
-      gap: 8px;
+      gap: var(--space-xs);
       align-items: center;
       flex-wrap: wrap;
       padding: 10px;
-      border: 1px solid #d8d8d8;
+      max-width: calc(100vw - 36px);
+      border: 1px solid var(--border);
       border-radius: 14px;
-      background: rgba(255,255,255,0.94);
-      box-shadow: 0 8px 28px rgba(0,0,0,0.12);
+      background: color-mix(in oklch, var(--panel) 88%, var(--selected-wash));
+      box-shadow: 0 8px 28px rgb(var(--shadow-ink) / 0.12);
       backdrop-filter: blur(8px);
+      animation: floating-nav-in var(--motion-base) var(--ease-out-expo) both;
+    }
+
+    @keyframes floating-nav-in {
+      from {
+        opacity: 0;
+        transform: translateY(8px);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
     }
 
     .floating-nav button {
       padding: 8px 10px;
-      font-size: 13px;
+      font-size: var(--text-sm);
+    }
+
+    .floating-nav button .selectedCount {
+      color: inherit;
+    }
+
+    .delight-toast-stack {
+      position: fixed;
+      right: 18px;
+      bottom: 82px;
+      z-index: calc(var(--z-floating) + 1);
+      display: grid;
+      gap: 8px;
+      width: min(320px, calc(100vw - 36px));
+      pointer-events: none;
+    }
+
+    .delight-toast {
+      padding: 10px 12px;
+      border: 1px solid var(--success-border);
+      border-radius: 10px;
+      background: color-mix(in oklch, var(--success-wash) 86%, var(--panel));
+      color: var(--text);
+      box-shadow: 0 8px 28px rgb(var(--shadow-ink) / 0.12);
+      font-size: var(--text-sm);
+      font-weight: var(--weight-semibold);
+      line-height: var(--leading-body);
+      opacity: 0;
+      transform: translateY(8px);
+      animation: toast-in 0.2s var(--ease-out) forwards, toast-out 0.22s var(--ease-out) 2.3s forwards;
+    }
+
+    @keyframes toast-in {
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
+    @keyframes toast-out {
+      to {
+        opacity: 0;
+        transform: translateY(6px);
+      }
+    }
+
+    .paper-burst {
+      position: fixed;
+      inset: 0;
+      z-index: calc(var(--z-floating) + 2);
+      pointer-events: none;
+      overflow: hidden;
+    }
+
+    .paper-burst span {
+      position: absolute;
+      left: var(--burst-x);
+      top: var(--burst-y);
+      width: 8px;
+      height: 12px;
+      border-radius: 3px;
+      border: 1px solid color-mix(in oklch, var(--selected-border) 70%, transparent);
+      background: color-mix(in oklch, var(--selected-wash) 82%, var(--panel));
+      opacity: 0;
+      transform: translate(0, 0) rotate(0deg);
+      animation: paper-fall 0.86s var(--ease-out) var(--burst-delay) forwards;
+    }
+
+    .paper-burst span:nth-child(3n) {
+      background: color-mix(in oklch, var(--info-wash) 86%, var(--panel));
+      border-color: var(--info-border);
+    }
+
+    @keyframes paper-fall {
+      8% { opacity: 1; }
+      100% {
+        opacity: 0;
+        transform: translate(var(--burst-tx), var(--burst-ty)) rotate(var(--burst-rot));
+      }
     }
 
     .step-note {
       margin-top: 10px;
       color: var(--muted);
-      font-size: 13px;
-      line-height: 1.45;
+      font-size: var(--text-sm);
+      line-height: var(--leading-body);
     }
 
     .hint {
       margin: 10px 0 8px;
-      color: #444444;
-      font-size: 14px;
-      line-height: 1.45;
+      color: var(--text);
+      font-size: var(--text-ui);
+      line-height: var(--leading-body);
     }
 
     button.quiet,
     a.quiet,
     label.quiet {
       background: transparent;
-      color: #555555;
-      border: 1px solid #d4d4d4;
+      color: var(--muted);
+      border: 1px solid var(--border);
     }
 
     button.quiet:hover,
     a.quiet:hover,
     label.quiet:hover {
-      background: #f0f0f0;
-      color: #111111;
+      background: var(--info-wash);
+      border-color: var(--info-border);
+      color: var(--text);
     }
 
 
 
     .subject-step-layout {
-      display: flex;
-      flex-direction: column;
-      gap: 14px;
-      margin-top: 14px;
+      display: grid;
+      grid-template-columns: 1fr;
+      gap: var(--space-md);
+      margin-top: var(--space-md);
+    }
+
+    .subject-step-layout:has(.subject-side-flow:not([style*="display: none"])) {
+      grid-template-columns: minmax(0, 1.4fr) minmax(280px, 0.8fr);
     }
 
     .subject-main-flow,
     .subject-side-flow {
       border: 1px solid var(--border);
       border-radius: 12px;
-      padding: 12px;
-      background: #ffffff;
+      padding: var(--space-sm);
+      background: var(--panel);
     }
 
     .subject-main-flow {
-      border-color: #d0d0d0;
+      border-color: var(--border);
     }
 
     .subject-side-flow {
-      background: #fafafa;
-      color: #444444;
+      background: var(--panel);
+      color: var(--text);
     }
 
     .side-title {
-      font-weight: 700;
-      font-size: 15px;
+      font-size: var(--text-control);
+      font-weight: var(--weight-bold);
+      line-height: var(--leading-ui);
       margin-bottom: 8px;
-      color: #333333;
+      color: var(--text);
     }
 
     .section-headline {
@@ -664,14 +1380,14 @@
 
     .source-note {
       color: var(--muted);
-      font-size: 12px;
-      line-height: 1.45;
+      font-size: var(--text-xs);
+      line-height: var(--leading-body);
     }
 
     .side-action-stack {
       display: flex;
-      gap: 7px;
-      margin-top: 10px;
+      gap: var(--space-xs);
+      margin-top: var(--space-sm);
       flex-wrap: wrap;
     }
 
@@ -687,15 +1403,17 @@
     }
 
     .compact-details summary {
-      font-size: 12px;
-      color: #666666;
+      font-size: var(--text-xs);
+      color: var(--muted);
     }
 
     @media (max-width: 640px) {
       body {
-        margin-top: 22px;
+        margin-top: 0;
+        padding-top: 22px;
         padding-left: 12px;
         padding-right: 12px;
+        padding-bottom: 132px;
       }
 
       .grid,
@@ -705,55 +1423,112 @@
       }
 
       .result-card {
-        grid-template-columns: 100px 1fr;
+        grid-template-columns: 1fr;
       }
 
       .preview-empty {
-        width: 100px;
+        width: 100%;
       }
 
       .image-grid {
-        grid-template-columns: repeat(auto-fill, minmax(145px, 1fr));
+        grid-template-columns: 1fr;
+      }
+
+      button,
+      a.button,
+      label.button {
+        min-height: 44px;
       }
 
       .floating-nav {
         left: 12px;
         right: 12px;
         bottom: 12px;
+        align-items: stretch;
         justify-content: space-between;
+      }
+
+      .floating-nav button {
+        flex: 1;
+        min-width: 0;
+        min-height: var(--touch-target);
+        white-space: normal;
+      }
+
+      .delight-toast-stack {
+        left: 12px;
+        right: 12px;
+        bottom: 74px;
+        width: auto;
+      }
+
+      #searchPanel .row {
+        grid-template-columns: 1fr;
+      }
+
+      .search-panel-head {
+        align-items: flex-start;
+      }
+
+      .proxy-current {
+        width: 100%;
+        justify-content: space-between;
+      }
+
+      .proxy-current button,
+      .draft-actions button,
+      .tag button,
+      .tag a.button {
+        min-height: var(--touch-target);
+      }
+
+      .workflow-note-nowrap {
+        overflow-x: visible;
+        white-space: normal;
+      }
+
+      .subject-step-layout:has(.subject-side-flow:not([style*="display: none"])) {
+        grid-template-columns: 1fr;
       }
     }
 
 
     .mode-panel {
-      display: flex;
-      gap: 10px;
+      display: grid;
+      grid-template-columns: auto auto minmax(220px, 1fr);
+      gap: var(--space-xs);
       align-items: center;
-      flex-wrap: wrap;
-      margin-top: 16px;
+      padding: var(--space-xs);
+      background: color-mix(in oklch, var(--panel-soft) 82%, var(--info-wash));
+      margin-top: 0;
     }
 
     .mode-button {
       min-width: 120px;
+      border: 1px solid var(--border);
     }
 
     .mode-button.active {
       background: var(--selected);
-      color: #ffffff;
+      color: var(--panel);
+      border-color: var(--selected);
+      box-shadow: 0 0 0 3px color-mix(in oklch, var(--selected-border) 22%, transparent);
     }
 
     .auto-form-grid {
       display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
-      gap: 10px;
+      grid-template-columns: minmax(180px, 0.9fr) minmax(360px, 1.8fr) repeat(2, minmax(150px, 0.75fr));
+      gap: var(--space-sm);
       align-items: end;
-      margin-top: 12px;
+      margin-top: var(--space-sm);
     }
 
     .auto-field label {
       display: block;
       color: var(--muted);
-      font-size: 12px;
+      font-size: var(--text-xs);
+      font-weight: var(--weight-semibold);
+      line-height: var(--leading-ui);
       margin-bottom: 5px;
     }
 
@@ -764,35 +1539,35 @@
 
     .auto-draft-grid {
       display: grid;
-      grid-template-columns: repeat(auto-fill, minmax(190px, 1fr));
-      gap: 12px;
-      margin-top: 14px;
+      grid-template-columns: repeat(auto-fill, minmax(min(100%, 280px), 1fr));
+      gap: var(--space-md);
+      margin-top: var(--space-md);
     }
 
     .auto-draft-bottom-actions {
       display: flex;
-      gap: 8px;
+      gap: var(--space-xs);
       align-items: center;
       justify-content: flex-start;
       flex-wrap: wrap;
-      margin-top: 14px;
-      padding-top: 12px;
-      border-top: 1px solid #eeeeee;
+      margin-top: var(--space-md);
+      padding-top: var(--space-sm);
+      border-top: 1px solid var(--border);
     }
 
     .auto-loading-pill {
       display: inline-flex;
       align-items: center;
       gap: 6px;
-      color: var(--muted);
+      color: var(--info);
     }
 
     .auto-loading-pill::before {
       content: "";
       width: 10px;
       height: 10px;
-      border: 2px solid #d0d0d0;
-      border-top-color: #333333;
+      border: 2px solid var(--border);
+      border-top-color: var(--info);
       border-radius: 999px;
       display: inline-block;
       animation: auto-spin 0.85s linear infinite;
@@ -804,34 +1579,63 @@
 
 
     .draft-card {
-      background: #ffffff;
+      background: var(--panel);
       border: 1px solid var(--border);
       border-radius: 12px;
-      padding: 10px;
+      padding: var(--space-sm);
+      transition: border-color 0.16s var(--ease-out), background-color 0.16s var(--ease-out), transform 0.16s var(--ease-out), opacity 0.16s var(--ease-out);
+    }
+
+    .draft-card.draft-enter {
+      animation: draft-enter 0.32s var(--ease-out-expo) both;
+      animation-delay: var(--stagger-delay, 0ms);
+    }
+
+    .draft-card.is-removing {
+      opacity: 0;
+      transform: translateY(6px) scale(0.985);
+    }
+
+    @keyframes draft-enter {
+      from {
+        opacity: 0;
+        transform: translateY(12px);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
+    .draft-card:hover,
+    .basket-card:hover,
+    .modal-choice:hover {
+      border-color: var(--info-border);
     }
 
     .draft-card img {
       width: 100%;
-      height: 120px;
+      aspect-ratio: 16 / 9;
+      height: auto;
       object-fit: cover;
       border-radius: 7px;
-      background: #eeeeee;
+      background: var(--soft);
       display: block;
       margin-bottom: 8px;
     }
 
     .draft-title {
-      font-weight: 700;
-      font-size: 14px;
-      line-height: 1.35;
+      font-size: var(--text-control);
+      font-weight: var(--weight-bold);
+      line-height: var(--leading-ui);
       min-height: 38px;
       margin-bottom: 6px;
     }
 
     .draft-meta {
       color: var(--muted);
-      font-size: 12px;
-      line-height: 1.4;
+      font-size: var(--text-xs);
+      line-height: var(--leading-body);
       margin-bottom: 8px;
     }
 
@@ -842,15 +1646,17 @@
     }
 
     .draft-actions button {
-      padding: 6px 8px;
-      font-size: 12px;
+      flex: 1 1 74px;
+      min-height: 32px;
+      padding: 5px 9px;
+      font-size: var(--text-xs);
     }
 
     .modal-backdrop {
       position: fixed;
       inset: 0;
-      z-index: 1200;
-      background: rgba(0,0,0,0.38);
+      z-index: var(--z-modal);
+      background: oklch(0.22 0.012 65 / 0.38);
       display: none;
       align-items: center;
       justify-content: center;
@@ -859,16 +1665,43 @@
 
     .modal-backdrop.show {
       display: flex;
+      animation: modal-backdrop-in 0.18s var(--ease-out) both;
+    }
+
+    body.modal-open {
+      overflow: hidden;
     }
 
     .modal-box {
       width: min(980px, 100%);
       max-height: min(760px, 92vh);
       overflow: auto;
-      background: #ffffff;
+      background: var(--panel);
       border-radius: 14px;
+      border: 1px solid var(--border);
       padding: 16px;
-      box-shadow: 0 18px 50px rgba(0,0,0,0.22);
+      box-shadow: 0 18px 50px rgb(var(--shadow-ink) / 0.22);
+    }
+
+    .modal-backdrop.show .modal-box {
+      animation: modal-box-in 0.24s var(--ease-out-expo) both;
+      transform-origin: center;
+    }
+
+    @keyframes modal-backdrop-in {
+      from { opacity: 0; }
+      to { opacity: 1; }
+    }
+
+    @keyframes modal-box-in {
+      from {
+        opacity: 0;
+        transform: translateY(10px) scale(0.985);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0) scale(1);
+      }
     }
 
     .modal-head {
@@ -889,7 +1722,28 @@
       border: 1px solid var(--border);
       border-radius: 12px;
       padding: 8px;
-      background: #ffffff;
+      background: var(--panel);
+      transition: border-color 0.16s var(--ease-out), background-color 0.16s var(--ease-out), transform 0.16s var(--ease-out);
+    }
+
+    .modal-choice.choice-enter {
+      animation: choice-enter 0.26s var(--ease-out-expo) both;
+      animation-delay: var(--stagger-delay, 0ms);
+    }
+
+    .modal-choice:hover {
+      transform: translateY(-1px);
+    }
+
+    @keyframes choice-enter {
+      from {
+        opacity: 0;
+        transform: translateY(8px);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
     }
 
     .modal-choice img {
@@ -897,33 +1751,48 @@
       height: 105px;
       object-fit: cover;
       border-radius: 7px;
-      background: #eeeeee;
+      background: var(--soft);
       display: block;
       margin-bottom: 8px;
     }
 
     .modal-choice-title {
-      font-size: 13px;
-      font-weight: 700;
-      line-height: 1.35;
+      font-size: var(--text-sm);
+      font-weight: var(--weight-bold);
+      line-height: var(--leading-ui);
       min-height: 36px;
       margin-bottom: 6px;
     }
 
     .modal-choice button {
       width: 100%;
-      padding: 7px 8px;
-      font-size: 12px;
+      min-height: 44px;
+      padding: 8px 10px;
+      font-size: var(--text-xs);
     }
 
 
     .mode-prompt {
       color: var(--muted);
-      font-size: 13px;
+      font-size: var(--text-sm);
+      line-height: var(--leading-body);
+      justify-self: end;
+      padding-inline: var(--space-xs);
+      text-align: right;
+    }
+
+    .shared-status-panel {
+      padding: var(--space-sm) var(--space-md);
+      border: 1px solid var(--info-border);
+      border-radius: 12px;
+      background: color-mix(in oklch, var(--info-wash) 78%, var(--panel));
+    }
+
+    .shared-status-panel .status {
+      margin: 0;
     }
 
     .auto-year-range {
-      grid-column: span 3;
       min-width: min(100%, 520px);
     }
 
@@ -938,13 +1807,13 @@
     .year-range-label {
       white-space: nowrap;
       color: var(--muted);
-      font-size: 13px;
-      line-height: 1.3;
+      font-size: var(--text-sm);
+      line-height: var(--leading-ui);
     }
 
     .year-range-label strong {
-      color: #222222;
-      font-weight: 700;
+      color: var(--text);
+      font-weight: var(--weight-bold);
     }
 
     .dual-range-wrap {
@@ -960,14 +1829,14 @@
       top: 13px;
       height: 3px;
       border-radius: 999px;
-      background: #dddddd;
+      background: var(--border);
       pointer-events: none;
     }
 
     .dual-range-active {
       left: var(--year-active-left, 0%);
       right: var(--year-active-right, 0%);
-      background: #333333;
+      background: var(--info);
     }
 
     .dual-range-input {
@@ -992,13 +1861,17 @@
       width: 15px;
       height: 15px;
       border-radius: 999px;
-      border: 2px solid #333333;
-      background: #ffffff;
+      border: 2px solid var(--info);
+      background: var(--panel);
       cursor: pointer;
       pointer-events: auto;
       appearance: none;
       -webkit-appearance: none;
       margin-top: -6px;
+    }
+
+    .dual-range-input:focus-visible::-webkit-slider-thumb {
+      box-shadow: 0 0 0 5px var(--focus-ring-soft);
     }
 
     .dual-range-input::-moz-range-track {
@@ -1010,18 +1883,46 @@
       width: 15px;
       height: 15px;
       border-radius: 999px;
-      border: 2px solid #333333;
-      background: #ffffff;
+      border: 2px solid var(--info);
+      background: var(--panel);
       cursor: pointer;
       pointer-events: auto;
+    }
+
+    .dual-range-input:focus-visible::-moz-range-thumb {
+      box-shadow: 0 0 0 5px var(--focus-ring-soft);
     }
 
     #autoYearFromRange { z-index: 2; }
     #autoYearToRange { z-index: 3; }
 
+    @media (max-width: 980px) {
+      .auto-form-grid {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+      }
+
+      .auto-year-range {
+        grid-column: 1 / -1;
+      }
+    }
+
     @media (max-width: 640px) {
+      .mode-panel {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+      }
+
+      .mode-prompt {
+        grid-column: 1 / -1;
+        justify-self: start;
+        padding: 0;
+        text-align: left;
+      }
+
       .auto-year-range {
         grid-column: span 1;
+      }
+      .auto-form-grid {
+        grid-template-columns: 1fr;
       }
       .year-range-line {
         grid-template-columns: 1fr;
@@ -1030,25 +1931,337 @@
       .year-range-label:last-child {
         text-align: right;
       }
+
+      .draft-actions button {
+        min-height: var(--touch-target);
+      }
+
+      .modal-backdrop {
+        padding: 10px;
+      }
+
+      .modal-head {
+        flex-direction: column;
+      }
+
+      .modal-head .toolbar,
+      .modal-head .toolbar button {
+        width: 100%;
+      }
+
+      .modal-grid {
+        grid-template-columns: repeat(auto-fill, minmax(138px, 1fr));
+      }
+    }
+
+    /* Anime workbench polish: visual-only layer, business logic stays untouched. */
+    .app-header {
+      max-width: var(--page-max);
+    }
+
+    .app-header-title-led .sub {
+      color: color-mix(in oklch, var(--muted) 88%, var(--text));
+      text-shadow: 0 1px 0 rgb(var(--panel-rgb) / 0.78);
+    }
+
+    main {
+      display: grid;
+      gap: var(--space-md);
+    }
+
+    main > .panel,
+    main > .shared-status-panel,
+    main > #bangumiResults:not(:empty),
+    main > #subjectDetail:not(:empty),
+    main > #fanCapsResults:not(:empty),
+    main > #imagePanel:not(:empty),
+    main > #selectedBasket:not(:empty) {
+      margin-top: 0;
+    }
+
+    input,
+    select,
+    textarea {
+      background:
+        linear-gradient(180deg, rgb(var(--panel-rgb) / 0.98), color-mix(in oklch, var(--panel) 88%, var(--sky-wash)));
+      border-color: color-mix(in oklch, var(--border) 82%, var(--selected-border));
+      box-shadow: inset 0 1px 0 rgb(var(--panel-rgb) / 0.72);
+    }
+
+    input:hover,
+    select:hover,
+    textarea:hover {
+      border-color: color-mix(in oklch, var(--info-border) 74%, var(--selected-border));
+    }
+
+    button,
+    a.button,
+    label.button {
+      border: 1px solid color-mix(in oklch, var(--dark) 68%, var(--selected-border));
+      background:
+        linear-gradient(180deg, color-mix(in oklch, var(--dark) 88%, oklch(0.72 0.08 328)), var(--dark));
+      box-shadow: 0 6px 16px rgb(var(--shadow-ink) / 0.10);
+    }
+
+    button:hover,
+    a.button:hover,
+    label.button:hover {
+      box-shadow: 0 8px 18px rgb(var(--shadow-ink) / 0.14);
+    }
+
+    button.light,
+    a.light,
+    label.light,
+    button.quiet,
+    a.quiet,
+    label.quiet {
+      box-shadow: none;
+    }
+
+    button.light,
+    a.light,
+    label.light {
+      background:
+        linear-gradient(180deg, color-mix(in oklch, var(--panel) 86%, var(--lilac-wash)), var(--panel-soft));
+      border-color: color-mix(in oklch, var(--border) 78%, var(--info-border));
+    }
+
+    button.light:hover,
+    a.light:hover,
+    label.light:hover,
+    button.quiet:hover,
+    a.quiet:hover,
+    label.quiet:hover {
+      background: color-mix(in oklch, var(--sky-wash) 72%, var(--panel));
+      border-color: color-mix(in oklch, var(--info-border) 78%, var(--selected-border));
+    }
+
+    a.button.source-link,
+    button.source-link {
+      background: transparent;
+      color: var(--muted);
+      border-color: color-mix(in oklch, var(--border) 88%, transparent);
+      box-shadow: none;
+      font-weight: var(--weight-medium);
+    }
+
+    a.button.source-link:hover,
+    button.source-link:hover {
+      background: color-mix(in oklch, var(--panel) 76%, var(--sky-wash));
+      color: var(--text);
+      border-color: color-mix(in oklch, var(--info-border) 70%, var(--border));
+      box-shadow: none;
+    }
+
+    .mode-panel {
+      border-color: color-mix(in oklch, var(--selected-border) 36%, var(--border));
+      background:
+        linear-gradient(90deg, color-mix(in oklch, var(--panel) 84%, var(--selected-wash)), color-mix(in oklch, var(--panel) 86%, var(--sky-wash)));
+      box-shadow: 0 10px 28px rgb(var(--shadow-ink) / 0.07);
+    }
+
+    .mode-button.active {
+      background:
+        linear-gradient(180deg, color-mix(in oklch, var(--selected) 92%, oklch(0.78 0.10 330)), var(--selected));
+      box-shadow: 0 0 0 3px color-mix(in oklch, var(--selected-border) 25%, transparent), 0 8px 20px color-mix(in oklch, var(--selected) 24%, transparent);
+    }
+
+    .shared-status-panel {
+      position: relative;
+      overflow: hidden;
+      border-color: color-mix(in oklch, var(--info-border) 70%, var(--selected-border));
+      background:
+        linear-gradient(90deg, color-mix(in oklch, var(--sky-wash) 66%, var(--panel)), color-mix(in oklch, var(--selected-wash) 38%, var(--panel)));
+      box-shadow: 0 8px 22px rgb(var(--shadow-ink) / 0.055);
+    }
+
+    .shared-status-panel::after {
+      content: "";
+      position: absolute;
+      inset: auto 12px 7px auto;
+      width: 86px;
+      height: 22px;
+      background:
+        radial-gradient(circle at 10px 50%, color-mix(in oklch, var(--selected) 32%, transparent) 0 2px, transparent 3px),
+        radial-gradient(circle at 34px 50%, color-mix(in oklch, var(--info) 28%, transparent) 0 2px, transparent 3px),
+        radial-gradient(circle at 58px 50%, color-mix(in oklch, var(--success) 24%, transparent) 0 2px, transparent 3px);
+      opacity: 0.78;
+    }
+
+    .card,
+    .result-card,
+    .image-card,
+    .basket-card,
+    .draft-card,
+    .modal-choice,
+    .subject-main-flow,
+    .subject-side-flow {
+      background:
+        linear-gradient(180deg, rgb(var(--panel-rgb) / 0.97), rgb(var(--panel-rgb) / 0.91));
+      border-color: color-mix(in oklch, var(--border) 82%, var(--selected-border));
+      box-shadow: 0 8px 22px rgb(var(--shadow-ink) / 0.045);
+    }
+
+    .card:hover,
+    .result-card:hover,
+    .draft-card:hover,
+    .basket-card:hover,
+    .modal-choice:hover {
+      border-color: color-mix(in oklch, var(--info-border) 70%, var(--selected-border));
+      background:
+        linear-gradient(180deg, color-mix(in oklch, var(--panel) 86%, var(--sky-wash)), rgb(var(--panel-rgb) / 0.93));
+    }
+
+    .image-card {
+      border-radius: 13px;
+    }
+
+    .image-card img,
+    .basket-card img,
+    .draft-card img,
+    .preview-grid img,
+    .modal-choice img {
+      border: 1px solid color-mix(in oklch, var(--border) 78%, var(--selected-border));
+      box-shadow: 0 4px 14px rgb(var(--shadow-ink) / 0.08);
+    }
+
+    .image-card.selected {
+      border-color: var(--selected);
+      background:
+        linear-gradient(180deg, color-mix(in oklch, var(--selected-wash) 74%, var(--panel)), rgb(var(--panel-rgb) / 0.94));
+      box-shadow: 0 0 0 2px color-mix(in oklch, var(--selected-border) 38%, transparent), 0 10px 24px color-mix(in oklch, var(--selected) 13%, transparent);
+    }
+
+    .title,
+    .draft-title,
+    .episode-title,
+    .side-title,
+    .result-section-title {
+      color: color-mix(in oklch, var(--text) 86%, var(--dark));
+    }
+
+    .pill,
+    .tag,
+    .quality-pill,
+    .result-details summary,
+    .proxy-summary {
+      background:
+        linear-gradient(180deg, color-mix(in oklch, var(--panel) 82%, var(--lilac-wash)), color-mix(in oklch, var(--panel-soft) 86%, var(--panel)));
+      border-color: color-mix(in oklch, var(--border) 78%, var(--info-border));
+    }
+
+    .basket-panel {
+      background:
+        linear-gradient(180deg, color-mix(in oklch, var(--panel) 78%, var(--selected-wash)), color-mix(in oklch, var(--panel) 84%, var(--sky-wash)));
+      border-color: color-mix(in oklch, var(--selected-border) 50%, var(--border));
+    }
+
+    .loading-line {
+      background: color-mix(in oklch, var(--panel-soft) 76%, var(--sky-wash));
+    }
+
+    .loading-line > div {
+      background:
+        linear-gradient(90deg, var(--info), color-mix(in oklch, var(--selected) 58%, var(--info)));
+    }
+
+    .floating-nav {
+      border-color: color-mix(in oklch, var(--selected-border) 44%, var(--border));
+      background: color-mix(in oklch, var(--panel) 78%, var(--selected-wash));
+      box-shadow: 0 16px 42px rgb(var(--shadow-ink) / 0.16);
+    }
+
+    .delight-toast {
+      border-color: color-mix(in oklch, var(--success-border) 70%, var(--selected-border));
+      background:
+        linear-gradient(180deg, color-mix(in oklch, var(--success-wash) 72%, var(--panel)), color-mix(in oklch, var(--panel) 84%, var(--selected-wash)));
+    }
+
+    @media (prefers-reduced-motion: no-preference) {
+      body::after {
+        animation: workbench-paper-drift 18s linear infinite;
+      }
+
+      .app-header-title-led::after {
+        animation: header-cel-drift 8s var(--ease-out-quart) infinite alternate;
+      }
+    }
+
+    @keyframes workbench-paper-drift {
+      to { background-position: 42px 42px, 42px 42px, 84px 84px; }
+    }
+
+    @keyframes header-cel-drift {
+      to { transform: translate3d(-10px, -4px, 0); opacity: 0.62; }
+    }
+
+    @media (max-width: 760px) {
+      body {
+        padding-top: 14px;
+      }
+
+      body::before {
+        background-position: 56% top;
+        opacity: 0.34;
+      }
+
+      .anime-bg-art {
+        opacity: 0.065;
+        object-position: 56% top;
+      }
+
+      .app-header-title-led {
+        min-height: 174px;
+        padding: 18px 16px;
+        border-radius: 16px;
+        background:
+          linear-gradient(115deg, rgb(var(--panel-rgb) / 0.96) 0%, rgb(var(--panel-rgb) / 0.90) 72%, rgb(var(--panel-rgb) / 0.62) 100%),
+          var(--anime-bg-image);
+        background-size: cover;
+        background-position: 58% 24%;
+      }
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      *,
+      *::before,
+      *::after {
+        animation-duration: 0.01ms !important;
+        animation-iteration-count: 1 !important;
+        scroll-behavior: auto !important;
+        transition-duration: 0.01ms !important;
+      }
     }
 
   </style>
 </head>
 <body>
   <div id="topAnchor"></div>
-  <h1>Anime Screenshot Picker</h1>
+  <img class="anime-bg-art" src="fancaps-anime-bg.jpg" alt="" aria-hidden="true" onerror="this.remove()">
+  <header class="app-header app-header-title-led">
+    <div class="header-kicker">动漫高手·一眼顶针</div>
+    <h1>动画截图出题工具</h1>
+    <p class="sub">从 FanCaps 截图库中挑选画面，生成可导出的题单。</p>
+  </header>
 
-  <div id="selectedBasket"></div>
+  <main>
 
-  <div id="modePanel" class="panel mode-panel">
-    <button id="manualModeBtn" class="mode-button light" onclick="switchMode('manual')">手动出题</button>
-    <button id="autoModeBtn" class="mode-button light" onclick="switchMode('auto')">自动出题</button>
-    <span class="mode-prompt">请选择出题方式。</span>
+  <div id="modePanel" class="panel mode-panel" role="group" aria-label="出题方式" aria-describedby="modePrompt">
+    <button id="manualModeBtn" class="mode-button active" type="button" aria-pressed="true" aria-controls="searchPanel" onclick="switchMode('manual')">手动出题</button>
+    <button id="autoModeBtn" class="mode-button light" type="button" aria-pressed="false" aria-controls="autoPanel" onclick="switchMode('auto')">自动出题</button>
+    <span class="mode-prompt" id="modePrompt">手动适合精挑截图，自动适合批量起草。</span>
+  </div>
+
+  <div class="shared-status-panel" aria-label="工作状态">
+    <div id="status" class="status" role="status" aria-live="polite">搜索动画开始手动出题，或切换到自动出题。</div>
+    <div id="progressWrap" class="loading-line" style="display: none;" role="progressbar" aria-label="当前任务进度" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0">
+      <div id="progressBar"></div>
+    </div>
   </div>
 
   <div id="autoPanel" class="panel" style="display: none;">
     <h2>自动出题</h2>
-    <div class="sub">从 FanCaps 动画截图中随机生成题单。填写 Bangumi 用户 ID 后，只从该用户看过的动画中随机；留空则从全部范围随机。</div>
+    <div class="workflow-note workflow-note-nowrap">填写 Bangumi 用户 ID 后，只从该用户标记“看过”的动画里抽题；留空则从全部可用动画里抽题。</div>
 
     <div class="auto-form-grid">
       <div class="auto-field">
@@ -1069,7 +2282,7 @@
         </div>
       </div>
       <div class="auto-field">
-        <label for="autoMinDone">最低看过人数</label>
+        <label for="autoMinDone">最低看过人数（Bangumi）</label>
         <input id="autoMinDone" type="number" min="0" step="1000" placeholder="不限" />
       </div>
       <div class="auto-field">
@@ -1078,21 +2291,21 @@
       </div>
     </div>
 
-    <div class="toolbar" style="margin-top: 12px;">
-      <button id="generateAutoDraftBtn" onclick="generateAutoDraft()">生成题单</button>
-      <button class="light" onclick="addAutoDraftToSelected()" id="addAutoDraftBtn" disabled>加入已选截图</button>
-      <span class="pill" id="autoPoolInfo">尚未生成</span>
-      <span class="pill auto-loading-pill" id="autoGenerateStatus" style="display: none;">正在生成题单...</span>
+    <div class="toolbar toolbar-spaced">
+      <button id="generateAutoDraftBtn" onclick="generateAutoDraft()">生成题单草稿</button>
+      <button class="light" onclick="addAutoDraftToSelected()" id="addAutoDraftBtn" disabled>把草稿加入已选</button>
+      <span class="pill" id="autoPoolInfo">等待生成</span>
+      <span class="pill auto-loading-pill" id="autoGenerateStatus" style="display: none;">正在生成草稿...</span>
     </div>
 
     <div id="autoDraftArea"></div>
   </div>
 
-  <div id="autoChoiceModal" class="modal-backdrop" onclick="handleModalBackdropClick(event)">
-    <div class="modal-box">
+  <div id="autoChoiceModal" class="modal-backdrop" aria-hidden="true" onclick="handleModalBackdropClick(event)">
+    <div class="modal-box" role="dialog" aria-modal="true" aria-labelledby="autoModalTitle" tabindex="-1">
       <div class="modal-head">
         <div>
-          <h2 id="autoModalTitle">选择</h2>
+          <h2 id="autoModalTitle">请选择一个选项</h2>
           <div class="sub" id="autoModalHint"></div>
         </div>
         <div class="toolbar">
@@ -1105,21 +2318,24 @@
   </div>
 
 
-  <div id="searchPanel" class="panel" style="display: none;">
+  <div id="searchPanel" class="panel">
+    <div class="search-panel-head">
+      <div class="workflow-note">搜索动画并选择正确条目，工具会自动查找可用截图。</div>
+      <div class="proxy-current">
+        <span>连接：<strong id="currentProxyLabel">默认连接（推荐）</strong></span>
+        <button class="quiet" type="button" onclick="toggleProxyPanel()" aria-controls="proxyDetails" aria-expanded="false">高级连接设置</button>
+      </div>
+    </div>
     <div class="row">
-      <input id="keyword" placeholder="输入中文名，例如：芙莉莲、金牌得主、孤独摇滚" />
-      <button id="searchBangumiBtn">搜索 Bangumi</button>
-      <button class="light" onclick="clearAll()">清空</button>
+      <input id="keyword" placeholder="输入中文名，例如：芙莉莲、金牌得主、孤独摇滚" aria-label="动画关键词" />
+      <button id="searchBangumiBtn" type="button">搜索动画</button>
+      <button class="light" type="button" onclick="clearAll()">清空当前流程</button>
     </div>
 
-    <div class="proxy-current">
-      <span>当前代理：<strong id="currentProxyLabel">Cloudflare Pages Function（推荐）</strong></span>
-      <button class="light" type="button" onclick="toggleProxyPanel()">切换代理</button>
-    </div>
     <div id="proxyDetails" class="proxy-details" style="display: none;">
       <div class="proxy-settings-grid">
         <div class="proxy-field">
-          <label for="proxyPreset">代理选项</label>
+          <label for="proxyPreset">连接方式</label>
           <select id="proxyPreset">
             <option value="/proxy?url=">Cloudflare Pages Function /proxy?url=（推荐）</option>
             <option value="https://corsproxy.io/?url=">corsproxy.io（公共备用）</option>
@@ -1129,29 +2345,28 @@
           </select>
         </div>
         <div class="proxy-field">
-          <label for="proxyInput">代理前缀</label>
+          <label for="proxyInput">自定义连接前缀</label>
           <input id="proxyInput" />
         </div>
       </div>
-      <div class="toolbar" style="margin-top: 10px;">
-        <button class="light" onclick="resetProxyToDefault()">恢复默认代理</button>
+      <div class="toolbar toolbar-spaced">
+        <button class="light" onclick="resetProxyToDefault()">恢复推荐连接</button>
       </div>
-      <div class="fineprint">默认使用本站 Cloudflare Pages Function。公共代理只作为临时保险，速度和稳定性不保证。</div>
+      <div class="fineprint">默认连接最稳定。公共备用连接只适合临时尝试，速度和成功率不保证。</div>
     </div>
 
-    <div id="status" class="status"></div>
-    <div id="progressWrap" class="loading-line" style="display: none;">
-      <div id="progressBar"></div>
-    </div>
   </div>
   <div id="bangumiResults" class="grid"></div>
   <div id="subjectDetail"></div>
   <div id="fanCapsResults"></div>
   <div id="imagePanel"></div>
+  <div id="selectedBasket"></div>
 
-  <div class="floating-nav" id="floatingNav">
-    <button onclick="scrollToTopSearch()">返回顶部搜索</button>
-    <button onclick="scrollToBasket()">查看/导出已选（<span id="floatSelectedCount" class="selectedCount">0</span>）</button>
+  </main>
+
+  <div class="floating-nav" id="floatingNav" aria-label="快速导航" style="display: none;">
+    <button type="button" onclick="scrollToTopSearch()">继续搜索</button>
+    <button type="button" onclick="scrollToBasket()">查看已选并导出（<span id="floatSelectedCount" class="selectedCount">0</span>）</button>
   </div>
 
   <script>
@@ -1181,6 +2396,7 @@
     const fanCapsResultsEl = document.getElementById("fanCapsResults");
     const imagePanelEl = document.getElementById("imagePanel");
     const selectedBasketEl = document.getElementById("selectedBasket");
+    const floatingNavEl = document.getElementById("floatingNav");
     const searchPanelEl = document.getElementById("searchPanel");
     const modePanelEl = document.getElementById("modePanel");
     const manualModeBtn = document.getElementById("manualModeBtn");
@@ -1217,6 +2433,9 @@
     let autoDraft = [];
     let autoModalState = null;
     let autoGenerating = false;
+    let lastModalFocus = null;
+    let hasUsedSelectedBasket = false;
+    let lastSelectedCount = 0;
 
     proxyInput.value = DEFAULT_PROXY;
     proxyPreset.value = DEFAULT_PROXY;
@@ -1224,30 +2443,38 @@
     proxyPreset.addEventListener("change", handleProxyPresetChange);
     proxyInput.addEventListener("input", syncProxyPresetByInput);
     renderSelectedBasket();
+    renderAutoDraft();
     syncAutoYearRangeLabels("init");
 
     document.getElementById("searchBangumiBtn").addEventListener("click", searchBangumi);
     keywordInput.addEventListener("keydown", (e) => {
       if (e.key === "Enter") searchBangumi();
     });
+    document.addEventListener("keydown", handleGlobalKeydown);
+    window.addEventListener("scroll", updateFloatingNavVisibility, { passive: true });
+    window.addEventListener("resize", updateFloatingNavVisibility);
 
 
     function switchMode(mode) {
       const isAuto = mode === "auto";
 
-      autoPanelEl.style.display = isAuto ? "block" : "none";
-      searchPanelEl.style.display = isAuto ? "none" : "block";
+      autoPanelEl.style.display = isAuto ? "" : "none";
+      searchPanelEl.style.display = isAuto ? "none" : "";
+      revealElement(isAuto ? autoPanelEl : searchPanelEl);
 
       const manualEls = [bangumiResultsEl, subjectDetailEl, fanCapsResultsEl, imagePanelEl];
       for (const el of manualEls) {
         if (isAuto) hideElement(el);
-        else showElement(el);
+        else showElement(el, false);
       }
 
       manualModeBtn.className = isAuto ? "mode-button light" : "mode-button active";
       autoModeBtn.className = isAuto ? "mode-button active" : "mode-button light";
+      manualModeBtn.setAttribute("aria-pressed", String(!isAuto));
+      autoModeBtn.setAttribute("aria-pressed", String(isAuto));
 
       setStatus(isAuto ? "已切换到自动出题。" : "已切换到手动出题。");
+      renderSelectedBasket();
       scrollToElement(isAuto ? autoPanelEl : searchPanelEl);
     }
 
@@ -1313,11 +2540,14 @@
 
         const text = await res.text();
         const records = [];
-        const lines = text.split(/\r?\n/).filter(line => line.trim());
+        const lines = text.split(/\r?\n/);
 
         for (let i = 0; i < lines.length; i++) {
+          const line = lines[i].trim();
+          if (!line) continue;
+
           try {
-            const raw = JSON.parse(lines[i]);
+            const raw = JSON.parse(line);
             const images = Array.isArray(raw.images)
               ? raw.images.map(x => String(x || "").trim()).filter(Boolean)
               : [];
@@ -1340,8 +2570,10 @@
               imageCount: images.length,
               images
             });
-          } catch (err) {
-            console.warn("skip bad jsonl line", i + 1, err);
+          } catch (err) {}
+
+          if (i > 0 && i % 250 === 0) {
+            await sleep(0);
           }
         }
 
@@ -1361,9 +2593,16 @@
       autoGenerating = Boolean(isGenerating);
       if (generateAutoDraftBtn) {
         generateAutoDraftBtn.disabled = autoGenerating;
-        generateAutoDraftBtn.textContent = autoGenerating ? "生成中..." : "生成题单";
+        generateAutoDraftBtn.textContent = autoGenerating ? "生成中..." : "生成题单草稿";
       }
       if (autoGenerateStatusEl) {
+        if (autoGenerating) {
+          autoGenerateStatusEl.textContent = pickOne([
+            "正在从截图池里抽一组题...",
+            "正在避开重复动画...",
+            "正在把候选截图排成草稿..."
+          ]);
+        }
         autoGenerateStatusEl.style.display = autoGenerating ? "inline-flex" : "none";
       }
     }
@@ -1372,7 +2611,7 @@
       if (autoGenerating) return;
 
       setAutoGenerating(true);
-      setStatus("正在生成题单...");
+      setStatus("正在生成题单草稿...");
       setProgress(8, true);
 
       try {
@@ -1388,7 +2627,7 @@
         if (!pool.length) {
           autoDraft = [];
           renderAutoDraft();
-          setStatus("当前筛选条件下没有可用截图。请放宽条件。");
+          setStatus("当前条件下没有可用截图。可以放宽年份、看过人数或清空 Bangumi 用户筛选。");
           setProgress(100, false);
           return;
         }
@@ -1396,13 +2635,12 @@
         setProgress(72, true);
         autoDraft = sampleUnique(pool, sampleCount).map(record => makeAutoDraftItem(record));
         renderAutoDraft();
-        setStatus(`已生成 ${autoDraft.length} 题。`);
+        setStatus(`已生成 ${autoDraft.length} 题草稿。可以换图、换动画，或加入已选截图。`);
         setProgress(100, false);
         scrollToElement(autoDraftAreaEl);
       } catch (err) {
-        console.error(err);
         setProgress(0, false);
-        setStatus("自动出题失败：" + err.message);
+        setStatus("自动出题失败。请调整条件后重试，或稍后再试。详情：" + err.message);
       } finally {
         setAutoGenerating(false);
       }
@@ -1416,7 +2654,7 @@
 
       let allowedIds = null;
       if (user) {
-        setStatus("正在读取 Bangumi 用户收藏...");
+        setStatus("正在读取这个 Bangumi 用户看过的动画...");
         allowedIds = await fetchBangumiWatchedIds(user);
       }
 
@@ -1428,7 +2666,7 @@
         return record.images && record.images.length;
       });
 
-      const scope = user ? `用户收藏交集：${pool.length} 部` : `可用动画：${pool.length} 部`;
+      const scope = user ? `符合用户看过：${pool.length} 部` : `可用动画：${pool.length} 部`;
       if (autoPoolInfoEl) autoPoolInfoEl.textContent = scope;
       return pool;
     }
@@ -1478,7 +2716,7 @@
       if (addAutoDraftBtn) addAutoDraftBtn.disabled = !autoDraft.length;
 
       if (!autoDraft.length) {
-        autoDraftAreaEl.innerHTML = `<div class="empty" style="margin-top: 12px;">还没有题单。设置条件后点击“生成题单”。</div>`;
+        autoDraftAreaEl.innerHTML = `<div class="empty content-spaced-sm">还没有题单草稿。设置条件后，点击“生成题单草稿”。</div>`;
         return;
       }
 
@@ -1494,19 +2732,20 @@
             ${autoDraft.map((item, idx) => renderAutoDraftCard(item, idx)).join("")}
           </div>
           <div class="auto-draft-bottom-actions">
-            <button type="button" class="light" onclick="addAutoDraftToSelected()">加入已选截图</button>
-            <button type="button" onclick="copyAutoDraftJsonl()">复制当前题单 JSONL</button>
-            <button type="button" onclick="exportAutoDraftJsonl()">导出当前题单 JSONL</button>
+            <button type="button" class="light" onclick="addAutoDraftToSelected()">把草稿加入已选</button>
+            <button type="button" onclick="copyAutoDraftJsonl()">复制草稿题单</button>
+            <button type="button" onclick="exportAutoDraftJsonl()">导出草稿题单</button>
           </div>
         </div>
       `;
+      revealElement(autoDraftAreaEl);
       updateSelectedCount();
     }
 
     function renderAutoDraftCard(item, idx) {
       return `
-        <div class="draft-card" id="${escapeHtml(item.uid)}">
-          <img src="${escapeHtml(originalToFanCapsThumbnailUrl(item.imageUrl))}" loading="lazy" referrerpolicy="no-referrer" onerror="this.style.display='none'">
+        <div class="draft-card draft-enter" id="${escapeHtml(item.uid)}" style="--stagger-delay: ${Math.min(idx * 24, 168)}ms;">
+          <img src="${escapeHtml(originalToFanCapsThumbnailUrl(item.imageUrl))}" alt="${escapeHtml(item.title)} 截图候选" loading="lazy" referrerpolicy="no-referrer" onerror="this.style.display='none'">
           <div class="draft-title">${idx + 1}. ${escapeHtml(item.title)}</div>
           <div class="draft-meta">${escapeHtml(item.date || "日期未知")} · 看过 ${Number(item.doneCount || 0).toLocaleString()}</div>
           <div class="draft-actions">
@@ -1530,6 +2769,17 @@
     }
 
     function removeAutoDraftItem(uid) {
+      const card = document.getElementById(uid);
+      if (card && !prefersReducedMotion()) {
+        card.classList.add("is-removing");
+        window.setTimeout(() => removeAutoDraftItemNow(uid), 170);
+        return;
+      }
+      removeAutoDraftItemNow(uid);
+      return;
+    }
+
+    function removeAutoDraftItemNow(uid) {
       autoDraft = autoDraft.filter(item => item.uid !== uid);
       renderAutoDraft();
       setStatus("已移除 1 题。");
@@ -1559,7 +2809,7 @@
 
       if (!candidates.length) {
         autoModalHintEl.textContent = item.title;
-        autoModalChoicesEl.innerHTML = `<div class="empty">这部动画没有其它可换图片。</div>`;
+        autoModalChoicesEl.innerHTML = `<div class="empty">这部动画暂时没有其它候选截图。可以改换动画，或保留当前截图。</div>`;
         return;
       }
 
@@ -1580,11 +2830,11 @@
         ? `${item.title} · 所有图片都随机完了，开始重新随机。`
         : item.title;
 
-      autoModalChoicesEl.innerHTML = finalChoices.map(url => `
-        <div class="modal-choice">
-          <img src="${escapeHtml(originalToFanCapsThumbnailUrl(url))}" loading="lazy" referrerpolicy="no-referrer" onerror="this.style.display='none'">
+      autoModalChoicesEl.innerHTML = finalChoices.map((url, idx) => `
+        <div class="modal-choice choice-enter" style="--stagger-delay: ${Math.min(idx * 22, 132)}ms;">
+          <img src="${escapeHtml(originalToFanCapsThumbnailUrl(url))}" alt="${escapeHtml(item.title)} 可替换截图" loading="lazy" referrerpolicy="no-referrer" onerror="this.style.display='none'">
           <div class="modal-choice-title">${escapeHtml(item.title)}</div>
-          <button onclick="chooseAutoImage('${escapeJsString(item.uid)}', '${escapeJsString(url)}')">选择这张</button>
+          <button onclick="chooseAutoImage('${escapeJsString(item.uid)}', '${escapeJsString(url)}')">选择</button>
         </div>
       `).join("");
     }
@@ -1594,7 +2844,8 @@
       if (idx < 0) return;
       const record = autoDraft[idx].record;
       autoDraft[idx] = makeAutoDraftItem(record, url);
-      renderAutoDraft();
+      autoDraft[idx].uid = uid;
+      replaceAutoDraftCard(uid, idx);
       closeAutoModal();
       setStatus("已更换图片。");
     }
@@ -1624,8 +2875,8 @@
       const pool = autoFilteredPool.filter(record => !used.has(record.bgmId) && record.bgmId !== currentBgmId);
 
       if (!pool.length) {
-        autoModalHintEl.textContent = "当前筛选范围没有更多动画。";
-        autoModalChoicesEl.innerHTML = `<div class="empty">当前筛选范围没有更多动画。</div>`;
+        autoModalHintEl.textContent = "当前筛选范围里没有更多可替换动画。";
+        autoModalChoicesEl.innerHTML = `<div class="empty">当前筛选范围里没有更多可替换动画。可以放宽条件后重新生成草稿。</div>`;
         return;
       }
 
@@ -1646,14 +2897,14 @@
         ? "所有动画都随机完了，开始重新随机。"
         : "从当前筛选范围中随机给出 5 部。";
 
-      autoModalChoicesEl.innerHTML = choices.map(record => {
+      autoModalChoicesEl.innerHTML = choices.map((record, idx) => {
         const image = randomOne(record.images);
         return `
-          <div class="modal-choice">
-            <img src="${escapeHtml(originalToFanCapsThumbnailUrl(image))}" loading="lazy" referrerpolicy="no-referrer" onerror="this.style.display='none'">
+          <div class="modal-choice choice-enter" style="--stagger-delay: ${Math.min(idx * 22, 132)}ms;">
+            <img src="${escapeHtml(originalToFanCapsThumbnailUrl(image))}" alt="${escapeHtml(record.title)} 截图候选" loading="lazy" referrerpolicy="no-referrer" onerror="this.style.display='none'">
             <div class="modal-choice-title">${escapeHtml(record.title)}</div>
             <div class="draft-meta">${escapeHtml(record.date || "日期未知")} · 看过 ${Number(record.doneCount || 0).toLocaleString()}</div>
-            <button onclick="chooseAutoAnime('${escapeJsString(uid)}', '${escapeJsString(record.bgmId)}', '${escapeJsString(image)}')">选择这部</button>
+            <button onclick="chooseAutoAnime('${escapeJsString(uid)}', '${escapeJsString(record.bgmId)}', '${escapeJsString(image)}')">选择</button>
           </div>
         `;
       }).join("");
@@ -1664,9 +2915,21 @@
       const record = autoFilteredPool.find(x => x.bgmId === bgmId);
       if (idx < 0 || !record) return;
       autoDraft[idx] = makeAutoDraftItem(record, imageUrl || randomOne(record.images));
-      renderAutoDraft();
+      autoDraft[idx].uid = uid;
+      replaceAutoDraftCard(uid, idx);
       closeAutoModal();
-      setStatus("已更换动画。 ");
+      setStatus("已更换动画。");
+    }
+
+    function replaceAutoDraftCard(uid, idx) {
+      const card = document.getElementById(uid);
+      const item = autoDraft[idx];
+      if (!card || !item) {
+        renderAutoDraft();
+        return;
+      }
+
+      card.outerHTML = renderAutoDraftCard(item, idx);
     }
 
     function refreshAutoModalBatch() {
@@ -1680,16 +2943,85 @@
     }
 
     function showAutoModal() {
+      lastModalFocus = document.activeElement instanceof HTMLElement ? document.activeElement : null;
       autoChoiceModalEl.classList.add("show");
+      autoChoiceModalEl.setAttribute("aria-hidden", "false");
+      document.body.classList.add("modal-open");
+      setTimeout(() => {
+        const firstAction = getAutoModalFocusable()[0];
+        (firstAction || autoChoiceModalEl.querySelector(".modal-box"))?.focus();
+      }, 0);
     }
 
     function closeAutoModal() {
       autoChoiceModalEl.classList.remove("show");
+      autoChoiceModalEl.setAttribute("aria-hidden", "true");
+      document.body.classList.remove("modal-open");
       autoModalState = null;
+      if (lastModalFocus && document.contains(lastModalFocus)) {
+        lastModalFocus.focus();
+      }
+      lastModalFocus = null;
     }
 
     function handleModalBackdropClick(event) {
       if (event.target === autoChoiceModalEl) closeAutoModal();
+    }
+
+    function handleGlobalKeydown(event) {
+      if (!autoChoiceModalEl.classList.contains("show")) return;
+
+      if (event.key === "Escape") {
+        closeAutoModal();
+        return;
+      }
+
+      if (event.key === "Tab") {
+        trapAutoModalFocus(event);
+      }
+    }
+
+    function getAutoModalFocusable() {
+      const selector = [
+        "button:not([disabled])",
+        "[href]",
+        "input:not([disabled])",
+        "select:not([disabled])",
+        "textarea:not([disabled])",
+        "[tabindex]:not([tabindex='-1'])"
+      ].join(", ");
+
+      return [...autoChoiceModalEl.querySelectorAll(selector)]
+        .filter(el => el instanceof HTMLElement && !el.hasAttribute("hidden") && el.offsetParent !== null);
+    }
+
+    function trapAutoModalFocus(event) {
+      const focusable = getAutoModalFocusable();
+      const modalBox = autoChoiceModalEl.querySelector(".modal-box");
+
+      if (!focusable.length) {
+        event.preventDefault();
+        modalBox?.focus();
+        return;
+      }
+
+      const first = focusable[0];
+      const last = focusable[focusable.length - 1];
+      const active = document.activeElement;
+
+      if (!autoChoiceModalEl.contains(active)) {
+        event.preventDefault();
+        first.focus();
+        return;
+      }
+
+      if (event.shiftKey && active === first) {
+        event.preventDefault();
+        last.focus();
+      } else if (!event.shiftKey && active === last) {
+        event.preventDefault();
+        first.focus();
+      }
     }
 
 
@@ -1710,7 +3042,7 @@
 
     async function copyAutoDraftJsonl() {
       if (!autoDraft.length) {
-        setStatus("当前没有题单。 ");
+        setStatus("还没有题单草稿。请先生成题单草稿。");
         return;
       }
       const text = getAutoDraftJsonlText();
@@ -1719,27 +3051,29 @@
       } catch {
         fallbackCopyText(text);
       }
-      setStatus(`已复制 ${autoDraft.length} 条当前题单 JSONL。`);
+      announceDelight("copyDraft", autoDraft.length, false);
     }
 
     function exportAutoDraftJsonl() {
       if (!autoDraft.length) {
-        setStatus("当前没有题单。 ");
+        setStatus("还没有题单草稿。请先生成题单草稿。");
         return;
       }
       const text = getAutoDraftJsonlText();
       downloadBlob(new Blob([text], { type: "application/x-ndjson" }), "fancaps-auto-question-list.jsonl");
-      setStatus(`已导出 ${autoDraft.length} 条当前题单 JSONL。`);
+      announceDelight("exportDraft", autoDraft.length);
     }
 
     function addAutoDraftToSelected() {
       if (!autoDraft.length) {
-        setStatus("当前没有题单草稿。 ");
+        setStatus("还没有题单草稿。请先生成题单草稿。");
         return;
       }
 
+      const addedIds = [];
       for (const item of autoDraft) {
         const id = `auto_${item.bgmId}_${hashString(item.imageUrl)}`;
+        addedIds.push(id);
         selectedImages.set(id, {
           id,
           episodeTitle: "",
@@ -1754,7 +3088,8 @@
 
       renderSelectedBasket();
       renderAutoDraft();
-      setStatus(`已加入 ${autoDraft.length} 张截图到已选。`);
+      for (const id of addedIds.slice(-8)) playPickedFeedback(id);
+      announceDelight("addDraft", autoDraft.length, false);
       scrollToBasket();
     }
 
@@ -1805,11 +3140,14 @@
 
     function toggleProxyPanel() {
       const panel = document.getElementById("proxyDetails");
+      const trigger = document.querySelector("[aria-controls='proxyDetails']");
       if (!panel) return;
       const isHidden = panel.style.display === "none" || !panel.style.display;
       panel.style.display = isHidden ? "block" : "none";
+      if (trigger) trigger.setAttribute("aria-expanded", String(isHidden));
       if (isHidden) {
-        panel.scrollIntoView({ behavior: "smooth", block: "nearest" });
+        revealElement(panel);
+        panel.scrollIntoView({ behavior: getScrollBehavior(), block: "nearest" });
       }
     }
 
@@ -1819,7 +3157,8 @@
       const isHidden = panel.style.display === "none" || !panel.style.display;
       panel.style.display = isHidden ? "block" : "none";
       if (isHidden) {
-        panel.scrollIntoView({ behavior: "smooth", block: "nearest" });
+        revealElement(panel);
+        panel.scrollIntoView({ behavior: getScrollBehavior(), block: "nearest" });
       }
     }
 
@@ -1833,7 +3172,7 @@
 
       proxyInput.value = value;
       updateCurrentProxyLabel();
-      setStatus(`已切换代理：${proxyPreset.options[proxyPreset.selectedIndex].text}`);
+      setStatus(`已切换连接方式：${proxyPreset.options[proxyPreset.selectedIndex].text}`);
     }
 
     function syncProxyPresetByInput() {
@@ -1847,22 +3186,29 @@
       proxyInput.value = DEFAULT_PROXY;
       proxyPreset.value = DEFAULT_PROXY;
       updateCurrentProxyLabel();
-      setStatus("已恢复默认代理。");
+      setStatus("已恢复推荐连接。");
     }
 
     function updateCurrentProxyLabel() {
       if (!currentProxyLabel) return;
       const selected = proxyPreset.options[proxyPreset.selectedIndex];
       if (proxyPreset.value === "custom") {
-        currentProxyLabel.textContent = "自定义代理";
+        currentProxyLabel.textContent = "自定义连接";
+      } else if (proxyPreset.value === DEFAULT_PROXY) {
+        currentProxyLabel.textContent = "默认连接（推荐）";
       } else if (selected) {
-        currentProxyLabel.textContent = selected.textContent;
+        currentProxyLabel.textContent = "备用连接";
       } else {
-        currentProxyLabel.textContent = proxyInput.value.trim() || "未设置";
+        currentProxyLabel.textContent = proxyInput.value.trim() ? "自定义连接" : "未设置";
       }
     }
 
     function clearAll() {
+      if (selectedImages.size && !window.confirm(`清空当前搜索结果和 ${selectedImages.size} 张已选截图？此操作不能撤销。`)) {
+        setStatus("已取消清空。");
+        return;
+      }
+
       keywordInput.value = "";
       bangumiResultsEl.innerHTML = "";
       subjectDetailEl.innerHTML = "";
@@ -1881,14 +3227,14 @@
       showElement(fanCapsResultsEl);
       showElement(imagePanelEl);
       setProgress(0, false);
-      setStatus("已清空。");
+      setStatus("已清空当前流程。可以重新搜索或生成草稿。");
       window.scrollTo({ top: 0, behavior: "smooth" });
     }
 
     async function searchBangumi() {
       const keyword = keywordInput.value.trim();
       if (!keyword) {
-        setStatus("请输入关键词。");
+        setStatus("请输入动画名。可以用中文名、日文名或常见简称。");
         return;
       }
 
@@ -1903,7 +3249,7 @@
       currentSubject = null;
       currentLoadedAnimeLabel = "";
       setProgress(0, false);
-      setStatus("正在搜索 Bangumi...");
+      setStatus("正在搜索动画条目...");
 
       try {
         const res = await fetch(`${BGM_API}/v0/search/subjects?limit=12&offset=0`, {
@@ -1928,37 +3274,37 @@
         const items = data.data || [];
 
         if (!items.length) {
-          setStatus("没有搜到 Bangumi 结果。可以换成更短关键词或日文名。");
+          setStatus("没有搜到动画条目。可以换成更短关键词、日文名或英文名再试。");
           return;
         }
 
         renderBangumiResults(items);
         showElement(bangumiResultsEl);
-        setStatus(`找到 ${items.length} 个 Bangumi 候选条目。`);
+        setStatus(`找到 ${items.length} 个候选条目。请选择正确动画。`);
         scrollToElement(bangumiResultsEl);
       } catch (err) {
-        console.error(err);
-        setStatus("Bangumi 请求失败：" + err.message);
+        setStatus("动画搜索失败。请检查连接方式后重试。详情：" + err.message);
       }
     }
 
     function renderBangumiResults(items) {
       bangumiResultsEl.innerHTML = items.map(item => {
         const img = item.images?.small || item.images?.grid || item.images?.common || "";
-        const nameCn = item.name_cn || "无中文名";
+        const displayName = item.name_cn || item.name || "未命名条目";
         const rawName = item.name || "";
+        const secondaryName = rawName && rawName !== displayName ? rawName : "";
         const date = item.date || "未知日期";
         const score = item.rating?.score ? `评分：${item.rating.score}` : "暂无评分";
 
         return `
-          <div class="card" onclick="loadSubject(${Number(item.id)})">
-            ${img ? `<img class="cover" src="${escapeHtml(img)}" alt="">` : `<div class="cover"></div>`}
-            <div>
-              <div class="title">${escapeHtml(nameCn)}</div>
-              <div class="sub">${escapeHtml(rawName)}</div>
+          <button type="button" class="card bangumi-card" onclick="loadSubject(${Number(item.id)})" aria-label="选择 ${escapeHtml(displayName)}">
+            ${img ? `<img class="cover" src="${escapeHtml(img)}" alt="${escapeHtml(displayName)} 封面">` : `<div class="cover" aria-hidden="true"></div>`}
+            <div class="bangumi-card-copy">
+              <div class="title">${escapeHtml(displayName)}</div>
+              ${secondaryName ? `<div class="sub">${escapeHtml(secondaryName)}</div>` : ""}
               <div class="sub">${escapeHtml(date)} · ${escapeHtml(score)}</div>
             </div>
-          </div>
+          </button>
         `;
       }).join("");
     }
@@ -1974,7 +3320,7 @@
       currentSubject = null;
       currentLoadedAnimeLabel = "";
       setProgress(0, false);
-      setStatus("正在读取 Bangumi 条目...");
+      setStatus("正在读取动画条目...");
 
       try {
         const res = await fetch(`${BGM_API}/v0/subjects/${id}`, {
@@ -1988,12 +3334,11 @@
         renderSubjectDetail(subject);
         hideElement(bangumiResultsEl);
         showElement(subjectDetailEl);
-        setStatus("已选择 Bangumi 条目，正在自动匹配 AniDB ID...");
+        setStatus("已选择动画，正在自动查找对应截图...");
         scrollToElement(subjectDetailEl);
         autoResolveAndSearchFanCaps(subject);
       } catch (err) {
-        console.error(err);
-        setStatus("读取条目失败：" + err.message);
+        setStatus("读取动画条目失败。请重新选择或稍后重试。详情：" + err.message);
       }
     }
 
@@ -2011,31 +3356,31 @@
               <div class="section-headline">
                 <div>
                   <div class="side-title">正在查找截图</div>
-                  <div class="source-note">会自动尝试匹配 FanCaps。</div>
+                  <div class="source-note">正在匹配可用截图来源。</div>
                 </div>
                 <button class="quiet" type="button" onclick="autoResolveAndSearchFanCaps(currentSubject)">重新查找</button>
               </div>
 
-              <div id="anidbMatchResults" class="fineprint" style="margin-top: 10px;">
-                正在自动查找...
+              <div id="anidbMatchResults" class="fineprint content-spaced-sm">
+                正在查找可用截图...
               </div>
             </section>
 
             <section id="manualTitleSearch" class="subject-side-flow" style="display: none;">
               <div class="side-title">手动搜索</div>
-              <div class="source-note">没有自动找到时，可以换一个标题搜索。</div>
+              <div class="source-note">自动查找失败时，可以改用下方标题继续搜索。</div>
 
-              <div style="margin-top: 8px;">
+              <div class="content-spaced-xs">
                 ${
                   latinCandidates.length
                     ? renderFanCapsCandidateTags(latinCandidates)
-                    : `<span class="empty">没有可用的标题候选。</span>`
+                    : `<span class="empty">没有可用的备用标题。可以回到搜索，换一个 Bangumi 条目。</span>`
                 }
               </div>
             </section>
           </div>
 
-          <div class="toolbar" style="margin-top: 12px;">
+          <div class="toolbar toolbar-spaced">
             <button class="quiet" onclick="showBangumiResults()">重新选择动画</button>
           </div>
         </div>
@@ -2060,8 +3405,8 @@
         return `
           <span class="tag">
             <span>${escapeHtml(text)}</span>
-            <button onclick="searchFanCaps('${escapeJsString(text)}')">搜 FanCaps</button>
-            <a class="button secondary" href="${escapeHtml(searchUrl)}" target="_blank" rel="noopener noreferrer">打开搜索页</a>
+            <button onclick="searchFanCaps('${escapeJsString(text)}')">用这个标题找截图</button>
+            <a class="button source-link" href="${escapeHtml(searchUrl)}" target="_blank" rel="noopener noreferrer">打开原搜索页</a>
           </span>
         `;
       }).join("");
@@ -2073,22 +3418,22 @@
 
     async function autoResolveAndSearchFanCaps(subject) {
       if (!subject) {
-        setStatus("请先选择一个 Bangumi 条目。");
+        setStatus("请先从搜索结果里选择一部动画。");
         return false;
       }
 
       const bangumiTitles = getBangumiAllTitleCandidates(subject);
 
       setProgress(8, true);
-      setStatus("正在自动查找截图...");
-      setAutoMatchMessage("正在自动查找...");
+      setStatus("正在自动查找可用截图...");
+      setAutoMatchMessage("正在查找可用截图...");
 
       try {
         const mapHit = await findAniDbIdFromAnimeMap(subject);
 
         if (mapHit && mapHit.anidbId) {
-          setAutoMatchMessage("已找到匹配，正在搜索截图...");
-          setStatus("已找到匹配，正在搜索 FanCaps...");
+          setAutoMatchMessage("已找到可能匹配，正在读取截图...");
+          setStatus("已找到可能匹配，正在读取截图...");
 
           const results = await searchFanCaps(String(mapHit.anidbId), {
             auto: true,
@@ -2102,26 +3447,25 @@
             return true;
           }
 
-          setAutoMatchMessage("继续尝试其它匹配方式...");
+          setAutoMatchMessage("还没有找到可用截图，正在尝试备用标题...");
         } else {
-          setAutoMatchMessage("继续尝试其它匹配方式...");
+          setAutoMatchMessage("还没有找到可用截图，正在尝试备用标题...");
         }
       } catch (err) {
-        console.warn("anime_map match failed:", err);
-        setAutoMatchMessage("继续尝试其它匹配方式...");
+        setAutoMatchMessage("还没有找到可用截图，正在尝试备用标题...");
       }
 
       if (!bangumiTitles.length) {
         setProgress(0, false);
-        setStatus("未自动找到截图，请手动搜索。");
-        setAutoMatchMessage("未自动找到截图。请选择一个标题手动搜索。", "empty");
+        setStatus("没有自动找到截图。请用备用标题手动搜索。");
+        setAutoMatchMessage("没有自动找到截图。请选择一个备用标题继续搜索。", "empty");
         showManualTitleSearch();
         return false;
       }
 
       try {
         setProgress(38, true);
-        setStatus("正在尝试备用匹配...");
+        setStatus("正在尝试备用标题...");
         const index = await loadAniDbTitleIndex();
         setProgress(72, true);
 
@@ -2130,14 +3474,14 @@
 
         if (!best) {
           setProgress(0, false);
-          setStatus("未自动找到截图，请手动搜索。");
-          setAutoMatchMessage("未自动找到截图。请选择一个标题手动搜索。", "empty");
+          setStatus("没有自动找到截图。请用备用标题手动搜索。");
+          setAutoMatchMessage("没有自动找到截图。请选择一个备用标题继续搜索。", "empty");
           showManualTitleSearch();
           return false;
         }
 
-        setStatus("已找到匹配，正在搜索 FanCaps...");
-        setAutoMatchMessage("已找到匹配，正在搜索截图...");
+        setStatus("已找到可能匹配，正在读取截图...");
+        setAutoMatchMessage("已找到可能匹配，正在读取截图...");
 
         const results = await searchFanCaps(String(best.aid), {
           auto: true,
@@ -2152,15 +3496,14 @@
           return true;
         }
 
-        setStatus("未自动找到截图，请手动搜索。");
-        setAutoMatchMessage("未自动找到截图。请选择一个标题手动搜索。", "empty");
+        setStatus("没有自动找到截图。请用备用标题手动搜索。");
+        setAutoMatchMessage("没有自动找到截图。请选择一个备用标题继续搜索。", "empty");
         showManualTitleSearch();
         return false;
       } catch (err) {
-        console.error(err);
         setProgress(0, false);
-        setStatus("未自动找到截图，请手动搜索。");
-        setAutoMatchMessage("未自动找到截图。请选择一个标题手动搜索。", "empty");
+        setStatus("没有自动找到截图。请用备用标题手动搜索。");
+        setAutoMatchMessage("没有自动找到截图。请选择一个备用标题继续搜索。", "empty");
         showManualTitleSearch();
         return false;
       }
@@ -2174,7 +3517,12 @@
         const res = await fetch(ANIME_MAP_PATH, { method: "GET", cache: "force-cache" });
         if (!res.ok) throw new Error(`anime_map.json 请求失败：HTTP ${res.status}`);
 
-        const data = await res.json();
+        const text = await res.text();
+        await sleep(0);
+
+        const data = JSON.parse(text);
+        await sleep(0);
+
         const rows = Array.isArray(data)
           ? data
           : Array.isArray(data?.items)
@@ -2182,11 +3530,16 @@
             : Object.values(data || {});
 
         const byBgmId = new Map();
-        for (const row of rows) {
+        for (let i = 0; i < rows.length; i++) {
+          const row = rows[i];
           if (!row) continue;
           const bgmId = row.bgm_id ?? row.bangumi_id ?? row.bgmId ?? row.id;
           if (bgmId === undefined || bgmId === null || bgmId === "") continue;
           byBgmId.set(String(bgmId), row);
+
+          if (i > 0 && i % 1000 === 0) {
+            await sleep(0);
+          }
         }
 
         animeMapIndexSource = `同目录 ${ANIME_MAP_PATH.replace(/^\.\//, "")}`;
@@ -2282,11 +3635,11 @@
 
     function renderAutoTitleExactMatchResult(best, bangumiTitles) {
       if (!best) {
-        setAutoMatchMessage("继续尝试手动标题搜索...", "empty");
+        setAutoMatchMessage("没有自动命中。请用备用标题手动搜索。", "empty");
         return;
       }
 
-      setAutoMatchMessage("已找到匹配，正在搜索截图...");
+      setAutoMatchMessage("已找到可能匹配，正在读取截图...");
     }
 
     async function loadAniDbTitleIndex() {
@@ -2295,8 +3648,8 @@
 
       anidbTitleIndexPromise = (async () => {
         const loaded = await fetchAniDbTitlesXmlPreferLocal();
-        setStatus("正在准备备用匹配...");
-        const index = buildAniDbTitleIndex(loaded.xmlText);
+        setStatus("正在准备备用标题库...");
+        const index = await buildAniDbTitleIndex(loaded.xmlText);
         anidbTitleIndex = index;
         anidbTitleIndexSource = loaded.sourceLabel;
         return index;
@@ -2320,8 +3673,8 @@
       }
 
       throw new Error(
-        `无法加载 AniDB title dump。${failures.join("；")}。` +
-        `请确认网站同目录存在 anime-titles.xml 或 anime-titles.xml.gz；如果默认文件不可用，请打开“更新 AniDB 标题库”，下载最新 GZ 后上传。`
+        `无法加载备用标题库。${failures.join("；")}。` +
+        `请确认网站同目录存在 anime-titles.xml 或 anime-titles.xml.gz；如果默认文件不可用，请下载最新 GZ 后上传。`
       );
     }
 
@@ -2349,16 +3702,16 @@
 
     async function fetchAniDbTitlesXmlViaProxy() {
       const proxy = proxyInput.value.trim();
-      if (!proxy) throw new Error("没有设置 CORS 代理。");
+      if (!proxy) throw new Error("没有设置连接方式。请恢复推荐连接后重试。");
 
       const url = proxy + encodeURIComponent(ANIDB_TITLES_URL);
       const res = await fetch(url, { method: "GET" });
-      if (!res.ok) throw new Error(`AniDB title dump 请求失败：HTTP ${res.status}`);
+      if (!res.ok) throw new Error(`备用标题库请求失败：HTTP ${res.status}`);
 
       const buffer = await res.arrayBuffer();
       return {
         xmlText: await decodeMaybeGzipText(buffer),
-        sourceLabel: "远程 AniDB title dump"
+        sourceLabel: "远程备用标题库"
       };
     }
 
@@ -2367,16 +3720,16 @@
 
       const panel = document.getElementById("anidbMatchResults");
       if (panel) {
-        panel.innerHTML = `<div style="margin-top: 8px;">正在读取本地文件：${escapeHtml(file.name)}</div>`;
+        panel.innerHTML = `<div class="content-spaced-xs">正在读取备用标题文件：${escapeHtml(file.name)}</div>`;
       }
       setProgress(12, true);
-      setStatus(`正在读取本地 AniDB 文件：${file.name}`);
+      setStatus(`正在读取备用标题文件：${file.name}`);
 
       try {
         const buffer = await file.arrayBuffer();
         const xmlText = await decodeMaybeGzipText(buffer);
         setProgress(55, true);
-        const index = buildAniDbTitleIndex(xmlText);
+        const index = await buildAniDbTitleIndex(xmlText);
         anidbTitleIndex = index;
         anidbTitleIndexPromise = null;
         anidbTitleIndexSource = `用户上传文件 ${file.name}`;
@@ -2384,18 +3737,17 @@
 
         if (panel) {
           panel.innerHTML = `
-            <div style="margin-top: 8px;">已加载上传的 AniDB 标题索引：${escapeHtml(file.name)}</div>
-            <div class="fineprint">标题库已更新。</div>
+            <div class="content-spaced-xs">已加载备用标题文件：${escapeHtml(file.name)}</div>
+            <div class="fineprint">现在会用这份标题库继续匹配截图。</div>
           `;
         }
-        setStatus(`已加载上传的 AniDB 标题索引：${file.name}。`);
+        setStatus(`已加载备用标题文件：${file.name}。`);
       } catch (err) {
-        console.error(err);
         setProgress(0, false);
         if (panel) {
-          panel.innerHTML = `<div class="empty" style="margin-top: 8px;">读取本地 AniDB 文件失败：${escapeHtml(err.message)}</div>`;
+          panel.innerHTML = `<div class="empty content-spaced-xs">读取备用标题文件失败：${escapeHtml(err.message)}</div>`;
         }
-        setStatus("读取本地 AniDB 文件失败：" + err.message);
+        setStatus("读取备用标题文件失败。请确认文件完整后重试。详情：" + err.message);
       }
     }
 
@@ -2406,27 +3758,28 @@
 
       const isGzip = bytes.length >= 2 && bytes[0] === 0x1f && bytes[1] === 0x8b;
       if (!isGzip) {
-        throw new Error("返回内容不像 XML，也不像 gzip。请检查代理是否正确返回 AniDB dump。");
+        throw new Error("返回内容不像可用的标题库文件。请检查文件或连接方式。");
       }
 
       if (typeof DecompressionStream === "undefined") {
-        throw new Error("当前浏览器不支持 DecompressionStream，无法直接解压 .gz。请换用新版 Chrome/Edge，或让代理在服务端解压。");
+        throw new Error("当前浏览器无法直接解压 .gz。请换用新版 Chrome/Edge，或上传解压后的 XML 文件。");
       }
 
       const stream = new Blob([buffer]).stream().pipeThrough(new DecompressionStream("gzip"));
       return await new Response(stream).text();
     }
 
-    function buildAniDbTitleIndex(xmlText) {
+    async function buildAniDbTitleIndex(xmlText) {
       const xml = new DOMParser().parseFromString(xmlText, "application/xml");
       const parseError = xml.querySelector("parsererror");
-      if (parseError) throw new Error("AniDB title dump XML 解析失败。");
+      if (parseError) throw new Error("备用标题库解析失败。请确认文件格式正确。");
 
       const titleMap = new Map();
       const aidMap = new Map();
       const animeNodes = [...xml.querySelectorAll("anime")];
 
-      for (const anime of animeNodes) {
+      for (let i = 0; i < animeNodes.length; i++) {
+        const anime = animeNodes[i];
         const aid = anime.getAttribute("aid");
         if (!aid) continue;
 
@@ -2450,6 +3803,10 @@
 
         if (titles.length) {
           aidMap.set(aid, { aid, titles });
+        }
+
+        if (i > 0 && i % 500 === 0) {
+          await sleep(0);
         }
       }
 
@@ -2516,16 +3873,16 @@
 
       if (!matches.length) {
         panel.innerHTML = `
-          <div class="empty" style="margin-top: 8px;">AniDB full match 未命中。</div>
+          <div class="empty content-spaced-xs">备用标题库没有命中。</div>
           <div class="fineprint">已尝试标题：${escapeHtml(bangumiTitles.join(" / "))}</div>
         `;
         return;
       }
 
       panel.innerHTML = `
-        <div style="margin-top: 10px;"><b>AniDB full match 结果</b></div>
-        <div class="fineprint">命中 ${matches.length} 个 aid。只有命中唯一 aid 时会自动搜 FanCaps；多个 aid 时需要手动选择。</div>
-        <div style="margin-top: 8px;">
+        <div class="content-spaced-sm"><b>备用标题匹配结果</b></div>
+        <div class="fineprint">命中 ${matches.length} 个候选编号。只有一个候选时会自动继续，多个候选需要手动选择。</div>
+        <div class="content-spaced-xs">
           ${matches.map(match => renderAniDbMatchItem(match)).join("")}
         </div>
       `;
@@ -2542,14 +3899,14 @@
       const searchUrl = buildFanCapsSearchUrl(aidQuery);
 
       return `
-        <div class="tag" style="align-items: flex-start; border-radius: 12px;">
+        <div class="tag match-item">
           <span>
-            <b>aid=${escapeHtml(match.aid)}</b>
-            <span class="sub">${escapeHtml(first.anidbTitle || "AniDB title")}</span>
+            <b>候选编号 ${escapeHtml(match.aid)}</b>
+            <span class="sub">${escapeHtml(first.anidbTitle || "备用标题")}</span>
             <br><span class="sub">${escapeHtml(matchedLines.join("；") + more)}</span>
           </span>
-          <button onclick="searchFanCaps('${escapeJsString(aidQuery)}')">搜 FanCaps</button>
-          <a class="button secondary" href="${escapeHtml(searchUrl)}" target="_blank" rel="noopener noreferrer">打开搜索页</a>
+          <button onclick="searchFanCaps('${escapeJsString(aidQuery)}')">用这个编号找截图</button>
+          <a class="button source-link" href="${escapeHtml(searchUrl)}" target="_blank" rel="noopener noreferrer">打开原搜索页</a>
         </div>
       `;
     }
@@ -2571,7 +3928,7 @@
       imageItemsById.clear();
       episodeDetailStates.clear();
       if (!isAuto) setProgress(0, false);
-      setStatus("正在搜索 FanCaps...");
+      setStatus("正在搜索截图来源...");
 
       try {
         const pageHtml = await fetchViaProxy(searchUrl);
@@ -2585,32 +3942,31 @@
         if (results.length) {
           if (shouldAutoLoadImages && results.length === 1) {
             const item = results[0];
-            setStatus("已找到结果，正在加载图片...");
+            setStatus("已找到截图来源，正在加载候选截图...");
             await sleep(120);
             await loadFanCapsImages(item.url, item.title, { auto: true });
           } else if (shouldAutoLoadImages && results.length > 1) {
-            setStatus(`找到 ${results.length} 个结果，请选择正确条目。`);
+            setStatus(`找到 ${results.length} 个可能来源。请选择正确条目。`);
             scrollToElement(fanCapsResultsEl);
           } else {
-            setStatus(`找到 ${results.length} 个结果，请选择正确条目。`);
+            setStatus(`找到 ${results.length} 个可能来源。请选择正确条目。`);
             scrollToElement(fanCapsResultsEl);
           }
         } else {
-          setStatus(isAuto ? "继续尝试其它匹配方式..." : "没有找到结果，可以换一个标题搜索。");
+          setStatus(isAuto ? "还没有找到截图来源，继续尝试备用标题..." : "没有找到截图来源。可以换一个标题搜索。");
           scrollToElement(fanCapsResultsEl);
         }
 
         return results;
       } catch (err) {
-        console.error(err);
-        setStatus("FanCaps 解析失败：" + err.message);
+        setStatus("截图来源读取失败。可以稍后重试，或打开原页面手动检查。详情：" + err.message);
         showElement(fanCapsResultsEl);
         fanCapsResultsEl.innerHTML = `
           <div class="panel">
-            <h2>搜索失败</h2>
-            <div class="sub">当前无法读取 FanCaps 页面，可以稍后重试或打开原页面。</div>
-            <div class="toolbar" style="margin-top: 12px;">
-              <a class="button" href="${escapeHtml(searchUrl)}" target="_blank" rel="noopener noreferrer">打开 FanCaps 搜索页</a>
+            <h2>截图来源读取失败</h2>
+            <div class="sub">当前无法读取 FanCaps 页面。可以稍后重试，或打开原搜索页手动检查。</div>
+            <div class="toolbar toolbar-spaced">
+              <a class="button source-link" href="${escapeHtml(searchUrl)}" target="_blank" rel="noopener noreferrer">打开原搜索页</a>
             </div>
           </div>
         `;
@@ -2723,23 +4079,24 @@
     function renderFanCapsResults(query, searchUrl, results, options = {}) {
       const isAuto = Boolean(options.auto || options.autoLoadImages || options.quiet);
       const hintText = isAuto
-        ? (results.length > 1 ? "找到多个结果，请选择正确条目。" : "正在加载图片...")
+        ? (results.length > 1 ? "找到多个可能来源，请选择正确条目。" : "正在加载候选截图...")
         : "请选择正确条目。";
 
       fanCapsResultsEl.innerHTML = `
         <div class="panel">
-          <h2>FanCaps 搜索结果</h2>
+          <h2>选择截图来源</h2>
           <div class="hint">${escapeHtml(hintText)}</div>
+          <div class="review-helper">先看预览图，确认是同一部动画后再查看截图。</div>
 
           <div class="result-list">
             ${
               results.length
                 ? results.map(renderFanCapsItem).join("")
-                : `<div class="empty">没有找到结果。可以换一个标题搜索。</div>`
+                : `<div class="empty">没有找到截图来源。可以换一个标题、日文名或英文名再试。</div>`
             }
           </div>
-          <div class="toolbar" style="margin-top: 12px;">
-            <a class="button quiet" href="${escapeHtml(searchUrl)}" target="_blank" rel="noopener noreferrer">打开 FanCaps 搜索页</a>
+          <div class="toolbar toolbar-spaced">
+            <a class="button source-link" href="${escapeHtml(searchUrl)}" target="_blank" rel="noopener noreferrer">打开原搜索页</a>
           </div>
         </div>
       `;
@@ -2751,9 +4108,9 @@
           ${renderPreviewThumbs(item.previews)}
           <div>
             <div class="title">${escapeHtml(item.title)}</div>
-            <div class="toolbar" style="margin-top: 12px;">
-              <button onclick="loadFanCapsImages('${escapeJsString(item.url)}', '${escapeJsString(item.title)}')">加载图片</button>
-              <a class="button quiet" href="${escapeHtml(item.url)}" target="_blank" rel="noopener noreferrer">打开 FanCaps</a>
+            <div class="toolbar toolbar-spaced">
+              <button onclick="loadFanCapsImages('${escapeJsString(item.url)}', '${escapeJsString(item.title)}')">查看截图</button>
+              <a class="button source-link" href="${escapeHtml(item.url)}" target="_blank" rel="noopener noreferrer">打开原页面</a>
             </div>
           </div>
         </div>
@@ -2768,7 +4125,7 @@
       return `
         <div class="preview-grid">
           ${previews.slice(0, 4).map(url => `
-            <img src="${escapeHtml(url)}" loading="lazy" referrerpolicy="no-referrer" onerror="this.style.visibility='hidden'">
+            <img src="${escapeHtml(url)}" alt="FanCaps 预览截图" loading="lazy" referrerpolicy="no-referrer" onerror="this.style.visibility='hidden'">
           `).join("")}
         </div>
       `;
@@ -2782,7 +4139,7 @@
       imageItemsById.clear();
       episodeDetailStates.clear();
       setProgress(0, false);
-      setStatus("正在读取 FanCaps 作品页图片...");
+      setStatus("正在读取候选截图...");
 
       try {
         const episodeGroups = await collectEpisodeTopImages(pageUrl);
@@ -2792,19 +4149,18 @@
         showElement(imagePanelEl);
         const imageCount = episodeGroups.reduce((sum, ep) => sum + ep.images.length, 0);
         setProgress(100, false);
-        setStatus(`${options.auto ? "已自动加载图片" : "加载完成"}：${episodeGroups.length} 个分组，${imageCount} 张图片。`);
+        setStatus(`${options.auto ? "已自动加载候选截图" : "候选截图已加载"}：${episodeGroups.length} 个分组，${imageCount} 张图片。请选择适合猜谜的截图。`);
         scrollToElement(imagePanelEl);
       } catch (err) {
-        console.error(err);
         setProgress(0, false);
-        setStatus("图片解析失败：" + err.message);
+        setStatus("候选截图读取失败。可以稍后重试，或打开原页面手动查看。详情：" + err.message);
         showElement(imagePanelEl);
         imagePanelEl.innerHTML = `
           <div class="panel">
-            <h2>图片解析失败</h2>
-            <div class="sub">可能是代理失败、FanCaps 页面结构变化，或请求被限制。</div>
-            <div class="toolbar" style="margin-top: 12px;">
-              <a class="button" href="${escapeHtml(pageUrl)}" target="_blank" rel="noopener noreferrer">打开 FanCaps 条目页</a>
+            <h2>候选截图读取失败</h2>
+            <div class="sub">可能是连接失败、FanCaps 页面结构变化，或请求被限制。可以稍后重试。</div>
+            <div class="toolbar toolbar-spaced">
+              <a class="button source-link" href="${escapeHtml(pageUrl)}" target="_blank" rel="noopener noreferrer">打开原页面</a>
             </div>
           </div>
         `;
@@ -2820,7 +4176,7 @@
 
       while (currentUrl && !visitedPages.has(currentUrl) && pageIndex <= MAX_SHOW_PAGES) {
         visitedPages.add(currentUrl);
-        setStatus(`正在读取 FanCaps 第 ${pageIndex} 页，已解析 ${allGroups.length} 个分组...`);
+        setStatus(`正在读取第 ${pageIndex} 页截图，已找到 ${allGroups.length} 个分组...`);
 
         const html = await fetchViaProxy(currentUrl);
         const doc = parseHtml(html);
@@ -3049,7 +4405,7 @@
 
       imagePanelEl.innerHTML = `
         <div class="panel">
-          <h2>${escapeHtml(title || "FanCaps 图片")}</h2>
+          <h2>${escapeHtml(finalLabelText || title || "FanCaps 图片")}</h2>
 
           <div class="stats">
             <span class="pill">分组：${episodeGroups.length}</span>
@@ -3057,19 +4413,20 @@
             <span class="pill">全局已选：<span class="selectedCount">${selectedImages.size}</span></span>
           </div>
 
-          <div class="hint">勾选截图。已选图片会保留在顶部“已选截图”。</div>
+          <div class="hint">勾选适合猜谜的截图；同一部动画建议只保留一张。</div>
+          <div class="review-helper">已选截图会保留在页面底部，方便最后统一导出。</div>
 
           <div class="toolbar">
-            <a class="button quiet" href="${escapeHtml(sourceUrl)}" target="_blank" rel="noopener noreferrer">打开 FanCaps</a>
+            <a class="button source-link" href="${escapeHtml(sourceUrl)}" target="_blank" rel="noopener noreferrer">打开原页面</a>
           </div>
 
           ${
             episodeGroups.length
               ? episodeGroups.map(renderEpisodeGroup).join("")
-              : `<div class="empty">没有解析到图片。</div>`
+              : `<div class="empty">没有读取到候选截图。可以打开原页面检查，或返回搜索换一个条目。</div>`
           }
-          <div class="toolbar" style="margin-top: 14px;">
-            <a class="button quiet" href="${escapeHtml(sourceUrl)}" target="_blank" rel="noopener noreferrer">打开 FanCaps</a>
+          <div class="toolbar toolbar-roomy">
+            <a class="button source-link" href="${escapeHtml(sourceUrl)}" target="_blank" rel="noopener noreferrer">打开原页面</a>
           </div>
         </div>
       `;
@@ -3082,16 +4439,15 @@
         <div class="episode-block">
           <div class="episode-header">
             <div class="episode-title">${escapeHtml(group.title)}</div>
-            <div class="toolbar" style="margin-top: 0;">
-              <button onclick="selectEpisodeTop('${escapeJsString(group.title)}')">选择 Top 图</button>
-              <button id="btn_${escapeHtml(detailId)}" onclick="toggleEpisodeDetail('${escapeJsString(detailId)}', '${escapeJsString(group.url)}', '${escapeJsString(group.title)}', '${escapeJsString(group.labelText || currentLoadedAnimeLabel || "")}')">展开本集截图</button>
+            <div class="toolbar">
+              <button id="btn_${escapeHtml(detailId)}" onclick="toggleEpisodeDetail('${escapeJsString(detailId)}', '${escapeJsString(group.url)}', '${escapeJsString(group.title)}', '${escapeJsString(group.labelText || currentLoadedAnimeLabel || "")}')">查看更多本集截图</button>
             </div>
           </div>
           <div class="image-grid">
             ${
               group.images.length
                 ? group.images.map(item => renderEpisodeImageCard(item)).join("")
-                : `<div class="empty">本组没有图片。</div>`
+                : `<div class="empty">本组没有候选截图。</div>`
             }
           </div>
           <div id="${escapeHtml(detailId)}" class="episode-detail"></div>
@@ -3105,8 +4461,8 @@
 
       return `
         <label class="image-card ${selected ? "selected" : ""}" id="card_${escapeHtml(item.id)}">
-          <img src="${escapeHtml(item.thumbUrl)}" loading="lazy" referrerpolicy="no-referrer" onerror="this.style.display='none'">
-          <div>
+          <img src="${escapeHtml(item.thumbUrl)}" alt="${escapeHtml(item.labelText || currentLoadedAnimeLabel || "动画")} ${escapeHtml(item.episodeTitle || "")} 截图，${stateText}" loading="lazy" referrerpolicy="no-referrer" onerror="this.style.display='none'">
+          <div class="image-state">
             <input
               type="checkbox"
               class="imageCheck"
@@ -3116,7 +4472,7 @@
               ${selected ? "checked" : ""}
               onchange="toggleImageById('${escapeJsString(item.id)}', this.checked)"
             >
-            <span class="sub" id="state_${escapeHtml(item.id)}">${stateText}</span>
+            <span id="state_${escapeHtml(item.id)}">${stateText}</span>
           </div>
         </label>
       `;
@@ -3141,13 +4497,14 @@
       if (card) card.classList.add("selected");
       updateSelectedCount();
       renderSelectedBasket();
+      playPickedFeedback(id);
 
       if (item.originalUrl) {
         updateImageState(id, "已选择");
         return;
       }
 
-      updateImageState(id, "解析原图...");
+      updateImageState(id, "解析中");
 
       try {
         item.originalUrl = await resolveOriginalImageUrl(item);
@@ -3155,7 +4512,6 @@
         updateImageState(id, "已选择");
         renderSelectedBasket();
       } catch (err) {
-        console.warn("resolve original failed:", err);
         item.originalUrl = upgradeFanCapsThumbUrl(item.thumbUrl) || item.thumbUrl;
         selectedImages.set(id, item);
         updateImageState(id, "已选择");
@@ -3294,13 +4650,18 @@
     }
 
     function updateSelectedCount() {
+      const nextCount = selectedImages.size;
       for (const el of [...document.querySelectorAll(".selectedCount")]) {
-        el.textContent = selectedImages.size;
+        el.textContent = nextCount;
       }
       const basketCount = document.getElementById("basketCount");
-      if (basketCount) basketCount.textContent = selectedImages.size;
+      if (basketCount) basketCount.textContent = nextCount;
       const floatCount = document.getElementById("floatSelectedCount");
-      if (floatCount) floatCount.textContent = selectedImages.size;
+      if (floatCount) floatCount.textContent = nextCount;
+      if (nextCount > lastSelectedCount) {
+        bumpSelectedCounts();
+      }
+      lastSelectedCount = nextCount;
       updateAutoActionButtons();
     }
 
@@ -3310,19 +4671,6 @@
       }
       for (const button of [...document.querySelectorAll("[data-auto-copy-export]")]) {
         button.disabled = !selectedImages.size;
-      }
-    }
-
-    async function selectEpisodeTop(episodeTitle) {
-      const checks = [...document.querySelectorAll(".imageCheck")]
-        .filter(input => input.dataset.episode === episodeTitle && input.dataset.kind === "top");
-
-      for (const input of checks) {
-        if (!input.checked) {
-          input.checked = true;
-          await toggleImageById(input.value, true);
-          await sleep(100);
-        }
       }
     }
 
@@ -3338,7 +4686,8 @@
 
       container.style.display = "block";
       container.dataset.open = "1";
-      if (button) button.textContent = "隐藏本集截图";
+      revealElement(container);
+      if (button) button.textContent = "收起本集截图";
 
       if (!episodeDetailStates.has(detailId)) {
         const pageUrl = buildEpisodeDetailPageUrl(episodeUrl, 1);
@@ -3357,7 +4706,7 @@
         });
       }
 
-      scrollToElement(container);
+      scrollToElement(container, { block: "start" });
       await goEpisodeDetailPage(detailId, 1);
     }
 
@@ -3367,7 +4716,7 @@
       if (!container) return;
       container.style.display = "none";
       container.dataset.open = "0";
-      if (button) button.textContent = "展开本集截图";
+      if (button) button.textContent = "查看更多本集截图";
     }
 
     async function goEpisodeDetailPage(detailId, pageNum) {
@@ -3382,13 +4731,13 @@
       if (state.pageCache.has(pageNum)) {
         episodeDetailStates.set(detailId, state);
         renderEpisodeDetail(detailId);
-        scrollToElement(container);
+        scrollToElement(container, { block: "start" });
         return;
       }
 
       state.loadingPage = pageNum;
       episodeDetailStates.set(detailId, state);
-      renderEpisodeDetail(detailId, `正在读取第 ${pageNum} 页...`);
+      renderEpisodeDetail(detailId, `正在读取第 ${pageNum} 页截图...`);
 
       try {
         const pageUrl = state.pageUrls.get(pageNum) || buildEpisodeDetailPageUrl(state.baseEpisodeUrl, pageNum);
@@ -3440,13 +4789,12 @@
         state.error = "";
         episodeDetailStates.set(detailId, state);
         renderEpisodeDetail(detailId);
-        scrollToElement(container);
+        scrollToElement(container, { block: "start" });
       } catch (err) {
-        console.error(err);
         state.loadingPage = null;
         state.error = err.message;
         episodeDetailStates.set(detailId, state);
-        renderEpisodeDetail(detailId, `读取失败：${err.message}`);
+        renderEpisodeDetail(detailId, `读取失败。请稍后重试，或打开原页面查看。详情：${err.message}`);
       }
     }
 
@@ -3465,21 +4813,21 @@
             <b>${escapeHtml(state.episodeTitle)} 详细截图</b>
             <span class="sub">当前第 ${state.currentPage} 页${current ? ` / ${currentCount} 张` : ""}</span>
           </div>
-          <button onclick="hideEpisodeDetail('${escapeJsString(detailId)}')">隐藏</button>
+          <button onclick="hideEpisodeDetail('${escapeJsString(detailId)}')">收起</button>
         </div>
 
         ${pageButtons}
-        ${message ? `<div class="sub" style="margin-bottom: 8px;">${escapeHtml(message)}</div>` : ""}
+        ${message ? `<div class="sub sub-spaced">${escapeHtml(message)}</div>` : ""}
 
         ${
           current
             ? renderEpisodeDetailPage(current)
-            : `<div class="empty">${state.loadingPage ? "正在加载本页..." : "还没有加载到截图。"}</div>`
+            : `<div class="empty">${state.loadingPage ? "正在加载本页截图..." : "还没有加载到截图。"}</div>`
         }
 
         <div class="episode-detail-bottom">
           ${pageButtons}
-          <button onclick="hideEpisodeDetail('${escapeJsString(detailId)}')">隐藏</button>
+          <button onclick="hideEpisodeDetail('${escapeJsString(detailId)}')">收起</button>
         </div>
       `;
     }
@@ -3515,12 +4863,12 @@
     function renderEpisodeDetailPage(page) {
       return `
         <div class="episode-detail-page">
-          <div class="sub" style="margin-bottom: 8px;">第 ${page.index} 页 · ${page.images.length} 张</div>
+          <div class="sub sub-spaced">第 ${page.index} 页 · ${page.images.length} 张</div>
           <div class="image-grid">
             ${
               page.images.length
                 ? page.images.map(item => renderEpisodeImageCard(item)).join("")
-                : `<div class="empty">本页没有解析到图片。</div>`
+                : `<div class="empty">本页没有读取到截图。可以换一页或稍后重试。</div>`
             }
           </div>
         </div>
@@ -3690,18 +5038,33 @@
 
     function renderSelectedBasket() {
       const items = [...selectedImages.entries()].map(([id, item]) => ({ id, item }));
+      if (items.length) hasUsedSelectedBasket = true;
+      if (!items.length && !hasUsedSelectedBasket) {
+        selectedBasketEl.innerHTML = "";
+        updateFloatingNavVisibility();
+        updateSelectedCount();
+        return;
+      }
+
+      const quality = getSelectedQuality(items);
+      const hasWarnings = quality.duplicateCount;
 
       selectedBasketEl.innerHTML = `
         <div class="panel basket-panel">
           <div class="basket-head">
             <div>
               <h2>已选截图</h2>
-              <div class="sub">跨动画保留，最后在这里复制或导出。</div>
+              <div class="sub">${items.length ? "导出前确认题数（推荐20），必要时移除重复动画。" : "选择截图后，这里会显示导出入口。"}</div>
+              <div class="basket-quality" aria-label="题单质量检查">
+                <span class="quality-pill">题数：${items.length}</span>
+                <span class="quality-pill ${quality.duplicateCount ? "warning" : ""}">重复动画：${quality.duplicateCount}</span>
+                <span class="quality-pill ${hasWarnings ? "warning" : "success"}">${hasWarnings ? "导出前建议复查" : "可导出"}</span>
+              </div>
             </div>
             <div class="toolbar">
-              <button onclick="copySelectedJsonl()" ${items.length ? "" : "disabled"}>复制 JSONL</button>
-              <button onclick="exportJsonl()" ${items.length ? "" : "disabled"}>导出 JSONL</button>
-              <button onclick="clearSelectedImages()" ${items.length ? "" : "disabled"}>清空选择</button>
+              <button onclick="copySelectedJsonl()" ${items.length ? "" : "disabled"}>复制题单</button>
+              <button onclick="exportJsonl()" ${items.length ? "" : "disabled"}>导出题单</button>
+              <button onclick="clearSelectedImages()" ${items.length ? "" : "disabled"}>清空已选</button>
               <button class="quiet" onclick="scrollToTopSearch()">继续搜索</button>
               <span class="pill">已选：<span id="basketCount" class="selectedCount">${items.length}</span></span>
             </div>
@@ -3710,20 +5073,54 @@
           ${
             items.length
               ? `<div class="basket-grid">${items.map(({ id, item }) => renderBasketCard(id, item)).join("")}</div>`
-              : `<div class="empty">还没有选择图片。可以手动搜索挑图，也可以用自动出题生成题单。</div>`
+              : `<div class="basket-empty-simple">还没有选择截图</div>`
           }
         </div>
       `;
+      updateFloatingNavVisibility();
       updateSelectedCount();
+    }
+
+    function updateFloatingNavVisibility() {
+      if (!floatingNavEl) return;
+      if (!selectedImages.size) {
+        floatingNavEl.style.display = "none";
+        return;
+      }
+      floatingNavEl.style.display = "flex";
+    }
+
+    function isBasketInView() {
+      if (!selectedBasketEl || !selectedBasketEl.innerHTML.trim()) return false;
+      const rect = selectedBasketEl.getBoundingClientRect();
+      const viewportHeight = window.innerHeight || document.documentElement.clientHeight || 0;
+      return rect.top < viewportHeight - 120 && rect.bottom > 120;
+    }
+
+    function getSelectedQuality(items) {
+      const labelCounts = new Map();
+
+      for (const { item } of items) {
+        const label = clean(item.labelText || "未命名动画");
+        labelCounts.set(label, (labelCounts.get(label) || 0) + 1);
+      }
+
+      let duplicateCount = 0;
+      for (const count of labelCounts.values()) {
+        if (count > 1) duplicateCount += count - 1;
+      }
+
+      return { duplicateCount };
     }
 
     function renderBasketCard(id, item) {
       const finalUrl = item.originalUrl || item.thumbUrl || "";
+      const label = item.labelText || "已选图片";
       return `
         <div class="basket-card" id="basket_${escapeHtml(id)}">
-          <button class="basket-remove" onclick="removeSelectedImage('${escapeJsString(id)}')">×</button>
-          <img src="${escapeHtml(item.thumbUrl || finalUrl)}" loading="lazy" referrerpolicy="no-referrer" onerror="this.style.display='none'">
-          <div class="sub">${escapeHtml(item.labelText || "已选图片")}</div>
+          <button class="basket-remove" type="button" aria-label="移除 ${escapeHtml(label)}" onclick="removeSelectedImage('${escapeJsString(id)}')">×</button>
+          <img src="${escapeHtml(item.thumbUrl || finalUrl)}" alt="${escapeHtml(label)} 截图" loading="lazy" referrerpolicy="no-referrer" onerror="this.style.display='none'">
+          <div class="sub">${escapeHtml(label)}</div>
         </div>
       `;
     }
@@ -3741,7 +5138,7 @@
 
     async function copySelectedJsonl() {
       if (!selectedImages.size) {
-        setStatus("还没有选择图片。");
+        setStatus("还没有选择截图。请先勾选想加入题单的截图。");
         return;
       }
 
@@ -3750,11 +5147,10 @@
 
       try {
         await navigator.clipboard.writeText(text);
-        setStatus(`已复制 ${selectedImages.size} 条 JSONL。`);
       } catch {
         fallbackCopyText(text);
-        setStatus(`已复制 ${selectedImages.size} 条 JSONL。`);
       }
+      announceDelight("copySelected", selectedImages.size, false);
     }
 
     function getSelectedJsonlText() {
@@ -3804,6 +5200,11 @@
     }
 
     function clearSelectedImages() {
+      if (selectedImages.size && !window.confirm(`清空 ${selectedImages.size} 张已选截图？此操作不能撤销。`)) {
+        setStatus("已取消清空。");
+        return;
+      }
+
       selectedImages.clear();
       document.querySelectorAll(".imageCheck").forEach(input => { input.checked = false; });
 
@@ -3815,22 +5216,24 @@
 
       updateSelectedCount();
       renderSelectedBasket();
+      setStatus("已清空已选截图。");
     }
 
     async function exportJsonl() {
       if (!selectedImages.size) {
-        setStatus("还没有选择图片。");
+        setStatus("还没有选择截图。请先勾选想加入题单的截图。");
         return;
       }
 
       await resolveAllSelectedOriginals();
       const text = getSelectedJsonlText();
       downloadBlob(new Blob([text], { type: "application/x-ndjson" }), "fancaps-selected-images.jsonl");
+      announceDelight("exportSelected", selectedImages.size);
     }
 
     async function exportJson() {
       if (!selectedImages.size) {
-        setStatus("还没有选择图片。");
+        setStatus("还没有选择截图。请先勾选想加入题单的截图。");
         return;
       }
 
@@ -3841,6 +5244,7 @@
         new Blob([data.map(record => JSON.stringify(record)).join("\n")], { type: "application/x-ndjson" }),
         "fancaps-selected-images.jsonl"
       );
+      announceDelight("exportSelected", selectedImages.size);
     }
 
     async function resolveAllSelectedOriginals() {
@@ -3852,7 +5256,7 @@
         setProgress(Math.round((i / entries.length) * 100), true);
 
         if (!item.originalUrl) {
-          updateImageState(id, "解析原图...");
+          updateImageState(id, "解析中");
           try {
             item.originalUrl = await resolveOriginalImageUrl(item);
           } catch {
@@ -3877,16 +5281,125 @@
       a.click();
       a.remove();
       URL.revokeObjectURL(url);
-      setStatus(`已导出：${filename}`);
+      setStatus(`已导出题单：${filename}`);
+    }
+
+    function announceDelight(type, count, burst = true) {
+      const text = getDelightMessage(type, count);
+      setStatus(text);
+      showDelightToast(text);
+      if (burst) launchPaperBurst();
+    }
+
+    function getDelightMessage(type, count) {
+      const safeCount = Number(count || 0);
+      const messages = {
+        copyDraft: [
+          `已复制 ${safeCount} 条草稿题单，可以先贴到游戏里试跑。`,
+          `草稿已复制，${safeCount} 题待你最后定稿。`
+        ],
+        exportDraft: [
+          `已导出 ${safeCount} 条草稿题单。`,
+          `草稿题单已落盘，${safeCount} 题可以继续复查。`
+        ],
+        copySelected: [
+          `已复制 ${safeCount} 条题单数据，可以直接粘贴使用。`,
+          `题单已复制，${safeCount} 张截图准备就绪。`
+        ],
+        exportSelected: [
+          `已导出 ${safeCount} 题，截图题单装好了。`,
+          `题单已导出，${safeCount} 张截图可以开局。`
+        ],
+        addDraft: [
+          `已把 ${safeCount} 张草稿截图放入已选，导出前再扫一眼。`,
+          `草稿已进入已选，${safeCount} 张截图等你定稿。`
+        ]
+      };
+      return pickOne(messages[type] || [`已完成 ${safeCount} 项。`]);
+    }
+
+    function showDelightToast(text) {
+      if (!text) return;
+      let stack = document.querySelector(".delight-toast-stack");
+      if (!stack) {
+        stack = document.createElement("div");
+        stack.className = "delight-toast-stack";
+        stack.setAttribute("aria-live", "polite");
+        stack.setAttribute("aria-atomic", "false");
+        document.body.appendChild(stack);
+      }
+
+      const toast = document.createElement("div");
+      toast.className = "delight-toast";
+      toast.setAttribute("role", "status");
+      toast.textContent = text;
+      stack.appendChild(toast);
+      window.setTimeout(() => toast.remove(), 2800);
+    }
+
+    function launchPaperBurst() {
+      if (prefersReducedMotion()) return;
+      const burst = document.createElement("div");
+      burst.className = "paper-burst";
+      const originX = Math.min(window.innerWidth - 42, Math.max(42, window.innerWidth - 146));
+      const originY = Math.min(window.innerHeight - 90, Math.max(72, window.innerHeight - 160));
+
+      for (let i = 0; i < 12; i++) {
+        const piece = document.createElement("span");
+        piece.style.setProperty("--burst-x", `${originX}px`);
+        piece.style.setProperty("--burst-y", `${originY}px`);
+        piece.style.setProperty("--burst-tx", `${Math.round((Math.random() - 0.5) * 180)}px`);
+        piece.style.setProperty("--burst-ty", `${Math.round(42 + Math.random() * 92)}px`);
+        piece.style.setProperty("--burst-rot", `${Math.round((Math.random() - 0.5) * 220)}deg`);
+        piece.style.setProperty("--burst-delay", `${(i * 0.018).toFixed(3)}s`);
+        burst.appendChild(piece);
+      }
+
+      document.body.appendChild(burst);
+      window.setTimeout(() => burst.remove(), 1200);
+    }
+
+    function playPickedFeedback(id) {
+      if (prefersReducedMotion()) return;
+      const targets = [
+        document.getElementById(`card_${id}`),
+        document.getElementById(`basket_${id}`)
+      ].filter(Boolean);
+
+      for (const el of targets) {
+        el.classList.remove("is-picked");
+        void el.offsetWidth;
+        el.classList.add("is-picked");
+        window.setTimeout(() => el.classList.remove("is-picked"), 700);
+      }
+    }
+
+    function bumpSelectedCounts() {
+      if (prefersReducedMotion()) return;
+      for (const el of [...document.querySelectorAll(".selectedCount")]) {
+        el.classList.remove("count-bump");
+        void el.offsetWidth;
+        el.classList.add("count-bump");
+        window.setTimeout(() => el.classList.remove("count-bump"), 520);
+      }
+    }
+
+    function prefersReducedMotion() {
+      return window.matchMedia && window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+    }
+
+    function pickOne(items) {
+      if (!Array.isArray(items) || !items.length) return "";
+      return items[Math.floor(Math.random() * items.length)];
     }
 
     async function fetchViaProxy(targetUrl) {
       const proxy = proxyInput.value.trim();
-      if (!proxy) throw new Error("没有设置 CORS 代理。");
+      if (!proxy) throw new Error("没有设置连接方式。请恢复推荐连接后重试。");
 
       const url = proxy + encodeURIComponent(targetUrl);
       const res = await fetch(url, { method: "GET" });
-      if (!res.ok) throw new Error(`代理请求失败：HTTP ${res.status}`);
+      if (!res.ok) throw new Error(`连接请求失败：HTTP ${res.status}`);
       return await res.text();
     }
 
@@ -4067,22 +5580,29 @@
 
     function setStatus(text) {
       statusEl.textContent = text;
+      pulseElement(statusEl, "status-pulse", 190);
     }
 
     function setProgress(percent, show) {
       if (!show) {
         progressWrapEl.style.display = "none";
+        progressWrapEl.classList.remove("is-active");
         progressBarEl.style.width = "0%";
+        progressWrapEl.setAttribute("aria-valuenow", "0");
         return;
       }
+      const value = Math.max(0, Math.min(100, Number(percent) || 0));
       progressWrapEl.style.display = "block";
-      progressBarEl.style.width = `${Math.max(0, Math.min(100, percent))}%`;
+      progressWrapEl.classList.add("is-active");
+      progressBarEl.style.width = `${value}%`;
+      progressWrapEl.setAttribute("aria-valuenow", String(Math.round(value)));
     }
 
 
-    function showElement(el) {
+    function showElement(el, animate = true) {
       if (!el) return;
       el.style.display = "";
+      if (animate) revealElement(el);
     }
 
     function hideElement(el) {
@@ -4090,9 +5610,25 @@
       el.style.display = "none";
     }
 
+    function revealElement(el) {
+      if (!el || prefersReducedMotion()) return;
+      el.classList.remove("motion-reveal");
+      void el.offsetWidth;
+      el.classList.add("motion-reveal");
+      window.setTimeout(() => el.classList.remove("motion-reveal"), 380);
+    }
+
+    function pulseElement(el, className, duration = 220) {
+      if (!el || prefersReducedMotion()) return;
+      el.classList.remove(className);
+      void el.offsetWidth;
+      el.classList.add(className);
+      window.setTimeout(() => el.classList.remove(className), duration);
+    }
+
     function showBangumiResults() {
       if (!bangumiResultsEl.innerHTML.trim()) {
-        setStatus("当前没有可显示的 Bangumi 候选。请重新搜索。");
+        setStatus("当前没有可显示的候选动画。请重新搜索。");
         scrollToTopSearch();
         return;
       }
@@ -4113,18 +5649,37 @@
     }
 
     function scrollToTopSearch() {
-      scrollToElement(searchPanelEl || document.getElementById("topAnchor"));
+      const target = autoPanelEl.style.display !== "none"
+        ? autoPanelEl
+        : (searchPanelEl.style.display !== "none" ? searchPanelEl : modePanelEl);
+      scrollToElement(target || modePanelEl || document.getElementById("topAnchor"), { block: "start" });
     }
 
     function scrollToBasket() {
       scrollToElement(selectedBasketEl);
     }
 
-    function scrollToElement(el) {
+    function scrollToElement(el, options = {}) {
       if (!el) return;
       setTimeout(() => {
-        el.scrollIntoView({ behavior: "smooth", block: "start" });
+        const block = options.block || "focus";
+        if (block === "focus") {
+          const rect = el.getBoundingClientRect();
+          const viewportHeight = window.innerHeight || document.documentElement.clientHeight || 0;
+          const targetTop = window.scrollY + rect.top - (viewportHeight * 0.42);
+          window.scrollTo({
+            top: Math.max(0, targetTop),
+            behavior: getScrollBehavior()
+          });
+          return;
+        }
+
+        el.scrollIntoView({ behavior: getScrollBehavior(), block });
       }, 80);
+    }
+
+    function getScrollBehavior() {
+      return prefersReducedMotion() ? "auto" : "smooth";
     }
 
     function escapeHtml(str) {
