@@ -1553,6 +1553,40 @@
       border-top: 1px solid var(--border);
     }
 
+    .download-progress {
+      display: none;
+      flex: 1 1 240px;
+      min-width: min(100%, 240px);
+      padding: 8px 10px;
+      border: 1px solid var(--info-border);
+      border-radius: 8px;
+      background: color-mix(in oklch, var(--info-wash) 76%, var(--panel));
+      color: var(--text);
+    }
+
+    .download-progress.is-active {
+      display: block;
+    }
+
+    .download-progress-label {
+      display: flex;
+      justify-content: space-between;
+      gap: var(--space-xs);
+      color: var(--muted);
+      font-size: var(--text-ui-sm);
+      line-height: 1.35;
+    }
+
+    .download-progress-label strong {
+      color: var(--info);
+      font-weight: 800;
+    }
+
+    .download-progress .loading-line {
+      margin-top: 6px;
+      height: 5px;
+    }
+
     .auto-loading-pill {
       display: inline-flex;
       align-items: center;
@@ -2731,11 +2765,26 @@
             <button type="button" onclick="copyAutoDraftJsonl()">复制草稿题单</button>
             <button type="button" onclick="exportAutoDraftJsonl()">导出草稿题单</button>
             <button type="button" onclick="downloadAutoDraftImages()">下载草稿图片ZIP</button>
+            ${renderInlineDownloadProgress("autoDraftDownloadProgress")}
           </div>
         </div>
       `;
       revealElement(autoDraftAreaEl);
       updateSelectedCount();
+    }
+
+    function renderInlineDownloadProgress(id) {
+      return `
+        <div id="${id}" class="download-progress" role="status" aria-live="polite" aria-hidden="true">
+          <div class="download-progress-label">
+            <span data-download-progress-text>准备下载</span>
+            <strong data-download-progress-percent>0%</strong>
+          </div>
+          <div class="loading-line" role="progressbar" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0">
+            <div data-download-progress-bar></div>
+          </div>
+        </div>
+      `;
     }
 
     function renderAutoDraftCard(item, idx) {
@@ -3082,6 +3131,7 @@
       await downloadImageEntriesAsZip(entries, {
         label: "草稿图片",
         successType: "downloadDraftImages",
+        progressId: "autoDraftDownloadProgress",
         folderName: makeDownloadFolderName("fancaps-draft-images"),
         makeFilename: makeAutoDraftImageFilename,
         partialText: (successCount, failCount) => `已打包 ${successCount} 张草稿图片，${failCount} 张失败。`,
@@ -5093,6 +5143,7 @@
               <button onclick="clearSelectedImages()" ${items.length ? "" : "disabled"}>清空已选</button>
               <button class="quiet" onclick="scrollToTopSearch()">继续搜索</button>
               <span class="pill">已选：<span id="basketCount" class="selectedCount">${items.length}</span></span>
+              ${renderInlineDownloadProgress("selectedDownloadProgress")}
             </div>
           </div>
 
@@ -5288,6 +5339,7 @@
       await downloadImageEntriesAsZip(entries, {
         label: "图片",
         successType: "downloadSelectedImages",
+        progressId: "selectedDownloadProgress",
         folderName: makeDownloadFolderName("fancaps-selected-images"),
         makeFilename: makeSelectedImageFilename,
         onFailure: entry => updateImageState(entry.id, "打包失败"),
@@ -5424,12 +5476,16 @@
       let failCount = 0;
       let lastFailureText = "";
       setProgress(0, true);
+      updateInlineDownloadProgress(options.progressId, 0, `开始抓取${options.label}...`, true);
 
       for (let i = 0; i < entries.length; i++) {
         const entry = entries[i];
         const current = i + 1;
-        setProgress(Math.round((i / entries.length) * 82), true);
-        setStatus(`正在抓取${options.label} ${current}/${entries.length}...`);
+        const percent = Math.round((i / entries.length) * 82);
+        const text = `正在抓取${options.label} ${current}/${entries.length}...`;
+        setProgress(percent, true);
+        setStatus(text);
+        updateInlineDownloadProgress(options.progressId, percent, text, true);
 
         try {
           const blob = await fetchImageBlob(entry.url);
@@ -5449,25 +5505,62 @@
 
       if (!files.length) {
         setProgress(100, false);
-        setStatus(`${options.failureText}${lastFailureText ? ` 详情：${lastFailureText}` : ""}`);
+        const text = `${options.failureText}${lastFailureText ? ` 详情：${lastFailureText}` : ""}`;
+        setStatus(text);
+        updateInlineDownloadProgress(options.progressId, 100, text, true);
+        hideInlineDownloadProgressSoon(options.progressId);
         return;
       }
 
-      setStatus(`正在生成 ZIP：${successCount} 张${options.label}...`);
+      const zipText = `正在生成 ZIP：${successCount} 张${options.label}...`;
+      setStatus(zipText);
       setProgress(92, true);
+      updateInlineDownloadProgress(options.progressId, 92, zipText, true);
       const zipBlob = createZipBlob(files);
       const zipFilename = options.zipFilename || `${options.folderName}.zip`;
       downloadBlob(zipBlob, zipFilename, "");
       setProgress(100, false);
 
       if (!failCount) {
+        updateInlineDownloadProgress(options.progressId, 100, `ZIP 已生成：${successCount} 张${options.label}`, true);
+        hideInlineDownloadProgressSoon(options.progressId);
         announceDelight(options.successType, successCount);
         return;
       }
 
       const text = options.partialText(successCount, failCount);
       setStatus(text);
+      updateInlineDownloadProgress(options.progressId, 100, text, true);
+      hideInlineDownloadProgressSoon(options.progressId);
       showDelightToast(text);
+    }
+
+    function updateInlineDownloadProgress(id, percent, text, show) {
+      if (!id) return;
+      const el = document.getElementById(id);
+      if (!el) return;
+
+      if (!show) {
+        el.classList.remove("is-active");
+        el.setAttribute("aria-hidden", "true");
+        return;
+      }
+
+      const value = Math.max(0, Math.min(100, Number(percent) || 0));
+      el.classList.add("is-active");
+      el.setAttribute("aria-hidden", "false");
+      const label = el.querySelector("[data-download-progress-text]");
+      const percentEl = el.querySelector("[data-download-progress-percent]");
+      const bar = el.querySelector("[data-download-progress-bar]");
+      const progress = el.querySelector('[role="progressbar"]');
+      if (label) label.textContent = text;
+      if (percentEl) percentEl.textContent = `${Math.round(value)}%`;
+      if (bar) bar.style.width = `${value}%`;
+      if (progress) progress.setAttribute("aria-valuenow", String(Math.round(value)));
+    }
+
+    function hideInlineDownloadProgressSoon(id) {
+      window.setTimeout(() => updateInlineDownloadProgress(id, 0, "", false), 2600);
     }
 
     function createZipBlob(files) {
