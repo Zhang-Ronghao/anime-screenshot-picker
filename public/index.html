@@ -6,22 +6,22 @@
   <title>动画截图出题工具</title>
   <style>
     :root {
-      --bg: oklch(0.986 0.006 343);
-      --panel: oklch(0.993 0.007 350);
-      --panel-rgb: 255 251 252;
-      --panel-soft: oklch(0.958 0.012 340);
-      --panel-soft-hover: oklch(0.938 0.018 338);
-      --text: oklch(0.225 0.024 303);
-      --muted: oklch(0.49 0.028 305);
-      --border: oklch(0.875 0.022 330);
-      --soft: oklch(0.956 0.012 326);
-      --dark: oklch(0.31 0.075 292);
-      --dark-hover: oklch(0.245 0.085 292);
-      --secondary: oklch(0.36 0.065 250);
-      --secondary-hover: oklch(0.29 0.072 250);
-      --info: oklch(0.50 0.105 231);
-      --info-border: oklch(0.78 0.065 226);
-      --info-wash: oklch(0.958 0.03 228);
+      --bg: oklch(0.956 0.013 254);
+      --panel: oklch(0.995 0.003 255);
+      --panel-rgb: 252 253 255;
+      --panel-soft: oklch(0.970 0.009 255);
+      --panel-soft-hover: oklch(0.942 0.014 255);
+      --text: oklch(0.245 0.035 263);
+      --muted: oklch(0.535 0.027 260);
+      --border: oklch(0.885 0.016 255);
+      --soft: oklch(0.948 0.012 255);
+      --dark: oklch(0.577 0.22 18);
+      --dark-hover: oklch(0.498 0.202 18);
+      --secondary: oklch(0.510 0.085 188);
+      --secondary-hover: oklch(0.430 0.076 188);
+      --info: oklch(0.510 0.085 188);
+      --info-border: oklch(0.790 0.050 198);
+      --info-wash: oklch(0.955 0.025 198);
       --success: oklch(0.46 0.088 158);
       --success-border: oklch(0.77 0.066 158);
       --success-wash: oklch(0.962 0.026 158);
@@ -30,16 +30,16 @@
       --warning-wash: oklch(0.968 0.036 76);
       --danger: oklch(0.50 0.145 24);
       --danger-hover: oklch(0.42 0.15 24);
-      --selected: oklch(0.55 0.17 352);
-      --selected-border: oklch(0.80 0.085 352);
-      --selected-wash: oklch(0.958 0.034 352);
-      --focus-ring: oklch(0.74 0.12 352);
-      --focus-ring-soft: oklch(0.74 0.12 352 / 0.25);
-      --sky-wash: oklch(0.956 0.036 219);
-      --lilac-wash: oklch(0.955 0.036 302);
+      --selected: oklch(0.577 0.22 18);
+      --selected-border: oklch(0.790 0.070 18);
+      --selected-wash: oklch(0.963 0.026 18);
+      --focus-ring: oklch(0.680 0.160 18);
+      --focus-ring-soft: oklch(0.680 0.160 18 / 0.25);
+      --sky-wash: oklch(0.956 0.026 255);
+      --lilac-wash: oklch(0.950 0.018 270);
       --mint-wash: oklch(0.961 0.03 166);
       --anime-bg-image: url("background.jpg");
-      --shadow-ink: 42 32 50;
+      --shadow-ink: 23 32 51;
       --ease-out: cubic-bezier(0.22, 1, 0.36, 1);
       --ease-out-quart: cubic-bezier(0.25, 1, 0.5, 1);
       --ease-out-expo: cubic-bezier(0.16, 1, 0.3, 1);
@@ -2350,6 +2350,413 @@
         background:
           linear-gradient(115deg, rgb(var(--panel-rgb) / 0.72) 0%, rgb(var(--panel-rgb) / 0.58) 72%, rgb(var(--panel-rgb) / 0.38) 100%),
           radial-gradient(circle at 88% 20%, color-mix(in oklch, var(--sky-wash) 30%, transparent), transparent 12rem);
+      }
+    }
+
+    /* Game-aligned UI layer: mirrors Anime Master Game's calm lobby/workbench style. */
+    body {
+      padding: 32px 20px 112px;
+      background:
+        radial-gradient(circle at top left, color-mix(in oklch, var(--selected) 16%, transparent), transparent 30rem),
+        linear-gradient(135deg, oklch(0.985 0.005 250) 0%, var(--bg) 48%, oklch(0.925 0.020 255) 100%);
+    }
+
+    body::before {
+      background: none;
+      opacity: 0;
+    }
+
+    body::after {
+      inset: 0;
+      background:
+        linear-gradient(90deg, oklch(0.74 0.022 255 / 0.07) 1px, transparent 1px),
+        linear-gradient(180deg, oklch(0.74 0.022 255 / 0.07) 1px, transparent 1px);
+      background-size: 48px 48px;
+      opacity: 0.34;
+    }
+
+    .anime-bg-art {
+      opacity: 0.018;
+      filter: grayscale(1) saturate(0.5) brightness(1.28);
+      mix-blend-mode: multiply;
+    }
+
+    .app-header {
+      display: grid;
+      grid-template-columns: minmax(0, 1fr) auto;
+      gap: var(--space-md);
+      align-items: start;
+      min-height: 0;
+      padding: 0;
+      border: none;
+      border-radius: 0;
+      background: transparent;
+      box-shadow: none;
+      overflow: visible;
+      isolation: auto;
+    }
+
+    .app-header-title-led::before,
+    .app-header-title-led::after {
+      display: none;
+    }
+
+    .app-header-title-led .header-kicker {
+      grid-column: 1;
+      width: max-content;
+      margin: 0 0 12px;
+      padding: 8px 14px;
+      border: 1px solid color-mix(in oklch, var(--selected-border) 70%, var(--panel));
+      border-radius: 999px;
+      background: color-mix(in oklch, var(--panel) 92%, var(--selected-wash));
+      color: var(--selected);
+      box-shadow: 0 2px 8px rgb(var(--shadow-ink) / 0.045);
+    }
+
+    .app-header-title-led .header-kicker::before {
+      background: var(--selected);
+      box-shadow: 0 0 0 3px color-mix(in oklch, var(--selected-wash) 76%, transparent);
+    }
+
+    .app-header-title-led h1 {
+      grid-column: 1;
+      max-width: 780px;
+      color: oklch(0.185 0.035 263);
+      font-size: 3rem;
+      font-weight: 780;
+      line-height: 1.08;
+    }
+
+    .app-header-title-led .sub {
+      grid-column: 1;
+      max-width: 680px;
+      margin-top: 18px;
+      color: var(--muted);
+      font-size: 1rem;
+      line-height: 1.7;
+    }
+
+    .header-help-button {
+      position: static;
+      grid-column: 2;
+      grid-row: 1 / span 3;
+      height: 40px;
+      min-height: 40px;
+      padding: 0 14px;
+      border: 1px solid var(--border);
+      border-radius: 6px;
+      background: var(--panel);
+      color: var(--text);
+      box-shadow: 0 10px 24px rgb(var(--shadow-ink) / 0.06);
+    }
+
+    .header-help-button:hover {
+      background: oklch(0.982 0.006 255);
+      border-color: color-mix(in oklch, var(--selected-border) 54%, var(--border));
+      color: var(--selected);
+    }
+
+    main {
+      margin-top: 30px;
+      gap: 16px;
+    }
+
+    .panel,
+    .shared-status-panel,
+    .basket-panel,
+    .modal-box {
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      background: var(--panel);
+      box-shadow: 0 18px 60px rgb(var(--shadow-ink) / 0.08);
+    }
+
+    .panel {
+      padding: 20px;
+    }
+
+    h1,
+    h2,
+    h3,
+    .title,
+    .draft-title,
+    .episode-title,
+    .side-title,
+    .result-section-title {
+      color: oklch(0.185 0.035 263);
+    }
+
+    input,
+    select,
+    textarea {
+      min-height: 44px;
+      border-radius: 6px;
+      background: var(--panel);
+      border-color: var(--border);
+      box-shadow: none;
+    }
+
+    input:hover,
+    select:hover,
+    textarea:hover {
+      border-color: color-mix(in oklch, var(--muted) 48%, var(--border));
+    }
+
+    input:focus,
+    select:focus,
+    textarea:focus {
+      outline: 3px solid var(--focus-ring-soft);
+      outline-offset: 0;
+      border-color: var(--selected);
+    }
+
+    button,
+    a.button,
+    label.button {
+      min-height: 44px;
+      border: 1px solid transparent;
+      border-radius: 6px;
+      background: var(--selected);
+      color: var(--panel);
+      box-shadow: 0 10px 22px color-mix(in oklch, var(--selected) 18%, transparent);
+    }
+
+    button:hover,
+    a.button:hover,
+    label.button:hover {
+      background: var(--dark-hover);
+      box-shadow: 0 12px 24px color-mix(in oklch, var(--selected) 22%, transparent);
+    }
+
+    button.secondary,
+    a.secondary,
+    label.secondary {
+      background: var(--secondary);
+      border-color: transparent;
+      color: var(--panel);
+      box-shadow: 0 10px 22px color-mix(in oklch, var(--secondary) 18%, transparent);
+    }
+
+    button.secondary:hover,
+    a.secondary:hover,
+    label.secondary:hover {
+      background: var(--secondary-hover);
+    }
+
+    button.light,
+    a.light,
+    label.light,
+    button.quiet,
+    a.quiet,
+    label.quiet,
+    a.button.source-link,
+    button.source-link {
+      background: var(--panel);
+      border-color: var(--border);
+      color: var(--text);
+      box-shadow: none;
+    }
+
+    button.light:hover,
+    a.light:hover,
+    label.light:hover,
+    button.quiet:hover,
+    a.quiet:hover,
+    label.quiet:hover,
+    a.button.source-link:hover,
+    button.source-link:hover {
+      background: oklch(0.972 0.010 255);
+      border-color: var(--border);
+      color: var(--text);
+      box-shadow: none;
+    }
+
+    .mode-panel {
+      grid-template-columns: auto auto minmax(220px, 1fr);
+      padding: 8px;
+      border-color: color-mix(in oklch, var(--border) 86%, var(--panel));
+      background: color-mix(in oklch, var(--panel) 76%, var(--panel-soft));
+      box-shadow: 0 12px 34px rgb(var(--shadow-ink) / 0.06);
+    }
+
+    .mode-button {
+      min-width: 126px;
+      box-shadow: none;
+    }
+
+    .mode-button.active,
+    .page-btn.active {
+      background: var(--selected);
+      border-color: var(--selected);
+      color: var(--panel);
+      box-shadow: 0 8px 18px color-mix(in oklch, var(--selected) 18%, transparent);
+    }
+
+    .mode-prompt,
+    .workflow-note,
+    .hint,
+    .step-note,
+    .fineprint,
+    .sub {
+      color: var(--muted);
+    }
+
+    .shared-status-panel {
+      padding: 12px 16px;
+      background: color-mix(in oklch, var(--panel) 82%, var(--sky-wash));
+      box-shadow: 0 8px 24px rgb(var(--shadow-ink) / 0.05);
+    }
+
+    .shared-status-panel::after {
+      display: none;
+    }
+
+    .status {
+      margin-top: 0;
+    }
+
+    .card,
+    .result-card,
+    .image-card,
+    .basket-card,
+    .draft-card,
+    .modal-choice,
+    .subject-main-flow,
+    .subject-side-flow {
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      background: var(--panel);
+      box-shadow: 0 8px 22px rgb(var(--shadow-ink) / 0.045);
+    }
+
+    .card:hover,
+    .result-card:hover,
+    .image-card:hover,
+    .draft-card:hover,
+    .basket-card:hover,
+    .modal-choice:hover {
+      border-color: color-mix(in oklch, var(--selected-border) 70%, var(--border));
+      background: oklch(0.985 0.007 255);
+    }
+
+    .cover,
+    .image-card img,
+    .basket-card img,
+    .draft-card img,
+    .preview-grid img,
+    .modal-choice img {
+      border-radius: 6px;
+      border: 1px solid var(--border);
+      box-shadow: none;
+    }
+
+    .image-card.selected {
+      border-color: var(--selected);
+      background: var(--selected-wash);
+      box-shadow: 0 0 0 2px color-mix(in oklch, var(--selected) 18%, transparent);
+    }
+
+    .image-card input {
+      accent-color: var(--selected);
+    }
+
+    .pill,
+    .tag,
+    .quality-pill,
+    .result-details summary,
+    .proxy-summary {
+      border: 1px solid var(--border);
+      border-radius: 999px;
+      background: color-mix(in oklch, var(--panel) 78%, var(--panel-soft));
+      color: var(--text);
+    }
+
+    .selectedCount,
+    .stat-emphasis {
+      color: var(--selected);
+    }
+
+    .basket-panel {
+      background: color-mix(in oklch, var(--panel) 86%, var(--selected-wash));
+      border-color: color-mix(in oklch, var(--selected-border) 52%, var(--border));
+    }
+
+    .loading-line {
+      background: color-mix(in oklch, var(--border) 52%, var(--panel));
+    }
+
+    .loading-line > div {
+      background: linear-gradient(90deg, var(--selected), var(--secondary));
+    }
+
+    .download-progress {
+      border-color: color-mix(in oklch, var(--info-border) 72%, var(--border));
+      background: color-mix(in oklch, var(--info-wash) 70%, var(--panel));
+    }
+
+    .download-progress-label strong,
+    .auto-loading-pill {
+      color: var(--secondary);
+    }
+
+    .floating-nav {
+      border: 1px solid color-mix(in oklch, var(--border) 70%, var(--panel));
+      border-radius: 8px;
+      background: rgb(var(--panel-rgb) / 0.96);
+      box-shadow: 0 18px 48px rgb(var(--shadow-ink) / 0.16);
+    }
+
+    .delight-toast {
+      border-color: color-mix(in oklch, var(--success-border) 62%, var(--border));
+      background: color-mix(in oklch, var(--success-wash) 58%, var(--panel));
+      box-shadow: 0 16px 38px rgb(var(--shadow-ink) / 0.12);
+    }
+
+    .paper-burst span {
+      border-color: color-mix(in oklch, var(--selected-border) 60%, var(--border));
+      background: var(--panel);
+    }
+
+    @media (prefers-reduced-motion: no-preference) {
+      body::after {
+        animation: none;
+      }
+
+      .app-header-title-led::after {
+        animation: none;
+      }
+    }
+
+    @media (max-width: 760px) {
+      body {
+        padding: 18px 14px 104px;
+      }
+
+      .app-header {
+        grid-template-columns: 1fr;
+      }
+
+      .header-help-button {
+        grid-column: 1;
+        grid-row: auto;
+        justify-self: start;
+        order: 4;
+      }
+
+      .app-header-title-led h1 {
+        font-size: 2.25rem;
+      }
+
+      .app-header-title-led .sub {
+        margin-top: 12px;
+      }
+
+      .mode-panel {
+        grid-template-columns: 1fr 1fr;
+      }
+
+      .mode-prompt {
+        grid-column: 1 / -1;
       }
     }
 
