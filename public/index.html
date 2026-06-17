@@ -285,17 +285,18 @@
       top: 18px;
       right: 18px;
       z-index: 1;
-      display: inline-grid;
-      place-items: center;
-      width: 34px;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 6px;
       height: 34px;
       min-height: 34px;
-      padding: 0;
+      padding: 0 12px;
       border-radius: 999px;
       border-color: color-mix(in oklch, var(--selected-border) 62%, var(--border));
       background: color-mix(in oklch, var(--panel) 84%, var(--selected-wash));
       color: var(--selected);
-      font-size: var(--text-title);
+      font-size: var(--text-sm);
       font-weight: var(--weight-bold);
       line-height: 1;
       box-shadow: 0 8px 20px rgb(var(--shadow-ink) / 0.08);
@@ -1840,6 +1841,11 @@
       line-height: var(--leading-ui);
     }
 
+    .stat-emphasis {
+      color: var(--selected);
+      font-weight: var(--weight-bold);
+    }
+
     .modal-grid {
       display: grid;
       grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
@@ -2364,7 +2370,7 @@
   <div id="topAnchor"></div>
   <img class="anime-bg-art" src="background.jpg" alt="" aria-hidden="true" onerror="this.remove()">
   <header class="app-header app-header-title-led">
-    <button class="header-help-button" type="button" aria-label="查看题库说明" title="题库说明" onclick="showAboutModal()">?</button>
+    <button class="header-help-button" type="button" aria-label="查看题库说明" title="题库说明" onclick="showAboutModal()">题库说明 ⓘ</button>
     <div class="header-kicker">动漫高手·一眼顶针</div>
     <h1>动画截图出题工具</h1>
     <p class="sub">从 FanCaps 截图库中挑选画面，生成可导出的题单</p>
@@ -2478,17 +2484,16 @@
         <section class="about-section">
           <h3>题库规模</h3>
           <ul class="about-list">
-            <li>初筛候选：Bangumi 看过人数 ≥ 100，共 8,369 部</li>
-            <li>可用于匹配 FanCaps：6,602 部</li>
-            <li>成功匹配 FanCaps：2,272 部 TV 动画</li>
-            <li>截图总数：146,335 张</li>
+            <li>Bangumi 看过人数 ≥ 100 有效条目：6,602 部</li>
+            <li>成功匹配 FanCaps：<span class="stat-emphasis">2,272</span> 部 TV 动画</li>
+            <li>截图总数：<span class="stat-emphasis">146,335</span> 张</li>
           </ul>
         </section>
         <section class="about-section">
           <h3>覆盖情况</h3>
           <ul class="about-list">
-            <li>Bangumi 看过人数 Top500：收录 349 部，占 69.8%</li>
-            <li>Bangumi 看过人数 Top1000：收录 636 部，占 63.6%</li>
+            <li>Bangumi 看过人数 Top500：收录 <span class="stat-emphasis">349</span> 部，占 <span class="stat-emphasis">69.8%</span></li>
+            <li>Bangumi 看过人数 Top1000：收录 <span class="stat-emphasis">636</span> 部，占 <span class="stat-emphasis">63.6%</span></li>
             <li>部分热门 TV 动画也可能没有可用来源</li>
           </ul>
         </section>
