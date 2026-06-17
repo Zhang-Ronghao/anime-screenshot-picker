@@ -1744,6 +1744,44 @@
       margin-bottom: 12px;
     }
 
+    .usage-modal-box {
+      width: min(460px, 100%);
+    }
+
+    .usage-steps {
+      display: grid;
+      gap: 10px;
+      margin: 14px 0 18px;
+      padding: 0;
+      list-style: none;
+    }
+
+    .usage-step {
+      display: grid;
+      grid-template-columns: 28px 1fr;
+      align-items: start;
+      gap: 10px;
+      color: var(--text);
+      line-height: var(--leading-ui);
+    }
+
+    .usage-step-index {
+      display: inline-grid;
+      place-items: center;
+      width: 24px;
+      height: 24px;
+      border-radius: 999px;
+      background: var(--dark);
+      color: white;
+      font-size: var(--text-xs);
+      font-weight: var(--weight-bold);
+    }
+
+    .usage-modal-actions {
+      display: flex;
+      justify-content: flex-end;
+    }
+
     .modal-grid {
       display: grid;
       grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
@@ -2270,7 +2308,7 @@
   <header class="app-header app-header-title-led">
     <div class="header-kicker">动漫高手·一眼顶针</div>
     <h1>动画截图出题工具</h1>
-    <p class="sub">从 FanCaps 截图库中挑选画面，生成可导出的题单。</p>
+    <p class="sub">从 FanCaps 截图库中挑选画面，生成可导出的题单</p>
   </header>
 
   <main>
@@ -2278,11 +2316,11 @@
   <div id="modePanel" class="panel mode-panel" role="group" aria-label="出题方式" aria-describedby="modePrompt">
     <button id="manualModeBtn" class="mode-button active" type="button" aria-pressed="true" aria-controls="searchPanel" onclick="switchMode('manual')">手动出题</button>
     <button id="autoModeBtn" class="mode-button light" type="button" aria-pressed="false" aria-controls="autoPanel" onclick="switchMode('auto')">自动出题</button>
-    <span class="mode-prompt" id="modePrompt">手动适合精挑截图，自动适合批量起草。</span>
+    <span class="mode-prompt" id="modePrompt">自动取每集精选图，适合批量起草；手动可浏览更多截图，适合精挑</span>
   </div>
 
   <div class="shared-status-panel" aria-label="工作状态">
-    <div id="status" class="status" role="status" aria-live="polite">搜索动画开始手动出题，或切换到自动出题。</div>
+    <div id="status" class="status" role="status" aria-live="polite">搜索动画开始手动出题，或切换到自动出题</div>
     <div id="progressWrap" class="loading-line" style="display: none;" role="progressbar" aria-label="当前任务进度" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0">
       <div id="progressBar"></div>
     </div>
@@ -2290,7 +2328,7 @@
 
   <div id="autoPanel" class="panel" style="display: none;">
     <h2>自动出题</h2>
-    <div class="workflow-note workflow-note-nowrap">填写 Bangumi 用户 ID 后，只从该用户标记“看过”的动画里抽题；留空则从全部可用动画里抽题。</div>
+    <div class="workflow-note workflow-note-nowrap">填写 Bangumi 用户 ID 后，只从该用户标记“看过”的动画里抽题；留空则从全部可用动画里抽题</div>
 
     <div class="auto-form-grid">
       <div class="auto-field">
@@ -2346,10 +2384,24 @@
     </div>
   </div>
 
+  <div id="usageModal" class="modal-backdrop" aria-hidden="true" onclick="handleUsageModalBackdropClick(event)">
+    <div class="modal-box usage-modal-box" role="dialog" aria-modal="true" aria-labelledby="usageModalTitle" tabindex="-1">
+      <div class="modal-head">
+        <div>
+          <h2 id="usageModalTitle">题单使用方式</h2>
+        </div>
+      </div>
+      <ol id="usageModalSteps" class="usage-steps"></ol>
+      <div class="usage-modal-actions">
+        <button type="button" onclick="closeUsageModal()">我知道了</button>
+      </div>
+    </div>
+  </div>
+
 
   <div id="searchPanel" class="panel">
     <div class="search-panel-head">
-      <div class="workflow-note">搜索动画并选择正确条目，工具会自动查找可用截图。</div>
+      <div class="workflow-note">搜索动画并选择正确条目，工具会自动查找可用截图</div>
       <div class="proxy-current">
         <span>连接：<strong id="currentProxyLabel">默认连接（推荐）</strong></span>
         <button class="quiet" type="button" onclick="toggleProxyPanel()" aria-controls="proxyDetails" aria-expanded="false">高级连接设置</button>
@@ -2381,7 +2433,7 @@
       <div class="toolbar toolbar-spaced">
         <button class="light" onclick="resetProxyToDefault()">恢复推荐连接</button>
       </div>
-      <div class="fineprint">默认连接最稳定。公共备用连接只适合临时尝试，速度和成功率不保证。</div>
+      <div class="fineprint">默认连接最稳定。公共备用连接只适合临时尝试，速度和成功率不保证</div>
     </div>
 
   </div>
@@ -2440,6 +2492,9 @@
     const autoModalTitleEl = document.getElementById("autoModalTitle");
     const autoModalHintEl = document.getElementById("autoModalHint");
     const autoModalChoicesEl = document.getElementById("autoModalChoices");
+    const usageModalEl = document.getElementById("usageModal");
+    const usageModalTitleEl = document.getElementById("usageModalTitle");
+    const usageModalStepsEl = document.getElementById("usageModalSteps");
     const autoYearFromRangeEl = document.getElementById("autoYearFromRange");
     const autoYearToRangeEl = document.getElementById("autoYearToRange");
     const autoYearFromLabelEl = document.getElementById("autoYearFromLabel");
@@ -2502,7 +2557,7 @@
       manualModeBtn.setAttribute("aria-pressed", String(!isAuto));
       autoModeBtn.setAttribute("aria-pressed", String(isAuto));
 
-      setStatus(isAuto ? "已切换到自动出题。" : "已切换到手动出题。");
+      setStatus(isAuto ? "已切换到自动出题" : "已切换到手动出题");
       renderSelectedBasket();
       scrollToElement(isAuto ? autoPanelEl : searchPanelEl);
     }
@@ -2656,7 +2711,7 @@
         if (!pool.length) {
           autoDraft = [];
           renderAutoDraft();
-          setStatus("当前条件下没有可用截图。可以放宽年份、看过人数或清空 Bangumi 用户筛选。");
+          setStatus("当前条件下没有可用截图。可以放宽年份、看过人数或清空 Bangumi 用户筛选");
           setProgress(100, false);
           return;
         }
@@ -2664,7 +2719,7 @@
         setProgress(72, true);
         autoDraft = sampleUnique(pool, sampleCount).map(record => makeAutoDraftItem(record));
         renderAutoDraft();
-        setStatus(`已生成 ${autoDraft.length} 题草稿。可以换图、换动画，或加入已选截图。`);
+        setStatus(`已生成 ${autoDraft.length} 题草稿。可以换图、换动画，或加入已选截图`);
         setProgress(100, false);
         scrollToElement(autoDraftAreaEl);
       } catch (err) {
@@ -2745,7 +2800,7 @@
       if (addAutoDraftBtn) addAutoDraftBtn.disabled = !autoDraft.length;
 
       if (!autoDraft.length) {
-        autoDraftAreaEl.innerHTML = `<div class="empty content-spaced-sm">还没有题单草稿。设置条件后，点击“生成题单草稿”。</div>`;
+        autoDraftAreaEl.innerHTML = `<div class="empty content-spaced-sm">还没有题单草稿。设置条件后，点击“生成题单草稿”</div>`;
         return;
       }
 
@@ -2810,7 +2865,7 @@
       const count = clampNumber(Number(document.getElementById("autoQuestionCount").value || 10), 1, 100);
       autoDraft = sampleUnique(autoFilteredPool, Math.min(count, autoFilteredPool.length)).map(record => makeAutoDraftItem(record));
       renderAutoDraft();
-      setStatus("已重新随机。");
+      setStatus("已重新随机");
     }
 
     function removeAutoDraftItem(uid) {
@@ -2827,7 +2882,7 @@
     function removeAutoDraftItemNow(uid) {
       autoDraft = autoDraft.filter(item => item.uid !== uid);
       renderAutoDraft();
-      setStatus("已移除 1 题。");
+      setStatus("已移除 1 题");
     }
 
     function openChangeImageModal(uid) {
@@ -2854,7 +2909,7 @@
 
       if (!candidates.length) {
         autoModalHintEl.textContent = item.title;
-        autoModalChoicesEl.innerHTML = `<div class="empty">这部动画暂时没有其它候选截图。可以改换动画，或保留当前截图。</div>`;
+        autoModalChoicesEl.innerHTML = `<div class="empty">这部动画暂时没有其它候选截图。可以改换动画，或保留当前截图</div>`;
         return;
       }
 
@@ -2872,7 +2927,7 @@
       }
 
       autoModalHintEl.textContent = restarted
-        ? `${item.title} · 所有图片都随机完了，开始重新随机。`
+        ? `${item.title} · 所有图片都随机完了，开始重新随机`
         : item.title;
 
       autoModalChoicesEl.innerHTML = finalChoices.map((url, idx) => `
@@ -2892,7 +2947,7 @@
       autoDraft[idx].uid = uid;
       replaceAutoDraftCard(uid, idx);
       closeAutoModal();
-      setStatus("已更换图片。");
+      setStatus("已更换图片");
     }
 
     function openChangeAnimeModal(uid) {
@@ -2906,7 +2961,7 @@
         shownAnimeIds: new Set([item.bgmId])
       };
       autoModalTitleEl.textContent = "选择一部动画";
-      autoModalHintEl.textContent = "从当前筛选范围中随机给出 5 部。";
+      autoModalHintEl.textContent = "从当前筛选范围中随机给出 5 部";
       renderChangeAnimeChoices(uid);
       showAutoModal();
     }
@@ -2920,8 +2975,8 @@
       const pool = autoFilteredPool.filter(record => !used.has(record.bgmId) && record.bgmId !== currentBgmId);
 
       if (!pool.length) {
-        autoModalHintEl.textContent = "当前筛选范围里没有更多可替换动画。";
-        autoModalChoicesEl.innerHTML = `<div class="empty">当前筛选范围里没有更多可替换动画。可以放宽条件后重新生成草稿。</div>`;
+        autoModalHintEl.textContent = "当前筛选范围里没有更多可替换动画";
+        autoModalChoicesEl.innerHTML = `<div class="empty">当前筛选范围里没有更多可替换动画。可以放宽条件后重新生成草稿</div>`;
         return;
       }
 
@@ -2939,8 +2994,8 @@
       }
 
       autoModalHintEl.textContent = restarted
-        ? "所有动画都随机完了，开始重新随机。"
-        : "从当前筛选范围中随机给出 5 部。";
+        ? "所有动画都随机完了，开始重新随机"
+        : "从当前筛选范围中随机给出 5 部";
 
       autoModalChoicesEl.innerHTML = choices.map((record, idx) => {
         const image = randomOne(record.images);
@@ -2963,7 +3018,7 @@
       autoDraft[idx].uid = uid;
       replaceAutoDraftCard(uid, idx);
       closeAutoModal();
-      setStatus("已更换动画。");
+      setStatus("已更换动画");
     }
 
     function replaceAutoDraftCard(uid, idx) {
@@ -3014,6 +3069,18 @@
     }
 
     function handleGlobalKeydown(event) {
+      if (usageModalEl.classList.contains("show")) {
+        if (event.key === "Escape") {
+          closeUsageModal();
+          return;
+        }
+
+        if (event.key === "Tab") {
+          trapModalFocus(event, usageModalEl);
+        }
+        return;
+      }
+
       if (!autoChoiceModalEl.classList.contains("show")) return;
 
       if (event.key === "Escape") {
@@ -3022,11 +3089,11 @@
       }
 
       if (event.key === "Tab") {
-        trapAutoModalFocus(event);
+        trapModalFocus(event, autoChoiceModalEl);
       }
     }
 
-    function getAutoModalFocusable() {
+    function getModalFocusable(modalEl) {
       const selector = [
         "button:not([disabled])",
         "[href]",
@@ -3036,13 +3103,17 @@
         "[tabindex]:not([tabindex='-1'])"
       ].join(", ");
 
-      return [...autoChoiceModalEl.querySelectorAll(selector)]
+      return [...modalEl.querySelectorAll(selector)]
         .filter(el => el instanceof HTMLElement && !el.hasAttribute("hidden") && el.offsetParent !== null);
     }
 
-    function trapAutoModalFocus(event) {
-      const focusable = getAutoModalFocusable();
-      const modalBox = autoChoiceModalEl.querySelector(".modal-box");
+    function getAutoModalFocusable() {
+      return getModalFocusable(autoChoiceModalEl);
+    }
+
+    function trapModalFocus(event, modalEl) {
+      const focusable = getModalFocusable(modalEl);
+      const modalBox = modalEl.querySelector(".modal-box");
 
       if (!focusable.length) {
         event.preventDefault();
@@ -3054,7 +3125,7 @@
       const last = focusable[focusable.length - 1];
       const active = document.activeElement;
 
-      if (!autoChoiceModalEl.contains(active)) {
+      if (!modalEl.contains(active)) {
         event.preventDefault();
         first.focus();
         return;
@@ -3067,6 +3138,72 @@
         event.preventDefault();
         first.focus();
       }
+    }
+
+    function showUsageModal(type) {
+      const content = getUsageModalContent(type);
+      if (!content) return;
+
+      lastModalFocus = document.activeElement instanceof HTMLElement ? document.activeElement : null;
+      usageModalTitleEl.textContent = content.title;
+      usageModalStepsEl.innerHTML = content.steps.map((step, index) => `
+        <li class="usage-step">
+          <span class="usage-step-index">${index + 1}</span>
+          <span>${escapeHtml(step)}</span>
+        </li>
+      `).join("");
+      usageModalEl.classList.add("show");
+      usageModalEl.setAttribute("aria-hidden", "false");
+      document.body.classList.add("modal-open");
+      setTimeout(() => {
+        const firstAction = getModalFocusable(usageModalEl)[0];
+        (firstAction || usageModalEl.querySelector(".modal-box"))?.focus();
+      }, 0);
+    }
+
+    function closeUsageModal() {
+      usageModalEl.classList.remove("show");
+      usageModalEl.setAttribute("aria-hidden", "true");
+      document.body.classList.remove("modal-open");
+      if (lastModalFocus && document.contains(lastModalFocus)) {
+        lastModalFocus.focus();
+      }
+      lastModalFocus = null;
+    }
+
+    function handleUsageModalBackdropClick(event) {
+      if (event.target === usageModalEl) closeUsageModal();
+    }
+
+    function getUsageModalContent(type) {
+      const sharedFirstStep = "等房主选择你为出题人";
+      const contents = {
+        copy: {
+          title: "题单已复制",
+          steps: [
+            sharedFirstStep,
+            "在准备题库页选择「出题工具题单/图片链接」",
+            "粘贴刚复制的内容"
+          ]
+        },
+        export: {
+          title: "题单已导出",
+          steps: [
+            sharedFirstStep,
+            "在准备题库页选择「出题工具题单/图片链接」",
+            "上传刚导出的 JSONL 文件"
+          ]
+        },
+        zip: {
+          title: "图片 ZIP 已下载",
+          steps: [
+            "先解压 ZIP",
+            sharedFirstStep,
+            "在准备题库页选择「上传图片」，上传解压后的文件夹"
+          ]
+        }
+      };
+      return contents[type] || null;
     }
 
 
@@ -3087,7 +3224,7 @@
 
     async function copyAutoDraftJsonl() {
       if (!autoDraft.length) {
-        setStatus("还没有题单草稿。请先生成题单草稿。");
+        setStatus("还没有题单草稿。请先生成题单草稿");
         return;
       }
       const text = getAutoDraftJsonlText();
@@ -3097,21 +3234,23 @@
         fallbackCopyText(text);
       }
       announceDelight("copyDraft", autoDraft.length, false);
+      showUsageModal("copy");
     }
 
     function exportAutoDraftJsonl() {
       if (!autoDraft.length) {
-        setStatus("还没有题单草稿。请先生成题单草稿。");
+        setStatus("还没有题单草稿。请先生成题单草稿");
         return;
       }
       const text = getAutoDraftJsonlText();
       downloadBlob(new Blob([text], { type: "application/x-ndjson" }), "fancaps-auto-question-list.jsonl");
       announceDelight("exportDraft", autoDraft.length);
+      showUsageModal("export");
     }
 
     async function downloadAutoDraftImages() {
       if (!autoDraft.length) {
-        setStatus("还没有题单草稿。请先生成题单草稿。");
+        setStatus("还没有题单草稿。请先生成题单草稿");
         return;
       }
 
@@ -3124,7 +3263,7 @@
         .filter(entry => entry.url);
 
       if (!entries.length) {
-        setStatus("草稿里没有可下载的图片地址。");
+        setStatus("草稿里没有可下载的图片地址");
         return;
       }
 
@@ -3134,14 +3273,14 @@
         progressId: "autoDraftDownloadProgress",
         folderName: makeDownloadFolderName("fancaps-draft-images"),
         makeFilename: makeAutoDraftImageFilename,
-        partialText: (successCount, failCount) => `已打包 ${successCount} 张草稿图片，${failCount} 张失败。`,
-        failureText: "草稿图片打包失败。请检查连接方式后重试。"
+        partialText: (successCount, failCount) => `已打包 ${successCount} 张草稿图片，${failCount} 张失败`,
+        failureText: "草稿图片打包失败。请检查连接方式后重试"
       });
     }
 
     function addAutoDraftToSelected() {
       if (!autoDraft.length) {
-        setStatus("还没有题单草稿。请先生成题单草稿。");
+        setStatus("还没有题单草稿。请先生成题单草稿");
         return;
       }
 
@@ -3261,7 +3400,7 @@
       proxyInput.value = DEFAULT_PROXY;
       proxyPreset.value = DEFAULT_PROXY;
       updateCurrentProxyLabel();
-      setStatus("已恢复推荐连接。");
+      setStatus("已恢复推荐连接");
     }
 
     function updateCurrentProxyLabel() {
@@ -3279,8 +3418,8 @@
     }
 
     function clearAll() {
-      if (selectedImages.size && !window.confirm(`清空当前搜索结果和 ${selectedImages.size} 张已选截图？此操作不能撤销。`)) {
-        setStatus("已取消清空。");
+      if (selectedImages.size && !window.confirm(`清空当前搜索结果和 ${selectedImages.size} 张已选截图？此操作不能撤销`)) {
+        setStatus("已取消清空");
         return;
       }
 
@@ -3302,14 +3441,14 @@
       showElement(fanCapsResultsEl);
       showElement(imagePanelEl);
       setProgress(0, false);
-      setStatus("已清空当前流程。可以重新搜索或生成草稿。");
+      setStatus("已清空当前流程。可以重新搜索或生成草稿");
       window.scrollTo({ top: 0, behavior: "smooth" });
     }
 
     async function searchBangumi() {
       const keyword = keywordInput.value.trim();
       if (!keyword) {
-        setStatus("请输入动画名。可以用中文名、日文名或常见简称。");
+        setStatus("请输入动画名。可以用中文名、日文名或常见简称");
         return;
       }
 
@@ -3349,13 +3488,13 @@
         const items = data.data || [];
 
         if (!items.length) {
-          setStatus("没有搜到动画条目。可以换成更短关键词、日文名或英文名再试。");
+          setStatus("没有搜到动画条目。可以换成更短关键词、日文名或英文名再试");
           return;
         }
 
         renderBangumiResults(items);
         showElement(bangumiResultsEl);
-        setStatus(`找到 ${items.length} 个候选条目。请选择正确动画。`);
+        setStatus(`找到 ${items.length} 个候选条目。请选择正确动画`);
         scrollToElement(bangumiResultsEl);
       } catch (err) {
         setStatus("动画搜索失败。请检查连接方式后重试。详情：" + err.message);
@@ -3431,7 +3570,7 @@
               <div class="section-headline">
                 <div>
                   <div class="side-title">正在查找截图</div>
-                  <div class="source-note">正在匹配可用截图来源。</div>
+                  <div class="source-note">正在匹配可用截图来源</div>
                 </div>
                 <button class="quiet" type="button" onclick="autoResolveAndSearchFanCaps(currentSubject)">重新查找</button>
               </div>
@@ -3443,13 +3582,13 @@
 
             <section id="manualTitleSearch" class="subject-side-flow" style="display: none;">
               <div class="side-title">手动搜索</div>
-              <div class="source-note">自动查找失败时，可以改用下方标题继续搜索。</div>
+              <div class="source-note">自动查找失败时，可以改用下方标题继续搜索</div>
 
               <div class="content-spaced-xs">
                 ${
                   latinCandidates.length
                     ? renderFanCapsCandidateTags(latinCandidates)
-                    : `<span class="empty">没有可用的备用标题。可以回到搜索，换一个 Bangumi 条目。</span>`
+                    : `<span class="empty">没有可用的备用标题。可以回到搜索，换一个 Bangumi 条目</span>`
                 }
               </div>
             </section>
@@ -3493,7 +3632,7 @@
 
     async function autoResolveAndSearchFanCaps(subject) {
       if (!subject) {
-        setStatus("请先从搜索结果里选择一部动画。");
+        setStatus("请先从搜索结果里选择一部动画");
         return false;
       }
 
@@ -3532,8 +3671,8 @@
 
       if (!bangumiTitles.length) {
         setProgress(0, false);
-        setStatus("没有自动找到截图。请用备用标题手动搜索。");
-        setAutoMatchMessage("没有自动找到截图。请选择一个备用标题继续搜索。", "empty");
+        setStatus("没有自动找到截图。请用备用标题手动搜索");
+        setAutoMatchMessage("没有自动找到截图。请选择一个备用标题继续搜索", "empty");
         showManualTitleSearch();
         return false;
       }
@@ -3549,8 +3688,8 @@
 
         if (!best) {
           setProgress(0, false);
-          setStatus("没有自动找到截图。请用备用标题手动搜索。");
-          setAutoMatchMessage("没有自动找到截图。请选择一个备用标题继续搜索。", "empty");
+          setStatus("没有自动找到截图。请用备用标题手动搜索");
+          setAutoMatchMessage("没有自动找到截图。请选择一个备用标题继续搜索", "empty");
           showManualTitleSearch();
           return false;
         }
@@ -3571,14 +3710,14 @@
           return true;
         }
 
-        setStatus("没有自动找到截图。请用备用标题手动搜索。");
-        setAutoMatchMessage("没有自动找到截图。请选择一个备用标题继续搜索。", "empty");
+        setStatus("没有自动找到截图。请用备用标题手动搜索");
+        setAutoMatchMessage("没有自动找到截图。请选择一个备用标题继续搜索", "empty");
         showManualTitleSearch();
         return false;
       } catch (err) {
         setProgress(0, false);
-        setStatus("没有自动找到截图。请用备用标题手动搜索。");
-        setAutoMatchMessage("没有自动找到截图。请选择一个备用标题继续搜索。", "empty");
+        setStatus("没有自动找到截图。请用备用标题手动搜索");
+        setAutoMatchMessage("没有自动找到截图。请选择一个备用标题继续搜索", "empty");
         showManualTitleSearch();
         return false;
       }
@@ -3710,7 +3849,7 @@
 
     function renderAutoTitleExactMatchResult(best, bangumiTitles) {
       if (!best) {
-        setAutoMatchMessage("没有自动命中。请用备用标题手动搜索。", "empty");
+        setAutoMatchMessage("没有自动命中。请用备用标题手动搜索", "empty");
         return;
       }
 
@@ -3749,7 +3888,7 @@
 
       throw new Error(
         `无法加载备用标题库。${failures.join("；")}。` +
-        `请确认网站同目录存在 anime-titles.xml 或 anime-titles.xml.gz；如果默认文件不可用，请下载最新 GZ 后上传。`
+        `请确认网站同目录存在 anime-titles.xml 或 anime-titles.xml.gz；如果默认文件不可用，请下载最新 GZ 后上传`
       );
     }
 
@@ -3777,7 +3916,7 @@
 
     async function fetchAniDbTitlesXmlViaProxy() {
       const proxy = proxyInput.value.trim();
-      if (!proxy) throw new Error("没有设置连接方式。请恢复推荐连接后重试。");
+      if (!proxy) throw new Error("没有设置连接方式。请恢复推荐连接后重试");
 
       const url = proxy + encodeURIComponent(ANIDB_TITLES_URL);
       const res = await fetch(url, { method: "GET" });
@@ -3813,10 +3952,10 @@
         if (panel) {
           panel.innerHTML = `
             <div class="content-spaced-xs">已加载备用标题文件：${escapeHtml(file.name)}</div>
-            <div class="fineprint">现在会用这份标题库继续匹配截图。</div>
+            <div class="fineprint">现在会用这份标题库继续匹配截图</div>
           `;
         }
-        setStatus(`已加载备用标题文件：${file.name}。`);
+        setStatus(`已加载备用标题文件：${file.name}`);
       } catch (err) {
         setProgress(0, false);
         if (panel) {
@@ -3833,11 +3972,11 @@
 
       const isGzip = bytes.length >= 2 && bytes[0] === 0x1f && bytes[1] === 0x8b;
       if (!isGzip) {
-        throw new Error("返回内容不像可用的标题库文件。请检查文件或连接方式。");
+        throw new Error("返回内容不像可用的标题库文件。请检查文件或连接方式");
       }
 
       if (typeof DecompressionStream === "undefined") {
-        throw new Error("当前浏览器无法直接解压 .gz。请换用新版 Chrome/Edge，或上传解压后的 XML 文件。");
+        throw new Error("当前浏览器无法直接解压 .gz。请换用新版 Chrome/Edge，或上传解压后的 XML 文件");
       }
 
       const stream = new Blob([buffer]).stream().pipeThrough(new DecompressionStream("gzip"));
@@ -3847,7 +3986,7 @@
     async function buildAniDbTitleIndex(xmlText) {
       const xml = new DOMParser().parseFromString(xmlText, "application/xml");
       const parseError = xml.querySelector("parsererror");
-      if (parseError) throw new Error("备用标题库解析失败。请确认文件格式正确。");
+      if (parseError) throw new Error("备用标题库解析失败。请确认文件格式正确");
 
       const titleMap = new Map();
       const aidMap = new Map();
@@ -3948,7 +4087,7 @@
 
       if (!matches.length) {
         panel.innerHTML = `
-          <div class="empty content-spaced-xs">备用标题库没有命中。</div>
+          <div class="empty content-spaced-xs">备用标题库没有命中</div>
           <div class="fineprint">已尝试标题：${escapeHtml(bangumiTitles.join(" / "))}</div>
         `;
         return;
@@ -3956,7 +4095,7 @@
 
       panel.innerHTML = `
         <div class="content-spaced-sm"><b>备用标题匹配结果</b></div>
-        <div class="fineprint">命中 ${matches.length} 个候选编号。只有一个候选时会自动继续，多个候选需要手动选择。</div>
+        <div class="fineprint">命中 ${matches.length} 个候选编号。只有一个候选时会自动继续，多个候选需要手动选择</div>
         <div class="content-spaced-xs">
           ${matches.map(match => renderAniDbMatchItem(match)).join("")}
         </div>
@@ -4021,14 +4160,14 @@
             await sleep(120);
             await loadFanCapsImages(item.url, item.title, { auto: true });
           } else if (shouldAutoLoadImages && results.length > 1) {
-            setStatus(`找到 ${results.length} 个可能来源。请选择正确条目。`);
+            setStatus(`找到 ${results.length} 个可能来源。请选择正确条目`);
             scrollToElement(fanCapsResultsEl);
           } else {
-            setStatus(`找到 ${results.length} 个可能来源。请选择正确条目。`);
+            setStatus(`找到 ${results.length} 个可能来源。请选择正确条目`);
             scrollToElement(fanCapsResultsEl);
           }
         } else {
-          setStatus(isAuto ? "还没有找到截图来源，继续尝试备用标题..." : "没有找到截图来源。可以换一个标题搜索。");
+          setStatus(isAuto ? "还没有找到截图来源，继续尝试备用标题..." : "没有找到截图来源。可以换一个标题搜索");
           scrollToElement(fanCapsResultsEl);
         }
 
@@ -4039,7 +4178,7 @@
         fanCapsResultsEl.innerHTML = `
           <div class="panel">
             <h2>截图来源读取失败</h2>
-            <div class="sub">当前无法读取 FanCaps 页面。可以稍后重试，或打开原搜索页手动检查。</div>
+            <div class="sub">当前无法读取 FanCaps 页面。可以稍后重试，或打开原搜索页手动检查</div>
             <div class="toolbar toolbar-spaced">
               <a class="button source-link" href="${escapeHtml(searchUrl)}" target="_blank" rel="noopener noreferrer">打开原搜索页</a>
             </div>
@@ -4154,20 +4293,20 @@
     function renderFanCapsResults(query, searchUrl, results, options = {}) {
       const isAuto = Boolean(options.auto || options.autoLoadImages || options.quiet);
       const hintText = isAuto
-        ? (results.length > 1 ? "找到多个可能来源，请选择正确条目。" : "正在加载候选截图...")
-        : "请选择正确条目。";
+        ? (results.length > 1 ? "找到多个可能来源，请选择正确条目" : "正在加载候选截图...")
+        : "请选择正确条目";
 
       fanCapsResultsEl.innerHTML = `
         <div class="panel">
           <h2>选择截图来源</h2>
           <div class="hint">${escapeHtml(hintText)}</div>
-          <div class="review-helper">先看预览图，确认是同一部动画后再查看截图。</div>
+          <div class="review-helper">先看预览图，确认是同一部动画后再查看截图</div>
 
           <div class="result-list">
             ${
               results.length
                 ? results.map(renderFanCapsItem).join("")
-                : `<div class="empty">没有找到截图来源。可以换一个标题、日文名或英文名再试。</div>`
+                : `<div class="empty">没有找到截图来源。可以换一个标题、日文名或英文名再试</div>`
             }
           </div>
           <div class="toolbar toolbar-spaced">
@@ -4224,7 +4363,7 @@
         showElement(imagePanelEl);
         const imageCount = episodeGroups.reduce((sum, ep) => sum + ep.images.length, 0);
         setProgress(100, false);
-        setStatus(`${options.auto ? "已自动加载候选截图" : "候选截图已加载"}：${episodeGroups.length} 个分组，${imageCount} 张图片。请选择适合猜谜的截图。`);
+        setStatus(`${options.auto ? "已自动加载候选截图" : "候选截图已加载"}：${episodeGroups.length} 个分组，${imageCount} 张图片。请选择适合猜谜的截图`);
         scrollToElement(imagePanelEl);
       } catch (err) {
         setProgress(0, false);
@@ -4233,7 +4372,7 @@
         imagePanelEl.innerHTML = `
           <div class="panel">
             <h2>候选截图读取失败</h2>
-            <div class="sub">可能是连接失败、FanCaps 页面结构变化，或请求被限制。可以稍后重试。</div>
+            <div class="sub">可能是连接失败、FanCaps 页面结构变化，或请求被限制。可以稍后重试</div>
             <div class="toolbar toolbar-spaced">
               <a class="button source-link" href="${escapeHtml(pageUrl)}" target="_blank" rel="noopener noreferrer">打开原页面</a>
             </div>
@@ -4488,8 +4627,8 @@
             <span class="pill">全局已选：<span class="selectedCount">${selectedImages.size}</span></span>
           </div>
 
-          <div class="hint">勾选适合猜谜的截图；同一部动画建议只保留一张。</div>
-          <div class="review-helper">已选截图会保留在页面底部，方便最后统一导出。</div>
+          <div class="hint">勾选适合猜谜的截图；同一部动画建议只保留一张</div>
+          <div class="review-helper">已选截图会保留在页面底部，方便最后统一导出</div>
 
           <div class="toolbar">
             <a class="button source-link" href="${escapeHtml(sourceUrl)}" target="_blank" rel="noopener noreferrer">打开原页面</a>
@@ -4498,7 +4637,7 @@
           ${
             episodeGroups.length
               ? episodeGroups.map(renderEpisodeGroup).join("")
-              : `<div class="empty">没有读取到候选截图。可以打开原页面检查，或返回搜索换一个条目。</div>`
+              : `<div class="empty">没有读取到候选截图。可以打开原页面检查，或返回搜索换一个条目</div>`
           }
           <div class="toolbar toolbar-roomy">
             <a class="button source-link" href="${escapeHtml(sourceUrl)}" target="_blank" rel="noopener noreferrer">打开原页面</a>
@@ -4522,7 +4661,7 @@
             ${
               group.images.length
                 ? group.images.map(item => renderEpisodeImageCard(item)).join("")
-                : `<div class="empty">本组没有候选截图。</div>`
+                : `<div class="empty">本组没有候选截图</div>`
             }
           </div>
           <div id="${escapeHtml(detailId)}" class="episode-detail"></div>
@@ -4897,7 +5036,7 @@
         ${
           current
             ? renderEpisodeDetailPage(current)
-            : `<div class="empty">${state.loadingPage ? "正在加载本页截图..." : "还没有加载到截图。"}</div>`
+            : `<div class="empty">${state.loadingPage ? "正在加载本页截图..." : "还没有加载到截图"}</div>`
         }
 
         <div class="episode-detail-bottom">
@@ -4943,7 +5082,7 @@
             ${
               page.images.length
                 ? page.images.map(item => renderEpisodeImageCard(item)).join("")
-                : `<div class="empty">本页没有读取到截图。可以换一页或稍后重试。</div>`
+                : `<div class="empty">本页没有读取到截图。可以换一页或稍后重试</div>`
             }
           </div>
         </div>
@@ -5129,7 +5268,7 @@
           <div class="basket-head">
             <div>
               <h2>已选截图</h2>
-              <div class="sub">${items.length ? "导出前确认题数（推荐10），必要时移除重复动画。" : "选择截图后，这里会显示导出入口。"}</div>
+              <div class="sub">${items.length ? "导出前确认题数（推荐10），必要时移除重复动画" : "选择截图后，这里会显示导出入口"}</div>
               <div class="basket-quality" aria-label="题单质量检查">
                 <span class="quality-pill">题数：${items.length}</span>
                 <span class="quality-pill ${quality.duplicateCount ? "warning" : ""}">重复动画：${quality.duplicateCount}</span>
@@ -5215,7 +5354,7 @@
 
     async function copySelectedJsonl() {
       if (!selectedImages.size) {
-        setStatus("还没有选择截图。请先勾选想加入题单的截图。");
+        setStatus("还没有选择截图。请先勾选想加入题单的截图");
         return;
       }
 
@@ -5228,6 +5367,7 @@
         fallbackCopyText(text);
       }
       announceDelight("copySelected", selectedImages.size, false);
+      showUsageModal("copy");
     }
 
     function getSelectedJsonlText() {
@@ -5277,8 +5417,8 @@
     }
 
     function clearSelectedImages() {
-      if (selectedImages.size && !window.confirm(`清空 ${selectedImages.size} 张已选截图？此操作不能撤销。`)) {
-        setStatus("已取消清空。");
+      if (selectedImages.size && !window.confirm(`清空 ${selectedImages.size} 张已选截图？此操作不能撤销`)) {
+        setStatus("已取消清空");
         return;
       }
 
@@ -5293,12 +5433,12 @@
 
       updateSelectedCount();
       renderSelectedBasket();
-      setStatus("已清空已选截图。");
+      setStatus("已清空已选截图");
     }
 
     async function exportJsonl() {
       if (!selectedImages.size) {
-        setStatus("还没有选择截图。请先勾选想加入题单的截图。");
+        setStatus("还没有选择截图。请先勾选想加入题单的截图");
         return;
       }
 
@@ -5306,18 +5446,19 @@
       const text = getSelectedJsonlText();
       downloadBlob(new Blob([text], { type: "application/x-ndjson" }), "fancaps-selected-images.jsonl");
       announceDelight("exportSelected", selectedImages.size);
+      showUsageModal("export");
     }
 
     async function downloadSelectedImages() {
       if (!selectedImages.size) {
-        setStatus("还没有选择截图。请先勾选想下载的截图。");
+        setStatus("还没有选择截图。请先勾选想下载的截图");
         return;
       }
 
       const currentEntries = [...selectedImages.values()]
         .filter(item => item.originalUrl || item.thumbUrl);
       if (!currentEntries.length) {
-        setStatus("没有找到可下载的图片地址。");
+        setStatus("没有找到可下载的图片地址");
         return;
       }
 
@@ -5332,7 +5473,7 @@
         .filter(entry => entry.url);
 
       if (!entries.length) {
-        setStatus("没有找到可下载的图片地址。");
+        setStatus("没有找到可下载的图片地址");
         return;
       }
 
@@ -5343,14 +5484,14 @@
         folderName: makeDownloadFolderName("fancaps-selected-images"),
         makeFilename: makeSelectedImageFilename,
         onFailure: entry => updateImageState(entry.id, "打包失败"),
-        partialText: (successCount, failCount) => `已打包 ${successCount} 张图片，${failCount} 张失败。`,
-        failureText: "图片打包失败。请检查连接方式后重试。"
+        partialText: (successCount, failCount) => `已打包 ${successCount} 张图片，${failCount} 张失败`,
+        failureText: "图片打包失败。请检查连接方式后重试"
       });
     }
 
     async function exportJson() {
       if (!selectedImages.size) {
-        setStatus("还没有选择截图。请先勾选想加入题单的截图。");
+        setStatus("还没有选择截图。请先勾选想加入题单的截图");
         return;
       }
 
@@ -5525,6 +5666,7 @@
         updateInlineDownloadProgress(options.progressId, 100, `ZIP 已生成：${successCount} 张${options.label}`, true);
         hideInlineDownloadProgressSoon(options.progressId);
         announceDelight(options.successType, successCount);
+        showUsageModal("zip");
         return;
       }
 
@@ -5533,6 +5675,7 @@
       updateInlineDownloadProgress(options.progressId, 100, text, true);
       hideInlineDownloadProgressSoon(options.progressId);
       showDelightToast(text);
+      showUsageModal("zip");
     }
 
     function updateInlineDownloadProgress(id, percent, text, show) {
@@ -5747,35 +5890,35 @@
       const safeCount = Number(count || 0);
       const messages = {
         copyDraft: [
-          `已复制 ${safeCount} 条草稿题单，可以先贴到游戏里试跑。`,
-          `草稿已复制，${safeCount} 题待你最后定稿。`
+          `已复制 ${safeCount} 条草稿题单，可以先贴到游戏里试跑`,
+          `草稿已复制，${safeCount} 题待你最后定稿`
         ],
         exportDraft: [
-          `已导出 ${safeCount} 条草稿题单。`,
-          `草稿题单已落盘，${safeCount} 题可以继续复查。`
+          `已导出 ${safeCount} 条草稿题单`,
+          `草稿题单已落盘，${safeCount} 题可以继续复查`
         ],
         downloadDraftImages: [
-          `已下载 ${safeCount} 张草稿图片的 ZIP。`,
-          `草稿图片 ZIP 已生成，${safeCount} 张都在压缩包里。`
+          `已下载 ${safeCount} 张草稿图片的 ZIP`,
+          `草稿图片 ZIP 已生成，${safeCount} 张都在压缩包里`
         ],
         copySelected: [
-          `已复制 ${safeCount} 条题单数据，可以直接粘贴使用。`,
-          `题单已复制，${safeCount} 张截图准备就绪。`
+          `已复制 ${safeCount} 条题单数据，可以直接粘贴使用`,
+          `题单已复制，${safeCount} 张截图准备就绪`
         ],
         exportSelected: [
-          `已导出 ${safeCount} 题，截图题单装好了。`,
-          `题单已导出，${safeCount} 张截图可以开局。`
+          `已导出 ${safeCount} 题，截图题单装好了`,
+          `题单已导出，${safeCount} 张截图可以开局`
         ],
         downloadSelectedImages: [
-          `已下载 ${safeCount} 张图片的 ZIP。`,
-          `图片 ZIP 已生成，${safeCount} 张都在压缩包里。`
+          `已下载 ${safeCount} 张图片的 ZIP`,
+          `图片 ZIP 已生成，${safeCount} 张都在压缩包里`
         ],
         addDraft: [
-          `已把 ${safeCount} 张草稿截图放入已选，导出前再扫一眼。`,
-          `草稿已进入已选，${safeCount} 张截图等你定稿。`
+          `已把 ${safeCount} 张草稿截图放入已选，导出前再扫一眼`,
+          `草稿已进入已选，${safeCount} 张截图等你定稿`
         ]
       };
-      return pickOne(messages[type] || [`已完成 ${safeCount} 项。`]);
+      return pickOne(messages[type] || [`已完成 ${safeCount} 项`]);
     }
 
     function showDelightToast(text) {
@@ -5855,7 +5998,7 @@
 
     async function fetchViaProxy(targetUrl) {
       const proxy = proxyInput.value.trim();
-      if (!proxy) throw new Error("没有设置连接方式。请恢复推荐连接后重试。");
+      if (!proxy) throw new Error("没有设置连接方式。请恢复推荐连接后重试");
 
       const url = proxy + encodeURIComponent(targetUrl);
       const res = await fetch(url, { method: "GET" });
@@ -6088,7 +6231,7 @@
 
     function showBangumiResults() {
       if (!bangumiResultsEl.innerHTML.trim()) {
-        setStatus("当前没有可显示的候选动画。请重新搜索。");
+        setStatus("当前没有可显示的候选动画。请重新搜索");
         scrollToTopSearch();
         return;
       }
