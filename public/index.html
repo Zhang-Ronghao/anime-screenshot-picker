@@ -280,6 +280,32 @@
       box-shadow: 0 0 0 4px color-mix(in oklch, var(--selected-wash) 72%, transparent), 0 0 20px color-mix(in oklch, var(--selected) 34%, transparent);
     }
 
+    .header-help-button {
+      position: absolute;
+      top: 18px;
+      right: 18px;
+      z-index: 1;
+      display: inline-grid;
+      place-items: center;
+      width: 34px;
+      height: 34px;
+      min-height: 34px;
+      padding: 0;
+      border-radius: 999px;
+      border-color: color-mix(in oklch, var(--selected-border) 62%, var(--border));
+      background: color-mix(in oklch, var(--panel) 84%, var(--selected-wash));
+      color: var(--selected);
+      font-size: var(--text-title);
+      font-weight: var(--weight-bold);
+      line-height: 1;
+      box-shadow: 0 8px 20px rgb(var(--shadow-ink) / 0.08);
+    }
+
+    .header-help-button:hover {
+      background: color-mix(in oklch, var(--selected-wash) 80%, var(--panel));
+      transform: translateY(-1px);
+    }
+
     .app-header-title-led h1 {
       margin: 0;
       max-width: 10em;
@@ -1782,6 +1808,38 @@
       justify-content: flex-end;
     }
 
+    .about-modal-box {
+      width: min(620px, 100%);
+    }
+
+    .about-sections {
+      display: grid;
+      gap: 14px;
+      margin-bottom: 18px;
+    }
+
+    .about-section {
+      padding: 12px;
+      border: 1px solid color-mix(in oklch, var(--border) 78%, var(--selected-border));
+      border-radius: 12px;
+      background: color-mix(in oklch, var(--panel) 88%, var(--selected-wash));
+    }
+
+    .about-section h3 {
+      margin-bottom: 8px;
+      font-size: var(--text-ui);
+    }
+
+    .about-list {
+      display: grid;
+      gap: 6px;
+      margin: 0;
+      padding-left: 18px;
+      color: var(--text);
+      font-size: var(--text-ui);
+      line-height: var(--leading-ui);
+    }
+
     .modal-grid {
       display: grid;
       grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
@@ -2306,6 +2364,7 @@
   <div id="topAnchor"></div>
   <img class="anime-bg-art" src="background.jpg" alt="" aria-hidden="true" onerror="this.remove()">
   <header class="app-header app-header-title-led">
+    <button class="header-help-button" type="button" aria-label="查看题库说明" title="题库说明" onclick="showAboutModal()">?</button>
     <div class="header-kicker">动漫高手·一眼顶针</div>
     <h1>动画截图出题工具</h1>
     <p class="sub">从 FanCaps 截图库中挑选画面，生成可导出的题单</p>
@@ -2394,6 +2453,55 @@
       <ol id="usageModalSteps" class="usage-steps"></ol>
       <div class="usage-modal-actions">
         <button type="button" onclick="closeUsageModal()">我知道了</button>
+      </div>
+    </div>
+  </div>
+
+  <div id="aboutModal" class="modal-backdrop" aria-hidden="true" onclick="handleAboutModalBackdropClick(event)">
+    <div class="modal-box about-modal-box" role="dialog" aria-modal="true" aria-labelledby="aboutModalTitle" tabindex="-1">
+      <div class="modal-head">
+        <div>
+          <h2 id="aboutModalTitle">题库说明</h2>
+        </div>
+        <div class="toolbar">
+          <button onclick="closeAboutModal()">关闭</button>
+        </div>
+      </div>
+      <div class="about-sections">
+        <section class="about-section">
+          <h3>数据来源</h3>
+          <ul class="about-list">
+            <li>自动题库来自 Bangumi 动画列表和 FanCaps 截图库的批量匹配</li>
+            <li>FanCaps 主要覆盖 TV 动画，不收录 OVA 和动画电影</li>
+          </ul>
+        </section>
+        <section class="about-section">
+          <h3>题库规模</h3>
+          <ul class="about-list">
+            <li>初筛候选：Bangumi 看过人数 ≥ 100，共 8,369 部</li>
+            <li>可用于匹配 FanCaps：6,602 部</li>
+            <li>成功匹配 FanCaps：2,272 部 TV 动画</li>
+            <li>截图总数：146,335 张</li>
+          </ul>
+        </section>
+        <section class="about-section">
+          <h3>覆盖情况</h3>
+          <ul class="about-list">
+            <li>Bangumi 看过人数 Top500：收录 349 部，占 69.8%</li>
+            <li>Bangumi 看过人数 Top1000：收录 636 部，占 63.6%</li>
+            <li>部分热门 TV 动画也可能没有可用来源</li>
+          </ul>
+        </section>
+        <section class="about-section">
+          <h3>截图范围</h3>
+          <ul class="about-list">
+            <li>自动出题：每集固定 4 张精选图</li>
+            <li>手动出题：可浏览 FanCaps 上更多截图</li>
+          </ul>
+        </section>
+      </div>
+      <div class="usage-modal-actions">
+        <button type="button" onclick="closeAboutModal()">我知道了</button>
       </div>
     </div>
   </div>
@@ -2495,6 +2603,7 @@
     const usageModalEl = document.getElementById("usageModal");
     const usageModalTitleEl = document.getElementById("usageModalTitle");
     const usageModalStepsEl = document.getElementById("usageModalSteps");
+    const aboutModalEl = document.getElementById("aboutModal");
     const autoYearFromRangeEl = document.getElementById("autoYearFromRange");
     const autoYearToRangeEl = document.getElementById("autoYearToRange");
     const autoYearFromLabelEl = document.getElementById("autoYearFromLabel");
@@ -3069,6 +3178,18 @@
     }
 
     function handleGlobalKeydown(event) {
+      if (aboutModalEl.classList.contains("show")) {
+        if (event.key === "Escape") {
+          closeAboutModal();
+          return;
+        }
+
+        if (event.key === "Tab") {
+          trapModalFocus(event, aboutModalEl);
+        }
+        return;
+      }
+
       if (usageModalEl.classList.contains("show")) {
         if (event.key === "Escape") {
           closeUsageModal();
@@ -3173,6 +3294,31 @@
 
     function handleUsageModalBackdropClick(event) {
       if (event.target === usageModalEl) closeUsageModal();
+    }
+
+    function showAboutModal() {
+      lastModalFocus = document.activeElement instanceof HTMLElement ? document.activeElement : null;
+      aboutModalEl.classList.add("show");
+      aboutModalEl.setAttribute("aria-hidden", "false");
+      document.body.classList.add("modal-open");
+      setTimeout(() => {
+        const firstAction = getModalFocusable(aboutModalEl)[0];
+        (firstAction || aboutModalEl.querySelector(".modal-box"))?.focus();
+      }, 0);
+    }
+
+    function closeAboutModal() {
+      aboutModalEl.classList.remove("show");
+      aboutModalEl.setAttribute("aria-hidden", "true");
+      document.body.classList.remove("modal-open");
+      if (lastModalFocus && document.contains(lastModalFocus)) {
+        lastModalFocus.focus();
+      }
+      lastModalFocus = null;
+    }
+
+    function handleAboutModalBackdropClick(event) {
+      if (event.target === aboutModalEl) closeAboutModal();
     }
 
     function getUsageModalContent(type) {
