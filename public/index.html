@@ -2316,7 +2316,7 @@
       </div>
       <div class="auto-field">
         <label for="autoQuestionCount">题目数量</label>
-        <input id="autoQuestionCount" type="number" min="1" max="100" value="20" />
+        <input id="autoQuestionCount" type="number" min="1" max="100" value="10" />
       </div>
     </div>
 
@@ -2650,7 +2650,7 @@
         const pool = await buildAutoCandidatePool(dataset);
         autoFilteredPool = pool;
 
-        const count = clampNumber(Number(document.getElementById("autoQuestionCount").value || 20), 1, 100);
+        const count = clampNumber(Number(document.getElementById("autoQuestionCount").value || 10), 1, 100);
         const sampleCount = Math.min(count, pool.length);
 
         if (!pool.length) {
@@ -2807,7 +2807,7 @@
         generateAutoDraft();
         return;
       }
-      const count = clampNumber(Number(document.getElementById("autoQuestionCount").value || 20), 1, 100);
+      const count = clampNumber(Number(document.getElementById("autoQuestionCount").value || 10), 1, 100);
       autoDraft = sampleUnique(autoFilteredPool, Math.min(count, autoFilteredPool.length)).map(record => makeAutoDraftItem(record));
       renderAutoDraft();
       setStatus("已重新随机。");
@@ -5129,7 +5129,7 @@
           <div class="basket-head">
             <div>
               <h2>已选截图</h2>
-              <div class="sub">${items.length ? "导出前确认题数（推荐20），必要时移除重复动画。" : "选择截图后，这里会显示导出入口。"}</div>
+              <div class="sub">${items.length ? "导出前确认题数（推荐10），必要时移除重复动画。" : "选择截图后，这里会显示导出入口。"}</div>
               <div class="basket-quality" aria-label="题单质量检查">
                 <span class="quality-pill">题数：${items.length}</span>
                 <span class="quality-pill ${quality.duplicateCount ? "warning" : ""}">重复动画：${quality.duplicateCount}</span>
