@@ -7,7 +7,7 @@
     "bgm-cover": "node scripts/bangumi-cover.mjs",
     "build-bgm-anime": "node scripts/build-bangumi-anime-subjects.mjs",
     "dev": "wrangler pages dev public --compatibility-date=2026-05-23",
-    "deploy": "wrangler pages deploy public"
+    "deploy": "wrangler pages deploy public --project-name anime-screenshot-picker"
   },
   "devDependencies": {
     "wrangler": "^4.0.0"

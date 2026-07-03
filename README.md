@@ -26,24 +26,31 @@ anime-screenshot-picker/
 ├── public/
 │   └── index.html          # 前端页面
 ├── functions/
-│   └── proxy.js            # Cloudflare Pages Function，代理 FanCaps 页面和图片下载
+│   ├── bangumi.js          # Cloudflare Pages Function，代理 Bangumi API
+│   └── proxy.js            # Cloudflare Pages Function，代理 FanCaps 页面和图片下载、Bangumi 封面展示
 ├── package.json
 ├── wrangler.toml
 ├── .gitignore
 └── README.md
 ```
 
-## 为什么需要 /proxy
+## 为什么需要 /bangumi 和 /proxy
 
 浏览器页面不能直接用 `fetch()` 读取 FanCaps 的 HTML 页面，因为 FanCaps 没有给你的站点开放 CORS。
 
-所以本项目用 Cloudflare Pages Function 提供一个轻量代理：
+Bangumi API 和封面图片在部分网络环境也可能无法由用户浏览器稳定直连，所以本项目用 Cloudflare Pages Functions 提供两个受限代理：
+
+```text
+/bangumi?path=%2Fv0%2Fsubjects%2F245665
+```
+
+`/bangumi` 只允许必要的 Bangumi API 路径，包括动画条目、搜索和用户收藏列表。自动封面出题读取 `images.large` 时会走这个后端代理。
 
 ```text
 /proxy?url=https%3A%2F%2Ffancaps.net%2F...
 ```
 
-注意：代理只开放必要的 FanCaps 页面、FanCaps 图片和 Bangumi 封面图片路径，避免被当成通用开放代理滥用。普通浏览时图片仍由用户浏览器直接从原站加载；打包 ZIP 时会通过代理读取图片。
+`/proxy` 只开放必要的 FanCaps 页面、FanCaps 图片和 Bangumi 封面图片路径，避免被当成通用开放代理滥用。Bangumi 封面在页面展示和 ZIP 打包下载时都会通过 `/proxy` 读取。
 
 ## 本地运行
 
@@ -64,6 +71,26 @@ npm run dev
 ```text
 http://localhost:8788
 ```
+
+不要用 `python -m http.server public` 或直接打开 HTML 测 Bangumi 封面功能；纯静态预览不会运行 `functions/bangumi.js` 和 `functions/proxy.js`。
+
+## 部署
+
+必须从仓库根目录部署，让 Cloudflare Pages 同时看到 `public/` 和 `functions/`：
+
+```bash
+npm run deploy
+```
+
+不要只上传 `public` 文件夹，也不要把 Cloudflare Pages 的 Root directory 配成 `public`。`functions/` 必须位于 Pages 项目根目录，否则 `/bangumi` 会 404，前端就无法走后端代理。
+
+部署后先访问下面的地址自检：
+
+```text
+https://你的域名/bangumi?path=%2Fv0%2Fsubjects%2F245665
+```
+
+正常应返回 Bangumi 条目 JSON。如果返回 404，说明 Functions 没部署进去或项目根目录配置不对。
 
 ## 按 Bangumi 条目 ID 获取封面
 
