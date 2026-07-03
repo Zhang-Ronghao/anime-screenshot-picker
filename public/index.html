@@ -2865,19 +2865,19 @@
   <main>
 
   <div id="modePanel" class="panel mode-panel" role="group" aria-label="出题方式" aria-describedby="modePrompt">
-    <button id="manualModeBtn" class="mode-button active" type="button" aria-pressed="true" aria-controls="searchPanel" onclick="switchMode('manual')">手动出题</button>
-    <button id="autoModeBtn" class="mode-button light" type="button" aria-pressed="false" aria-controls="autoPanel" onclick="switchMode('auto')">自动出题</button>
+    <button id="autoModeBtn" class="mode-button active" type="button" aria-pressed="true" aria-controls="autoPanel" onclick="switchMode('auto')">自动出题</button>
+    <button id="manualModeBtn" class="mode-button light" type="button" aria-pressed="false" aria-controls="searchPanel" onclick="switchMode('manual')">手动出题</button>
     <span class="mode-prompt" id="modePrompt">自动可批量抽截图或封面；手动可浏览更多截图，适合精挑</span>
   </div>
 
   <div class="shared-status-panel" aria-label="工作状态">
-    <div id="status" class="status" role="status" aria-live="polite">搜索动画开始手动出题，或切换到自动出题</div>
+    <div id="status" class="status" role="status" aria-live="polite">设置条件后生成自动题单，或切换到手动出题</div>
     <div id="progressWrap" class="loading-line" style="display: none;" role="progressbar" aria-label="当前任务进度" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0">
       <div id="progressBar"></div>
     </div>
   </div>
 
-  <div id="autoPanel" class="panel" style="display: none;">
+  <div id="autoPanel" class="panel">
     <h2>自动出题</h2>
     <div class="workflow-note workflow-note-nowrap">填写 Bangumi 用户 ID 后，只从该用户标记“看过”的动画里抽题；留空则从全部可用动画里抽题</div>
     <input id="autoImageSource" type="hidden" value="fancaps" />
@@ -3010,7 +3010,7 @@
   </div>
 
 
-  <div id="searchPanel" class="panel">
+  <div id="searchPanel" class="panel" style="display: none;">
     <div class="search-panel-head">
       <div class="workflow-note">搜索动画并选择正确条目，工具会自动查找可用截图</div>
       <div class="proxy-current">
