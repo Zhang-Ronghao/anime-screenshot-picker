@@ -4,6 +4,8 @@
   "private": true,
   "description": "Anime screenshot picker for quiz/game assets, powered by Bangumi and FanCaps.",
   "scripts": {
+    "bgm-cover": "node scripts/bangumi-cover.mjs",
+    "build-bgm-anime": "node scripts/build-bangumi-anime-subjects.mjs",
     "dev": "wrangler pages dev public --compatibility-date=2026-05-23",
     "deploy": "wrangler pages deploy public"
   },

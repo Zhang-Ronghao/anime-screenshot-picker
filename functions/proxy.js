@@ -1,5 +1,6 @@
 const FANCAPS_HOST = 'fancaps.net';
 const FANCAPS_IMAGE_HOST = 'cdni.fancaps.net';
+const BANGUMI_IMAGE_HOST = 'lain.bgm.tv';
 
 const CORS_HEADERS = {
   'Access-Control-Allow-Origin': '*',
@@ -33,15 +34,15 @@ export async function onRequest(context) {
     return json({ error: 'Invalid url parameter' }, 400);
   }
 
-  if (targetUrl.protocol !== 'https:' || !isAllowedFanCapsHost(targetUrl.hostname)) {
-    return json({ error: 'Only FanCaps URLs are allowed' }, 400);
+  if (targetUrl.protocol !== 'https:' || !isAllowedHost(targetUrl.hostname)) {
+    return json({ error: 'Only FanCaps or Bangumi image URLs are allowed' }, 400);
   }
 
-  if (!isAllowedFanCapsPath(targetUrl)) {
-    return json({ error: 'This FanCaps path is not allowed' }, 400);
+  if (!isAllowedPath(targetUrl)) {
+    return json({ error: 'This path is not allowed' }, 400);
   }
 
-  const isImage = isFanCapsImageUrl(targetUrl);
+  const isImage = isAllowedImageUrl(targetUrl);
 
   const cache = caches.default;
   const cacheKey = new Request(targetUrl.toString(), { method: 'GET' });
@@ -59,7 +60,7 @@ export async function onRequest(context) {
         ? 'image/avif,image/webp,image/apng,image/svg+xml,image/*,*/*;q=0.8'
         : 'text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8',
       'Accept-Language': 'en-US,en;q=0.9,zh-CN;q=0.8,zh;q=0.7',
-      'Referer': 'https://fancaps.net/',
+      'Referer': getReferer(targetUrl.hostname),
     },
     cf: {
       cacheTtl: getCacheTtl(targetUrl.pathname),
@@ -114,14 +115,17 @@ export async function onRequest(context) {
   return response;
 }
 
-function isAllowedFanCapsHost(hostname) {
-  return hostname === FANCAPS_HOST || hostname === FANCAPS_IMAGE_HOST;
+function isAllowedHost(hostname) {
+  return hostname === FANCAPS_HOST || hostname === FANCAPS_IMAGE_HOST || hostname === BANGUMI_IMAGE_HOST;
 }
 
-function isAllowedFanCapsPath(url) {
+function isAllowedPath(url) {
   const { hostname, pathname } = url;
   if (hostname === FANCAPS_IMAGE_HOST) {
     return isFanCapsImagePath(pathname);
+  }
+  if (hostname === BANGUMI_IMAGE_HOST) {
+    return isBangumiImagePath(pathname);
   }
 
   if (hostname !== FANCAPS_HOST) return false;
@@ -139,6 +143,10 @@ function isFanCapsImageUrl(url) {
   return url.hostname === FANCAPS_IMAGE_HOST && isFanCapsImagePath(url.pathname);
 }
 
+function isAllowedImageUrl(url) {
+  return isFanCapsImageUrl(url) || (url.hostname === BANGUMI_IMAGE_HOST && isBangumiImagePath(url.pathname));
+}
+
 function isFanCapsImagePath(pathname) {
   return (
     pathname.startsWith('/file/fancaps-animeimages/') &&
@@ -146,7 +154,23 @@ function isFanCapsImagePath(pathname) {
   );
 }
 
+function isBangumiImagePath(pathname) {
+  return (
+    (
+      pathname.startsWith('/pic/cover/') ||
+      /^\/r\/\d+\/pic\/cover\//.test(pathname)
+    ) &&
+    /\.(avif|gif|jpe?g|png|webp)$/i.test(pathname)
+  );
+}
+
+function getReferer(hostname) {
+  if (hostname === BANGUMI_IMAGE_HOST) return 'https://bgm.tv/';
+  return 'https://fancaps.net/';
+}
+
 function getCacheTtl(pathname) {
+  if (isBangumiImagePath(pathname)) return 60 * 60 * 24 * 30; // 30 days
   if (isFanCapsImagePath(pathname)) return 60 * 60 * 24 * 30; // 30 days
   if (pathname === '/search.php') return 60 * 60 * 24; // 1 day
   if (pathname.includes('picture.php')) return 60 * 60 * 24 * 30; // 30 days

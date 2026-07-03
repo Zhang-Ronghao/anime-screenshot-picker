@@ -12,6 +12,13 @@
 6. 多部动画的已选截图会保留在全局选择篮中。
 7. 可复制或导出已选图片 URL。
 
+自动出题支持两种图片来源：
+
+- `FanCaps 截图库`：从已匹配的 FanCaps 截图池中随机抽题。
+- `Bangumi 封面图`：从 Bangumi 动画候选池中随机抽条目，再调用 Bangumi API 获取 `images.large` 原图封面。
+
+两种来源共用年份范围、Bangumi 看过人数、Bangumi 用户看过列表筛选逻辑。题目数量固定最多 20 道。
+
 ## 项目结构
 
 ```text
@@ -56,6 +63,44 @@ npm run dev
 
 ```text
 http://localhost:8788
+```
+
+## 按 Bangumi 条目 ID 获取封面
+
+Bangumi dump 的 `subject.jsonlines` 不包含封面文件名或 CDN hash，因此不能只靠 dump 从 `245665` 推导出 `9d/d1/245665_5an54.jpg`。本项目提供了一个小工具，通过 Bangumi API 获取封面链接：
+
+```bash
+npm run bgm-cover -- 245665
+```
+
+默认输出 `common` 尺寸，也就是 `/r/400/`：
+
+```text
+245665  鬼灭之刃  https://lain.bgm.tv/r/400/pic/cover/l/9d/d1/245665_5an54.jpg
+```
+
+获取原图链接：
+
+```bash
+npm run bgm-cover -- 245665 --size large
+```
+
+输出全部尺寸：
+
+```bash
+npm run bgm-cover -- 245665 --all
+```
+
+也可以传入本地 dump 文件，用它校验或补充条目名；封面链接仍来自 Bangumi API：
+
+```bash
+npm run bgm-cover -- 245665 --dump "C:\Users\Hu_care\Downloads\dump-2026-05-19.210434Z\subject.jsonlines"
+```
+
+如果更新了 Bangumi dump，可以重新生成自动出题用的封面候选池：
+
+```bash
+npm run build-bgm-anime -- "C:\Users\Hu_care\Downloads\dump-2026-05-19.210434Z\subject.jsonlines"
 ```
 
 ## 部署到 Cloudflare Pages

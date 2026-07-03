@@ -1542,7 +1542,7 @@
 
     .auto-form-grid {
       display: grid;
-      grid-template-columns: minmax(180px, 0.9fr) minmax(360px, 1.8fr) repeat(2, minmax(150px, 0.75fr));
+      grid-template-columns: minmax(150px, 0.8fr) minmax(180px, 0.9fr) minmax(360px, 1.8fr) repeat(2, minmax(150px, 0.75fr));
       gap: var(--space-sm);
       align-items: end;
       margin-top: var(--space-sm);
@@ -1681,6 +1681,12 @@
       background: var(--soft);
       display: block;
       margin-bottom: 8px;
+    }
+
+    .draft-card img.draft-image-cover,
+    .modal-choice img.draft-image-cover {
+      aspect-ratio: 3 / 4;
+      object-fit: contain;
     }
 
     .draft-title {
@@ -2780,7 +2786,7 @@
     <button class="header-help-button" type="button" aria-label="查看题库说明" title="题库说明" onclick="showAboutModal()">题库说明 ⓘ</button>
     <div class="header-kicker">动漫高手·一眼顶针</div>
     <h1>动画截图出题工具</h1>
-    <p class="sub">从 FanCaps 截图库中挑选画面，生成可导出的题单</p>
+    <p class="sub">从 FanCaps 截图或 Bangumi 封面中挑选画面，生成可导出的题单</p>
   </header>
 
   <main>
@@ -2788,7 +2794,7 @@
   <div id="modePanel" class="panel mode-panel" role="group" aria-label="出题方式" aria-describedby="modePrompt">
     <button id="manualModeBtn" class="mode-button active" type="button" aria-pressed="true" aria-controls="searchPanel" onclick="switchMode('manual')">手动出题</button>
     <button id="autoModeBtn" class="mode-button light" type="button" aria-pressed="false" aria-controls="autoPanel" onclick="switchMode('auto')">自动出题</button>
-    <span class="mode-prompt" id="modePrompt">自动取每集精选图，适合批量起草；手动可浏览更多截图，适合精挑</span>
+    <span class="mode-prompt" id="modePrompt">自动可批量抽截图或封面；手动可浏览更多截图，适合精挑</span>
   </div>
 
   <div class="shared-status-panel" aria-label="工作状态">
@@ -2803,6 +2809,13 @@
     <div class="workflow-note workflow-note-nowrap">填写 Bangumi 用户 ID 后，只从该用户标记“看过”的动画里抽题；留空则从全部可用动画里抽题</div>
 
     <div class="auto-form-grid">
+      <div class="auto-field">
+        <label for="autoImageSource">图片来源</label>
+        <select id="autoImageSource">
+          <option value="fancaps">FanCaps 截图库</option>
+          <option value="bangumi-cover">Bangumi 封面图</option>
+        </select>
+      </div>
       <div class="auto-field">
         <label for="autoBangumiUser">Bangumi 用户 ID（可选）</label>
         <input id="autoBangumiUser" placeholder="例如：123456" />
@@ -2826,7 +2839,7 @@
       </div>
       <div class="auto-field">
         <label for="autoQuestionCount">题目数量</label>
-        <input id="autoQuestionCount" type="number" min="1" max="100" value="10" />
+        <input id="autoQuestionCount" type="number" min="1" max="20" value="10" />
       </div>
     </div>
 
@@ -2884,14 +2897,15 @@
         <section class="about-section">
           <h3>数据来源</h3>
           <ul class="about-list">
-            <li>自动题库来自 Bangumi 动画列表和 FanCaps 截图库的批量匹配</li>
-            <li>FanCaps 主要覆盖 TV 动画，不收录 OVA 和动画电影</li>
+            <li>自动题库可选择 FanCaps 截图库或 Bangumi 封面图</li>
+            <li>FanCaps 主要覆盖 TV 动画；Bangumi 封面来自条目 API 的 large 原图</li>
           </ul>
         </section>
         <section class="about-section">
           <h3>题库规模</h3>
           <ul class="about-list">
-            <li>Bangumi 看过人数 ≥ 100 有效条目：6,602 部</li>
+            <li>Bangumi 动画封面候选条目：<span class="stat-emphasis">29,742</span> 部</li>
+            <li>Bangumi 看过人数 ≥ 100 封面候选：<span class="stat-emphasis">9,749</span> 部</li>
             <li>成功匹配 FanCaps：<span class="stat-emphasis">2,272</span> 部 TV 动画</li>
             <li>截图总数：<span class="stat-emphasis">146,335</span> 张</li>
           </ul>
@@ -2901,13 +2915,13 @@
           <ul class="about-list">
             <li>Bangumi 看过人数 Top500：收录 <span class="stat-emphasis">349</span> 部，占 <span class="stat-emphasis">69.8%</span></li>
             <li>Bangumi 看过人数 Top1000：收录 <span class="stat-emphasis">636</span> 部，占 <span class="stat-emphasis">63.6%</span></li>
-            <li>部分热门 TV 动画也可能没有可用来源</li>
+            <li>部分热门 TV 动画也可能没有可用 FanCaps 截图</li>
           </ul>
         </section>
         <section class="about-section">
           <h3>截图范围</h3>
           <ul class="about-list">
-            <li>自动出题：每集固定 4 张精选图</li>
+            <li>自动出题：最多 20 题，可选截图或封面来源</li>
             <li>手动出题：可浏览 FanCaps 上更多截图</li>
           </ul>
         </section>
@@ -2981,7 +2995,11 @@
     ];
     const ANIME_MAP_PATH = "./anime_map.json";
     const FANCAPS_AUTO_DATA_PATH = "./fancaps_anime_images.jsonl";
+    const BANGUMI_AUTO_DATA_PATH = "./bangumi_anime_subjects.jsonl";
     const DEFAULT_PROXY = "/proxy?url=";
+    const AUTO_MAX_QUESTION_COUNT = 20;
+    const BANGUMI_COVER_SIZE = "large";
+    const BANGUMI_NO_COVER_URL = "https://lain.bgm.tv/img/no_icon_subject.png";
     const TOP_IMAGES_PER_EPISODE = 4;
     const MAX_SHOW_PAGES = 30;
 
@@ -3050,6 +3068,8 @@
     renderSelectedBasket();
     renderAutoDraft();
     syncAutoYearRangeLabels("init");
+    document.getElementById("autoImageSource")?.addEventListener("change", handleAutoImageSourceChange);
+    document.getElementById("autoQuestionCount")?.addEventListener("input", getAutoQuestionCount);
 
     document.getElementById("searchBangumiBtn").addEventListener("click", searchBangumi);
     keywordInput.addEventListener("keydown", (e) => {
@@ -3081,6 +3101,19 @@
       setStatus(isAuto ? "已切换到自动出题" : "已切换到手动出题");
       renderSelectedBasket();
       scrollToElement(isAuto ? autoPanelEl : searchPanelEl);
+    }
+
+
+    function handleAutoImageSourceChange() {
+      autoDraft = [];
+      autoFilteredPool = [];
+      closeAutoModal();
+      renderAutoDraft();
+      if (autoPoolInfoEl) autoPoolInfoEl.textContent = "等待生成";
+      const source = getAutoImageSource();
+      setStatus(source === "bangumi-cover"
+        ? "已切换到 Bangumi 封面图。生成时会调用 Bangumi API 获取 large 原图封面"
+        : "已切换到 FanCaps 截图库");
     }
 
 
@@ -3135,11 +3168,17 @@
       return value === 2027 ? 0 : value;
     }
 
-    async function loadAutoDataset() {
-      if (autoDataset) return autoDataset;
-      if (autoDatasetPromise) return autoDatasetPromise;
+    async function loadAutoDataset(source = getAutoImageSource()) {
+      if (source === "bangumi-cover") return loadBangumiAutoDataset();
+      return loadFanCapsAutoDataset();
+    }
 
-      autoDatasetPromise = (async () => {
+    async function loadFanCapsAutoDataset() {
+      if (autoDataset?.fancaps) return autoDataset.fancaps;
+      if (autoDatasetPromise?.fancaps) return autoDatasetPromise.fancaps;
+
+      autoDatasetPromise = autoDatasetPromise || {};
+      autoDatasetPromise.fancaps = (async () => {
         const res = await fetch(FANCAPS_AUTO_DATA_PATH, { cache: "force-cache" });
         if (!res.ok) throw new Error(`FanCaps 截图读取失败：HTTP ${res.status}`);
 
@@ -3165,6 +3204,7 @@
             const doneCount = Number(raw.done_count || 0) || 0;
 
             records.push({
+              source: "fancaps",
               bgmId,
               anidbId: raw.anidb_id ? String(raw.anidb_id) : "",
               title: clean(raw.label_text || raw.name_cn || raw.name || `Bangumi ${bgmId}`),
@@ -3182,11 +3222,71 @@
           }
         }
 
-        autoDataset = records;
+        autoDataset = autoDataset || {};
+        autoDataset.fancaps = records;
         return records;
       })();
 
-      return autoDatasetPromise;
+      return autoDatasetPromise.fancaps;
+    }
+
+    async function loadBangumiAutoDataset() {
+      if (autoDataset?.bangumiCover) return autoDataset.bangumiCover;
+      if (autoDatasetPromise?.bangumiCover) return autoDatasetPromise.bangumiCover;
+
+      autoDatasetPromise = autoDatasetPromise || {};
+      autoDatasetPromise.bangumiCover = (async () => {
+        const res = await fetch(BANGUMI_AUTO_DATA_PATH, { cache: "force-cache" });
+        if (!res.ok) throw new Error(`Bangumi 动画候选池读取失败：HTTP ${res.status}`);
+
+        const text = await res.text();
+        const records = [];
+        const lines = text.split(/\r?\n/);
+
+        for (let i = 0; i < lines.length; i++) {
+          const line = lines[i].trim();
+          if (!line) continue;
+
+          try {
+            const raw = JSON.parse(line);
+            const bgmId = String(raw.bgm_id || raw.bangumi_id || raw.id || "").trim();
+            if (!bgmId) continue;
+
+            records.push({
+              source: "bangumi-cover",
+              bgmId,
+              title: clean(raw.label_text || raw.name_cn || raw.name || `Bangumi ${bgmId}`),
+              date: raw.date || "",
+              year: extractYear(raw.date),
+              doneCount: Number(raw.done_count || 0) || 0,
+              ratingCount: Number(raw.rating_count || 0) || 0,
+              images: []
+            });
+          } catch (err) {}
+
+          if (i > 0 && i % 500 === 0) {
+            await sleep(0);
+          }
+        }
+
+        autoDataset = autoDataset || {};
+        autoDataset.bangumiCover = records;
+        return records;
+      })();
+
+      return autoDatasetPromise.bangumiCover;
+    }
+
+    function getAutoImageSource() {
+      const value = document.getElementById("autoImageSource")?.value || "fancaps";
+      return value === "bangumi-cover" ? "bangumi-cover" : "fancaps";
+    }
+
+    function getAutoQuestionCount() {
+      const input = document.getElementById("autoQuestionCount");
+      const count = clampNumber(Number(input?.value || 10), 1, AUTO_MAX_QUESTION_COUNT);
+      if (input) input.value = String(count);
+      return count;
     }
 
     function extractYear(dateText) {
@@ -3202,11 +3302,18 @@
       }
       if (autoGenerateStatusEl) {
         if (autoGenerating) {
-          autoGenerateStatusEl.textContent = pickOne([
-            "正在从截图池里抽一组题...",
-            "正在避开重复动画...",
-            "正在把候选截图排成草稿..."
-          ]);
+          const source = getAutoImageSource();
+          autoGenerateStatusEl.textContent = source === "bangumi-cover"
+            ? pickOne([
+                "正在抽取动画并读取封面...",
+                "正在调用 Bangumi API 获取原图封面...",
+                "正在避开重复动画..."
+              ])
+            : pickOne([
+                "正在从截图池里抽一组题...",
+                "正在避开重复动画...",
+                "正在把候选截图排成草稿..."
+              ]);
         }
         autoGenerateStatusEl.style.display = autoGenerating ? "inline-flex" : "none";
       }
@@ -3220,27 +3327,44 @@
       setProgress(8, true);
 
       try {
-        const dataset = await loadAutoDataset();
+        const source = getAutoImageSource();
+        const dataset = await loadAutoDataset(source);
         setProgress(32, true);
 
-        const pool = await buildAutoCandidatePool(dataset);
+        const pool = await buildAutoCandidatePool(dataset, source);
         autoFilteredPool = pool;
 
-        const count = clampNumber(Number(document.getElementById("autoQuestionCount").value || 10), 1, 100);
+        const count = getAutoQuestionCount();
         const sampleCount = Math.min(count, pool.length);
 
         if (!pool.length) {
           autoDraft = [];
           renderAutoDraft();
-          setStatus("当前条件下没有可用截图。可以放宽年份、看过人数或清空 Bangumi 用户筛选");
+          setStatus(source === "bangumi-cover"
+            ? "当前条件下没有可用封面条目。可以放宽年份、看过人数或清空 Bangumi 用户筛选"
+            : "当前条件下没有可用截图。可以放宽年份、看过人数或清空 Bangumi 用户筛选");
           setProgress(100, false);
           return;
         }
 
-        setProgress(72, true);
-        autoDraft = sampleUnique(pool, sampleCount).map(record => makeAutoDraftItem(record));
+        setProgress(source === "bangumi-cover" ? 52 : 72, true);
+        if (source === "bangumi-cover") {
+          autoDraft = await makeBangumiCoverDraftItems(pool, sampleCount);
+        } else {
+          autoDraft = sampleUnique(pool, sampleCount).map(record => makeAutoDraftItem(record));
+        }
+
+        if (!autoDraft.length) {
+          renderAutoDraft();
+          setStatus("抽中的 Bangumi 条目没有可用封面。请放宽条件或稍后再试");
+          setProgress(100, false);
+          return;
+        }
+
         renderAutoDraft();
-        setStatus(`已生成 ${autoDraft.length} 题草稿。可以换图、换动画，或加入已选截图`);
+        setStatus(source === "bangumi-cover"
+          ? `已生成 ${autoDraft.length} 题封面草稿。可以换动画，或加入已选图片`
+          : `已生成 ${autoDraft.length} 题草稿。可以换图、换动画，或加入已选截图`);
         setProgress(100, false);
         scrollToElement(autoDraftAreaEl);
       } catch (err) {
@@ -3251,7 +3375,7 @@
       }
     }
 
-    async function buildAutoCandidatePool(dataset) {
+    async function buildAutoCandidatePool(dataset, source = getAutoImageSource()) {
       const yearFrom = getAutoYearFromValue();
       const yearTo = getAutoYearToValue();
       const minDone = Number(document.getElementById("autoMinDone").value || 0) || 0;
@@ -3268,10 +3392,12 @@
         if (minDone && record.doneCount < minDone) return false;
         if (yearFrom && (!record.year || record.year < yearFrom)) return false;
         if (yearTo && (!record.year || record.year > yearTo)) return false;
-        return record.images && record.images.length;
+        if (source === "fancaps") return record.images && record.images.length;
+        return true;
       });
 
-      const scope = user ? `符合用户看过：${pool.length} 部` : `可用动画：${pool.length} 部`;
+      const sourceLabel = source === "bangumi-cover" ? "封面条目" : "截图动画";
+      const scope = user ? `符合用户看过：${pool.length} 部${sourceLabel}` : `可用${sourceLabel}：${pool.length} 部`;
       if (autoPoolInfoEl) autoPoolInfoEl.textContent = scope;
       return pool;
     }
@@ -3308,6 +3434,7 @@
       return {
         uid: `draft_${record.bgmId}_${hashString(chosen)}_${Math.random().toString(36).slice(2, 7)}`,
         bgmId: record.bgmId,
+        source: record.source || "fancaps",
         title: record.title,
         date: record.date,
         year: record.year,
@@ -3315,6 +3442,48 @@
         imageUrl: chosen,
         record
       };
+    }
+
+    async function makeBangumiCoverDraftItems(pool, count) {
+      const items = [];
+      const candidates = sampleUnique(pool, Math.min(pool.length, Math.max(count * 3, count + 12)));
+      const batchSize = 5;
+
+      for (let i = 0; i < candidates.length && items.length < count; i += batchSize) {
+        const batch = candidates.slice(i, i + batchSize);
+        const settled = await Promise.all(batch.map(record => fetchBangumiCoverRecord(record).catch(() => null)));
+
+        for (const record of settled) {
+          if (!record?.images?.length) continue;
+          items.push(makeAutoDraftItem(record, record.images[0]));
+          if (items.length >= count) break;
+        }
+
+        const percent = 52 + Math.round((items.length / Math.max(1, count)) * 36);
+        setProgress(Math.min(88, percent), true);
+        if (items.length < count) await sleep(120);
+      }
+
+      return items;
+    }
+
+    async function fetchBangumiCoverRecord(record) {
+      if (record.images?.length) return record;
+
+      const res = await fetch(`${BGM_API}/v0/subjects/${encodeURIComponent(record.bgmId)}`, {
+        headers: {
+          "Accept": "application/json"
+        }
+      });
+      if (!res.ok) throw new Error(`Bangumi 封面读取失败：HTTP ${res.status}`);
+
+      const subject = await res.json();
+      const cover = clean(subject?.images?.[BANGUMI_COVER_SIZE] || "");
+      if (!cover || cover === BANGUMI_NO_COVER_URL) return null;
+
+      record.title = clean(subject.name_cn || subject.name || record.title);
+      record.images = [cover];
+      return record;
     }
 
     function renderAutoDraft() {
@@ -3364,13 +3533,17 @@
     }
 
     function renderAutoDraftCard(item, idx) {
+      const isCover = item.source === "bangumi-cover";
+      const imageUrl = getAutoDraftDisplayUrl(item);
+      const imageAlt = isCover ? `${item.title} 封面图候选` : `${item.title} 截图候选`;
+      const imageClass = isCover ? "draft-image-cover" : "";
       return `
         <div class="draft-card draft-enter" id="${escapeHtml(item.uid)}" style="--stagger-delay: ${Math.min(idx * 24, 168)}ms;">
-          <img src="${escapeHtml(originalToFanCapsThumbnailUrl(item.imageUrl))}" alt="${escapeHtml(item.title)} 截图候选" loading="lazy" referrerpolicy="no-referrer" onerror="this.style.display='none'">
+          <img class="${imageClass}" src="${escapeHtml(imageUrl)}" alt="${escapeHtml(imageAlt)}" loading="lazy" referrerpolicy="no-referrer" onerror="this.style.display='none'">
           <div class="draft-title">${idx + 1}. ${escapeHtml(item.title)}</div>
-          <div class="draft-meta">${escapeHtml(item.date || "日期未知")} · 看过 ${Number(item.doneCount || 0).toLocaleString()}</div>
+          <div class="draft-meta">${escapeHtml(item.date || "日期未知")} · 看过 ${Number(item.doneCount || 0).toLocaleString()} · ${isCover ? "Bangumi 封面" : "FanCaps 截图"}</div>
           <div class="draft-actions">
-            <button onclick="openChangeImageModal('${escapeJsString(item.uid)}')">换图</button>
+            ${isCover ? "" : `<button onclick="openChangeImageModal('${escapeJsString(item.uid)}')">换图</button>`}
             <button class="quiet" onclick="openChangeAnimeModal('${escapeJsString(item.uid)}')">换动画</button>
             <button class="quiet" onclick="removeAutoDraftItem('${escapeJsString(item.uid)}')">移除</button>
           </div>
@@ -3378,13 +3551,23 @@
       `;
     }
 
-    function regenerateAutoDraft() {
+    function getAutoDraftDisplayUrl(item) {
+      if (item?.source === "bangumi-cover") return item.imageUrl || "";
+      return originalToFanCapsThumbnailUrl(item?.imageUrl || "");
+    }
+
+    async function regenerateAutoDraft() {
       if (!autoFilteredPool.length) {
         generateAutoDraft();
         return;
       }
-      const count = clampNumber(Number(document.getElementById("autoQuestionCount").value || 10), 1, 100);
-      autoDraft = sampleUnique(autoFilteredPool, Math.min(count, autoFilteredPool.length)).map(record => makeAutoDraftItem(record));
+      const count = getAutoQuestionCount();
+      const source = getAutoImageSource();
+      if (source === "bangumi-cover") {
+        autoDraft = await makeBangumiCoverDraftItems(autoFilteredPool, Math.min(count, autoFilteredPool.length));
+      } else {
+        autoDraft = sampleUnique(autoFilteredPool, Math.min(count, autoFilteredPool.length)).map(record => makeAutoDraftItem(record));
+      }
       renderAutoDraft();
       setStatus("已重新随机");
     }
@@ -3409,6 +3592,10 @@
     function openChangeImageModal(uid) {
       const item = autoDraft.find(x => x.uid === uid);
       if (!item) return;
+      if (item.source === "bangumi-cover") {
+        setStatus("Bangumi 封面模式每部动画只有一张封面图，可以改换动画");
+        return;
+      }
 
       autoModalState = {
         type: "image",
@@ -3487,11 +3674,13 @@
       showAutoModal();
     }
 
-    function renderChangeAnimeChoices(uid) {
+    async function renderChangeAnimeChoices(uid) {
       const state = autoModalState && autoModalState.type === "anime" && autoModalState.uid === uid
         ? autoModalState
         : null;
       const currentBgmId = state?.currentBgmId || "";
+      const currentItem = autoDraft.find(item => item.uid === uid);
+      const source = currentItem?.source || getAutoImageSource();
       const used = new Set(autoDraft.filter(item => item.uid !== uid).map(item => item.bgmId));
       const pool = autoFilteredPool.filter(record => !used.has(record.bgmId) && record.bgmId !== currentBgmId);
 
@@ -3514,15 +3703,27 @@
         for (const record of choices) state.shownAnimeIds.add(record.bgmId);
       }
 
+      let hydratedChoices = choices;
+      if (source === "bangumi-cover") {
+        autoModalChoicesEl.innerHTML = `<div class="empty">正在读取候选动画封面...</div>`;
+        const settled = await Promise.all(choices.map(record => fetchBangumiCoverRecord(record).catch(() => null)));
+        hydratedChoices = settled.filter(Boolean);
+        if (!hydratedChoices.length) {
+          autoModalHintEl.textContent = "这一批候选没有可用封面";
+          autoModalChoicesEl.innerHTML = `<div class="empty">这一批候选没有可用封面。可以换一批，或放宽条件后重新生成草稿</div>`;
+          return;
+        }
+      }
+
       autoModalHintEl.textContent = restarted
         ? "所有动画都随机完了，开始重新随机"
         : "从当前筛选范围中随机给出 5 部";
 
-      autoModalChoicesEl.innerHTML = choices.map((record, idx) => {
-        const image = randomOne(record.images);
+      autoModalChoicesEl.innerHTML = hydratedChoices.map((record, idx) => {
+        const image = source === "bangumi-cover" ? record.images?.[0] : randomOne(record.images);
         return `
           <div class="modal-choice choice-enter" style="--stagger-delay: ${Math.min(idx * 22, 132)}ms;">
-            <img src="${escapeHtml(originalToFanCapsThumbnailUrl(image))}" alt="${escapeHtml(record.title)} 截图候选" loading="lazy" referrerpolicy="no-referrer" onerror="this.style.display='none'">
+            <img class="${source === "bangumi-cover" ? "draft-image-cover" : ""}" src="${escapeHtml(source === "bangumi-cover" ? image : originalToFanCapsThumbnailUrl(image))}" alt="${escapeHtml(record.title)} ${source === "bangumi-cover" ? "封面图" : "截图"}候选" loading="lazy" referrerpolicy="no-referrer" onerror="this.style.display='none'">
             <div class="modal-choice-title">${escapeHtml(record.title)}</div>
             <div class="draft-meta">${escapeHtml(record.date || "日期未知")} · 看过 ${Number(record.doneCount || 0).toLocaleString()}</div>
             <button onclick="chooseAutoAnime('${escapeJsString(uid)}', '${escapeJsString(record.bgmId)}', '${escapeJsString(image)}')">选择</button>
@@ -3531,11 +3732,25 @@
       }).join("");
     }
 
-    function chooseAutoAnime(uid, bgmId, imageUrl) {
+    async function chooseAutoAnime(uid, bgmId, imageUrl) {
       const idx = autoDraft.findIndex(x => x.uid === uid);
       const record = autoFilteredPool.find(x => x.bgmId === bgmId);
       if (idx < 0 || !record) return;
-      autoDraft[idx] = makeAutoDraftItem(record, imageUrl || randomOne(record.images));
+      const source = autoDraft[idx]?.source || record.source || getAutoImageSource();
+      let nextRecord = record;
+      let nextImageUrl = imageUrl || randomOne(record.images);
+
+      if (source === "bangumi-cover") {
+        const hydrated = await fetchBangumiCoverRecord(record).catch(() => null);
+        if (!hydrated?.images?.length) {
+          setStatus("这部动画没有可用封面，请换一批再试");
+          return;
+        }
+        nextRecord = hydrated;
+        nextImageUrl = hydrated.images[0];
+      }
+
+      autoDraft[idx] = makeAutoDraftItem(nextRecord, nextImageUrl);
       autoDraft[idx].uid = uid;
       replaceAutoDraftCard(uid, idx);
       closeAutoModal();
@@ -3801,7 +4016,9 @@
         return;
       }
       const text = getAutoDraftJsonlText();
-      downloadBlob(new Blob([text], { type: "application/x-ndjson" }), "fancaps-auto-question-list.jsonl");
+      const source = autoDraft[0]?.source === "bangumi-cover" ? "bangumi-cover" : "fancaps";
+      const filename = source === "bangumi-cover" ? "bangumi-cover-auto-question-list.jsonl" : "fancaps-auto-question-list.jsonl";
+      downloadBlob(new Blob([text], { type: "application/x-ndjson" }), filename);
       announceDelight("exportDraft", autoDraft.length);
       showUsageModal("export");
     }
@@ -3825,14 +4042,18 @@
         return;
       }
 
+      const source = autoDraft[0]?.source === "bangumi-cover" ? "bangumi-cover" : "fancaps";
+      const sourceLabel = source === "bangumi-cover" ? "封面草稿图片" : "草稿图片";
+      const folderBase = source === "bangumi-cover" ? "bangumi-cover-draft-images" : "fancaps-draft-images";
+
       await downloadImageEntriesAsZip(entries, {
-        label: "草稿图片",
+        label: sourceLabel,
         successType: "downloadDraftImages",
         progressId: "autoDraftDownloadProgress",
-        folderName: makeDownloadFolderName("fancaps-draft-images"),
+        folderName: makeDownloadFolderName(folderBase),
         makeFilename: makeAutoDraftImageFilename,
-        partialText: (successCount, failCount) => `已打包 ${successCount} 张草稿图片，${failCount} 张失败`,
-        failureText: "草稿图片打包失败。请检查连接方式后重试"
+        partialText: (successCount, failCount) => `已打包 ${successCount} 张${sourceLabel}，${failCount} 张失败`,
+        failureText: `${sourceLabel}打包失败。请检查连接方式后重试`
       });
     }
 
@@ -3844,15 +4065,16 @@
 
       const addedIds = [];
       for (const item of autoDraft) {
-        const id = `auto_${item.bgmId}_${hashString(item.imageUrl)}`;
+        const source = item.source === "bangumi-cover" ? "bangumi_cover" : "fancaps";
+        const id = `auto_${source}_${item.bgmId}_${hashString(item.imageUrl)}`;
         addedIds.push(id);
         selectedImages.set(id, {
           id,
           episodeTitle: "",
-          thumbUrl: originalToFanCapsThumbnailUrl(item.imageUrl),
+          thumbUrl: getAutoDraftDisplayUrl(item),
           originalUrl: item.imageUrl,
           picturePageUrl: "",
-          sourcePage: FANCAPS_AUTO_DATA_PATH,
+          sourcePage: item.source === "bangumi-cover" ? BANGUMI_AUTO_DATA_PATH : FANCAPS_AUTO_DATA_PATH,
           labelText: item.title,
           kind: "auto"
         });
@@ -6398,7 +6620,8 @@
       const padded = String(index).padStart(3, "0");
       const key = url || item.imageUrl || padded;
       const ext = getImageExtension(key, blob?.type);
-      return `fancaps-draft-${padded}-${hashString(key)}.${ext}`;
+      const prefix = item.source === "bangumi-cover" ? "bangumi-cover-draft" : "fancaps-draft";
+      return `${prefix}-${padded}-${hashString(key)}.${ext}`;
     }
 
     function getImageExtension(url, contentType = "") {
