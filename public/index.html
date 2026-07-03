@@ -7200,6 +7200,9 @@
       try {
         const res = await fetchWithTimeout(proxyUrl, options, timeoutMs);
         if (res.status !== 404) return res;
+        if (!isLikelyLocalStaticPreview()) {
+          throw new Error(`站点 /bangumi Function 返回 404，可能没有部署 functions/bangumi.js 或 Pages 项目根目录配置不对：${proxyUrl}`);
+        }
 
         logBangumiDiagnostic("proxy-not-found-fallback", {
           path: normalizedPath,
