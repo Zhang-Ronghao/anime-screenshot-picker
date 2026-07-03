@@ -3077,6 +3077,7 @@
     const AUTO_MAX_QUESTION_COUNT = 20;
     const BANGUMI_COVER_SIZE = "large";
     const BANGUMI_NO_COVER_URL = "https://lain.bgm.tv/img/no_icon_subject.png";
+    const BANGUMI_REQUEST_TIMEOUT_MS = 12000;
     const TOP_IMAGES_PER_EPISODE = 4;
     const MAX_SHOW_PAGES = 30;
 
@@ -3526,7 +3527,9 @@
       while (guard < 80) {
         guard += 1;
         const url = `${BGM_API}/v0/users/${encodeURIComponent(username)}/collections?subject_type=2&type=2&limit=${limit}&offset=${offset}`;
-        const res = await fetch(url, { headers: { "Accept": "application/json" } });
+        const res = await fetchWithTimeout(url, {
+          headers: { "Accept": "application/json" }
+        }, BANGUMI_REQUEST_TIMEOUT_MS);
         if (!res.ok) throw new Error(`读取用户收藏失败：HTTP ${res.status}`);
         const json = await res.json();
         const data = Array.isArray(json.data) ? json.data : [];
@@ -3564,13 +3567,30 @@
       const candidates = sampleUnique(pool, pool.length);
       const batchSize = 5;
       const requestCap = Math.min(pool.length, Math.max(count * 8, count + 40));
+      let failedBatchStreak = 0;
 
       for (let i = 0; i < candidates.length && i < requestCap && items.length < count; i += batchSize) {
         if (options.runId && !isCurrentAutoGeneration(options.runId, options.source || "bangumi-cover")) break;
         const batch = candidates.slice(i, i + batchSize);
-        const settled = await Promise.all(batch.map(record => fetchBangumiCoverRecord(record).catch(() => null)));
+        const tried = Math.min(i + batch.length, requestCap);
+        setStatus(`正在读取 Bangumi 封面：已找到 ${items.length}/${count}，已尝试 ${tried}/${requestCap}`);
+        const settled = await Promise.all(batch.map(record => fetchBangumiCoverRecord(record).catch(err => {
+          logBangumiDiagnostic("cover-fetch-failed", {
+            bgmId: record?.bgmId,
+            title: record?.title,
+            message: err?.message || String(err)
+          });
+          return { failed: true, record: null };
+        })));
 
-        for (const record of settled) {
+        const failedCount = settled.filter(result => result?.failed).length;
+        failedBatchStreak = failedCount === batch.length ? failedBatchStreak + 1 : 0;
+        if (failedBatchStreak >= 3 && !items.length) {
+          throw new Error("Bangumi API 连续多批请求失败，可能是网络、跨域、限流或 Bangumi API 暂时不可用。请打开浏览器 Console 查看 [Bangumi cover] 日志");
+        }
+
+        for (const result of settled) {
+          const record = result?.record === null ? null : result;
           if (!record?.images?.length) continue;
           items.push(makeAutoDraftItem(record, record.images[0]));
           if (items.length >= count) break;
@@ -3587,12 +3607,12 @@
     async function fetchBangumiCoverRecord(record) {
       if (record.images?.length) return record;
 
-      const res = await fetch(`${BGM_API}/v0/subjects/${encodeURIComponent(record.bgmId)}`, {
+      const res = await fetchWithTimeout(`${BGM_API}/v0/subjects/${encodeURIComponent(record.bgmId)}`, {
         headers: {
           "Accept": "application/json"
         }
-      });
-      if (!res.ok) throw new Error(`Bangumi 封面读取失败：HTTP ${res.status}`);
+      }, BANGUMI_REQUEST_TIMEOUT_MS);
+      if (!res.ok) throw new Error(`Bangumi 封面读取失败：subject ${record.bgmId}, HTTP ${res.status}`);
 
       const subject = await res.json();
       const cover = clean(subject?.images?.[BANGUMI_COVER_SIZE] || "");
@@ -3827,7 +3847,14 @@
       let hydratedChoices = choices;
       if (source === "bangumi-cover") {
         autoModalChoicesEl.innerHTML = `<div class="empty">正在读取候选动画封面...</div>`;
-        const settled = await Promise.all(choices.map(record => fetchBangumiCoverRecord(record).catch(() => null)));
+        const settled = await Promise.all(choices.map(record => fetchBangumiCoverRecord(record).catch(err => {
+          logBangumiDiagnostic("modal-cover-fetch-failed", {
+            bgmId: record?.bgmId,
+            title: record?.title,
+            message: err?.message || String(err)
+          });
+          return null;
+        })));
         if (!isCurrentAutoModalRequest(uid, requestId, source)) return;
         hydratedChoices = settled.filter(Boolean);
         if (!hydratedChoices.length) {
@@ -7085,6 +7112,36 @@
 
     function sleep(ms) {
       return new Promise(resolve => setTimeout(resolve, ms));
+    }
+
+    async function fetchWithTimeout(url, options = {}, timeoutMs = 12000) {
+      const controller = new AbortController();
+      const timer = window.setTimeout(() => controller.abort(), timeoutMs);
+
+      try {
+        return await fetch(url, {
+          ...options,
+          signal: controller.signal
+        });
+      } catch (err) {
+        if (err?.name === "AbortError") {
+          throw new Error(`请求超时（${Math.round(timeoutMs / 1000)} 秒）：${url}`);
+        }
+        throw err;
+      } finally {
+        window.clearTimeout(timer);
+      }
+    }
+
+    function logBangumiDiagnostic(type, detail = {}) {
+      const entry = {
+        type,
+        time: new Date().toISOString(),
+        ...detail
+      };
+      window.__bangumiCoverDebug = window.__bangumiCoverDebug || [];
+      window.__bangumiCoverDebug.push(entry);
+      console.warn("[Bangumi cover]", entry);
     }
 
     function decodeURIComponentSafe(s) {
