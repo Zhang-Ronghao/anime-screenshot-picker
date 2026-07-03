@@ -6,6 +6,7 @@ import readline from "node:readline";
 const args = process.argv.slice(2);
 const input = args[0] || process.env.BGM_SUBJECT_DUMP || "";
 const output = args[1] || path.join("public", "bangumi_anime_subjects.jsonl");
+const minDone = Number(process.env.BGM_MIN_DONE || 100) || 0;
 
 if (!input || args.includes("--help") || args.includes("-h")) {
   console.log(`用法:
@@ -13,6 +14,8 @@ if (!input || args.includes("--help") || args.includes("-h")) {
 
 示例:
   node scripts/build-bangumi-anime-subjects.mjs "C:\\Users\\Hu_care\\Downloads\\dump-2026-05-19.210434Z\\subject.jsonlines"
+
+默认只保留 Bangumi 看过人数 >= 100 的动画。可用环境变量 BGM_MIN_DONE 覆盖。
 `);
   process.exit(input ? 0 : 1);
 }
@@ -46,13 +49,16 @@ for await (const line of reader) {
 
   if (raw.type !== 2 || !raw.id) continue;
 
+  const doneCount = Number(raw.favorite?.done || 0) || 0;
+  if (doneCount < minDone) continue;
+
   const record = {
     bgm_id: String(raw.id),
     name: clean(raw.name),
     name_cn: clean(raw.name_cn),
     label_text: clean(raw.name_cn || raw.name || `Bangumi ${raw.id}`),
     date: clean(raw.date),
-    done_count: Number(raw.favorite?.done || 0) || 0,
+    done_count: doneCount,
     rating_count: sumScoreDetails(raw.score_details),
   };
 
@@ -69,7 +75,7 @@ await new Promise((resolve, reject) => {
   writer.on("error", reject);
 });
 
-console.log(`已写入 ${animeCount} 个动画条目：${output}`);
+console.log(`已写入 ${animeCount} 个动画条目：${output}（看过人数 >= ${minDone}）`);
 
 function clean(value) {
   return String(value || "").trim();

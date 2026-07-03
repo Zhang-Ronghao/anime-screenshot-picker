@@ -2904,7 +2904,6 @@
         <section class="about-section">
           <h3>题库规模</h3>
           <ul class="about-list">
-            <li>Bangumi 动画封面候选条目：<span class="stat-emphasis">29,742</span> 部</li>
             <li>Bangumi 看过人数 ≥ 100 封面候选：<span class="stat-emphasis">9,749</span> 部</li>
             <li>成功匹配 FanCaps：<span class="stat-emphasis">2,272</span> 部 TV 动画</li>
             <li>截图总数：<span class="stat-emphasis">146,335</span> 张</li>
@@ -2913,13 +2912,14 @@
         <section class="about-section">
           <h3>覆盖情况</h3>
           <ul class="about-list">
-            <li>Bangumi 看过人数 Top500：收录 <span class="stat-emphasis">349</span> 部，占 <span class="stat-emphasis">69.8%</span></li>
-            <li>Bangumi 看过人数 Top1000：收录 <span class="stat-emphasis">636</span> 部，占 <span class="stat-emphasis">63.6%</span></li>
+            <li>FanCaps 截图覆盖 Bangumi 看过人数 Top500：<span class="stat-emphasis">349</span> 部，占 <span class="stat-emphasis">69.8%</span></li>
+            <li>FanCaps 截图覆盖 Bangumi 看过人数 Top1000：<span class="stat-emphasis">636</span> 部，占 <span class="stat-emphasis">63.6%</span></li>
+            <li>Bangumi 封面候选覆盖看过人数 ≥ 100 的动画条目，生成时实时读取封面</li>
             <li>部分热门 TV 动画也可能没有可用 FanCaps 截图</li>
           </ul>
         </section>
         <section class="about-section">
-          <h3>截图范围</h3>
+          <h3>出题范围</h3>
           <ul class="about-list">
             <li>自动出题：最多 20 题，可选截图或封面来源</li>
             <li>手动出题：可浏览 FanCaps 上更多截图</li>
@@ -3056,6 +3056,8 @@
     let autoDraft = [];
     let autoModalState = null;
     let autoGenerating = false;
+    let autoGenerateRunId = 0;
+    let autoModalRequestId = 0;
     let lastModalFocus = null;
     let hasUsedSelectedBasket = false;
     let lastSelectedCount = 0;
@@ -3296,6 +3298,8 @@
 
     function setAutoGenerating(isGenerating) {
       autoGenerating = Boolean(isGenerating);
+      const autoImageSourceEl = document.getElementById("autoImageSource");
+      if (autoImageSourceEl) autoImageSourceEl.disabled = autoGenerating;
       if (generateAutoDraftBtn) {
         generateAutoDraftBtn.disabled = autoGenerating;
         generateAutoDraftBtn.textContent = autoGenerating ? "生成中..." : "生成题单草稿";
@@ -3322,16 +3326,19 @@
     async function generateAutoDraft() {
       if (autoGenerating) return;
 
+      const runId = ++autoGenerateRunId;
+      const source = getAutoImageSource();
       setAutoGenerating(true);
       setStatus("正在生成题单草稿...");
       setProgress(8, true);
 
       try {
-        const source = getAutoImageSource();
         const dataset = await loadAutoDataset(source);
+        if (!isCurrentAutoGeneration(runId, source)) return;
         setProgress(32, true);
 
         const pool = await buildAutoCandidatePool(dataset, source);
+        if (!isCurrentAutoGeneration(runId, source)) return;
         autoFilteredPool = pool;
 
         const count = getAutoQuestionCount();
@@ -3349,7 +3356,8 @@
 
         setProgress(source === "bangumi-cover" ? 52 : 72, true);
         if (source === "bangumi-cover") {
-          autoDraft = await makeBangumiCoverDraftItems(pool, sampleCount);
+          autoDraft = await makeBangumiCoverDraftItems(pool, sampleCount, { runId, source });
+          if (!isCurrentAutoGeneration(runId, source)) return;
         } else {
           autoDraft = sampleUnique(pool, sampleCount).map(record => makeAutoDraftItem(record));
         }
@@ -3371,8 +3379,12 @@
         setProgress(0, false);
         setStatus("自动出题失败。请调整条件后重试，或稍后再试。详情：" + err.message);
       } finally {
-        setAutoGenerating(false);
+        if (autoGenerateRunId === runId) setAutoGenerating(false);
       }
+    }
+
+    function isCurrentAutoGeneration(runId, source) {
+      return autoGenerateRunId === runId && autoGenerating && getAutoImageSource() === source;
     }
 
     async function buildAutoCandidatePool(dataset, source = getAutoImageSource()) {
@@ -3444,12 +3456,14 @@
       };
     }
 
-    async function makeBangumiCoverDraftItems(pool, count) {
+    async function makeBangumiCoverDraftItems(pool, count, options = {}) {
       const items = [];
-      const candidates = sampleUnique(pool, Math.min(pool.length, Math.max(count * 3, count + 12)));
+      const candidates = sampleUnique(pool, pool.length);
       const batchSize = 5;
+      const requestCap = Math.min(pool.length, Math.max(count * 8, count + 40));
 
-      for (let i = 0; i < candidates.length && items.length < count; i += batchSize) {
+      for (let i = 0; i < candidates.length && i < requestCap && items.length < count; i += batchSize) {
+        if (options.runId && !isCurrentAutoGeneration(options.runId, options.source || "bangumi-cover")) break;
         const batch = candidates.slice(i, i + batchSize);
         const settled = await Promise.all(batch.map(record => fetchBangumiCoverRecord(record).catch(() => null)));
 
@@ -3666,18 +3680,22 @@
         type: "anime",
         uid,
         currentBgmId: item.bgmId,
-        shownAnimeIds: new Set([item.bgmId])
+        shownAnimeIds: new Set([item.bgmId]),
+        requestId: 0
       };
       autoModalTitleEl.textContent = "选择一部动画";
       autoModalHintEl.textContent = "从当前筛选范围中随机给出 5 部";
-      renderChangeAnimeChoices(uid);
       showAutoModal();
+      renderChangeAnimeChoices(uid);
     }
 
     async function renderChangeAnimeChoices(uid) {
       const state = autoModalState && autoModalState.type === "anime" && autoModalState.uid === uid
         ? autoModalState
         : null;
+      if (!state) return;
+      const requestId = ++autoModalRequestId;
+      state.requestId = requestId;
       const currentBgmId = state?.currentBgmId || "";
       const currentItem = autoDraft.find(item => item.uid === uid);
       const source = currentItem?.source || getAutoImageSource();
@@ -3707,6 +3725,7 @@
       if (source === "bangumi-cover") {
         autoModalChoicesEl.innerHTML = `<div class="empty">正在读取候选动画封面...</div>`;
         const settled = await Promise.all(choices.map(record => fetchBangumiCoverRecord(record).catch(() => null)));
+        if (!isCurrentAutoModalRequest(uid, requestId, source)) return;
         hydratedChoices = settled.filter(Boolean);
         if (!hydratedChoices.length) {
           autoModalHintEl.textContent = "这一批候选没有可用封面";
@@ -3730,6 +3749,14 @@
           </div>
         `;
       }).join("");
+    }
+
+    function isCurrentAutoModalRequest(uid, requestId, source) {
+      if (!autoChoiceModalEl.classList.contains("show")) return false;
+      if (!autoModalState || autoModalState.type !== "anime" || autoModalState.uid !== uid) return false;
+      if (autoModalState.requestId !== requestId) return false;
+      const currentItem = autoDraft.find(item => item.uid === uid);
+      return (currentItem?.source || getAutoImageSource()) === source;
     }
 
     async function chooseAutoAnime(uid, bgmId, imageUrl) {

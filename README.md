@@ -15,7 +15,7 @@
 自动出题支持两种图片来源：
 
 - `FanCaps 截图库`：从已匹配的 FanCaps 截图池中随机抽题。
-- `Bangumi 封面图`：从 Bangumi 动画候选池中随机抽条目，再调用 Bangumi API 获取 `images.large` 原图封面。
+- `Bangumi 封面图`：从看过人数 ≥ 100 的 Bangumi 动画候选池中随机抽条目，再调用 Bangumi API 获取 `images.large` 原图封面。
 
 两种来源共用年份范围、Bangumi 看过人数、Bangumi 用户看过列表筛选逻辑。题目数量固定最多 20 道。
 
@@ -26,7 +26,7 @@ anime-screenshot-picker/
 ├── public/
 │   └── index.html          # 前端页面
 ├── functions/
-│   └── proxy.js            # Cloudflare Pages Function，代理 FanCaps HTML 页面
+│   └── proxy.js            # Cloudflare Pages Function，代理 FanCaps 页面和图片下载
 ├── package.json
 ├── wrangler.toml
 ├── .gitignore
@@ -43,7 +43,7 @@ anime-screenshot-picker/
 /proxy?url=https%3A%2F%2Ffancaps.net%2F...
 ```
 
-注意：只代理 FanCaps 的 HTML 页面，不代理图片。图片仍由用户浏览器直接从 FanCaps/CDN 加载。
+注意：代理只开放必要的 FanCaps 页面、FanCaps 图片和 Bangumi 封面图片路径，避免被当成通用开放代理滥用。普通浏览时图片仍由用户浏览器直接从原站加载；打包 ZIP 时会通过代理读取图片。
 
 ## 本地运行
 
@@ -102,6 +102,8 @@ npm run bgm-cover -- 245665 --dump "C:\Users\Hu_care\Downloads\dump-2026-05-19.2
 ```bash
 npm run build-bgm-anime -- "C:\Users\Hu_care\Downloads\dump-2026-05-19.210434Z\subject.jsonlines"
 ```
+
+生成脚本默认只保留 Bangumi 看过人数 ≥ 100 的动画；如需调整，可设置 `BGM_MIN_DONE`。
 
 ## 部署到 Cloudflare Pages
 
@@ -166,8 +168,9 @@ https://anime-screenshot-picker.pages.dev
 - FanCaps 作品页
 - FanCaps 单集详细页
 - FanCaps `picture.php` 原图解析页
+- FanCaps 图片和 Bangumi 封面图片的 ZIP 打包下载
 
-图片本身不走代理。
+普通浏览图片不走代理；打包 ZIP 下载时图片会走代理。
 
 建议：
 
@@ -178,7 +181,7 @@ https://anime-screenshot-picker.pages.dev
 
 ## 安全限制
 
-`functions/proxy.js` 只允许代理 FanCaps 的相关 HTML 页面，避免被当成通用开放代理滥用。
+`functions/proxy.js` 只允许代理 FanCaps 的相关页面/图片和 Bangumi 封面图片，避免被当成通用开放代理滥用。
 
 当前允许路径包括：
 
@@ -189,6 +192,9 @@ https://fancaps.net/anime/episodeimages.php
 https://fancaps.net/anime/picture.php
 https://fancaps.net/movies/MovieImages.php
 https://fancaps.net/movies/picture.php
+https://cdni.fancaps.net/file/fancaps-animeimages/...
+https://lain.bgm.tv/pic/cover/...
+https://lain.bgm.tv/r/.../pic/cover/...
 ```
 
 ## 备注
