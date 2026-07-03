@@ -3673,11 +3673,12 @@
     function renderAutoDraftCard(item, idx) {
       const isCover = item.source === "bangumi-cover";
       const imageUrl = getAutoDraftDisplayUrl(item);
+      const originalImageUrl = item.imageUrl || "";
       const imageAlt = isCover ? `${item.title} 封面图候选` : `${item.title} 截图候选`;
       const imageClass = isCover ? "draft-image-cover" : "";
       return `
         <div class="draft-card draft-enter" id="${escapeHtml(item.uid)}" style="--stagger-delay: ${Math.min(idx * 24, 168)}ms;">
-          <img class="${imageClass}" src="${escapeHtml(imageUrl)}" alt="${escapeHtml(imageAlt)}" loading="lazy" referrerpolicy="no-referrer" onerror="this.style.display='none'">
+          <img class="${imageClass}" src="${escapeHtml(imageUrl)}" data-original-src="${escapeHtml(originalImageUrl)}" alt="${escapeHtml(imageAlt)}" loading="lazy" referrerpolicy="no-referrer" onerror="handleImageDisplayError(this)">
           <div class="draft-title">${idx + 1}. ${escapeHtml(item.title)}</div>
           <div class="draft-meta">${escapeHtml(item.date || "日期未知")} · 看过 ${Number(item.doneCount || 0).toLocaleString()} · ${isCover ? "Bangumi 封面" : "FanCaps 截图"}</div>
           <div class="draft-actions">
@@ -3690,7 +3691,7 @@
     }
 
     function getAutoDraftDisplayUrl(item) {
-      if (item?.source === "bangumi-cover") return item.imageUrl || "";
+      if (item?.source === "bangumi-cover") return toImageProxyUrl(item.imageUrl || "");
       return originalToFanCapsThumbnailUrl(item?.imageUrl || "");
     }
 
@@ -3871,9 +3872,10 @@
 
       autoModalChoicesEl.innerHTML = hydratedChoices.map((record, idx) => {
         const image = source === "bangumi-cover" ? record.images?.[0] : randomOne(record.images);
+        const displayImage = source === "bangumi-cover" ? toImageProxyUrl(image) : originalToFanCapsThumbnailUrl(image);
         return `
           <div class="modal-choice choice-enter" style="--stagger-delay: ${Math.min(idx * 22, 132)}ms;">
-            <img class="${source === "bangumi-cover" ? "draft-image-cover" : ""}" src="${escapeHtml(source === "bangumi-cover" ? image : originalToFanCapsThumbnailUrl(image))}" alt="${escapeHtml(record.title)} ${source === "bangumi-cover" ? "封面图" : "截图"}候选" loading="lazy" referrerpolicy="no-referrer" onerror="this.style.display='none'">
+            <img class="${source === "bangumi-cover" ? "draft-image-cover" : ""}" src="${escapeHtml(displayImage)}" data-original-src="${escapeHtml(image || "")}" alt="${escapeHtml(record.title)} ${source === "bangumi-cover" ? "封面图" : "截图"}候选" loading="lazy" referrerpolicy="no-referrer" onerror="handleImageDisplayError(this)">
             <div class="modal-choice-title">${escapeHtml(record.title)}</div>
             <div class="draft-meta">${escapeHtml(record.date || "日期未知")} · 看过 ${Number(record.doneCount || 0).toLocaleString()}</div>
             <button onclick="chooseAutoAnime('${escapeJsString(uid)}', '${escapeJsString(record.bgmId)}', '${escapeJsString(image)}')">选择</button>
@@ -4256,6 +4258,50 @@
       return text;
     }
 
+    function toImageProxyUrl(url) {
+      const text = String(url || "").trim();
+      if (!text) return "";
+      if (!isBangumiImageUrl(text)) return text;
+      return `${DEFAULT_PROXY}${encodeURIComponent(text)}`;
+    }
+
+    function isBangumiImageUrl(url) {
+      try {
+        const parsed = new URL(url);
+        return (
+          parsed.protocol === "https:" &&
+          parsed.hostname === "lain.bgm.tv" &&
+          (
+            parsed.pathname.startsWith("/pic/cover/") ||
+            /^\/r\/\d+\/pic\/cover\//.test(parsed.pathname)
+          )
+        );
+      } catch {
+        return false;
+      }
+    }
+
+    function handleImageDisplayError(img) {
+      if (!img || img.dataset.failedDisplayFallback === "1") {
+        if (img) img.style.display = "none";
+        return;
+      }
+
+      img.dataset.failedDisplayFallback = "1";
+      const original = String(img.dataset.originalSrc || "").trim();
+      logBangumiDiagnostic("image-display-failed", {
+        src: img.currentSrc || img.src || "",
+        original
+      });
+
+      if (original && img.src !== original) {
+        img.src = original;
+        return;
+      }
+
+      img.style.display = "none";
+    }
+
     function getFanCapsImageIdFromUrl(url) {
       const text = String(url || "");
       const direct = text.match(/\/([0-9]{4,})\.jpg(?:[?#].*)?$/i);
@@ -4442,6 +4488,7 @@
     function renderBangumiResults(items) {
       bangumiResultsEl.innerHTML = items.map(item => {
         const img = item.images?.small || item.images?.grid || item.images?.common || "";
+        const displayImg = toImageProxyUrl(img);
         const displayName = item.name_cn || item.name || "未命名条目";
         const rawName = item.name || "";
         const secondaryName = rawName && rawName !== displayName ? rawName : "";
@@ -4450,7 +4497,7 @@
 
         return `
           <button type="button" class="card bangumi-card" onclick="loadSubject(${Number(item.id)})" aria-label="选择 ${escapeHtml(displayName)}">
-            ${img ? `<img class="cover" src="${escapeHtml(img)}" alt="${escapeHtml(displayName)} 封面">` : `<div class="cover" aria-hidden="true"></div>`}
+            ${displayImg ? `<img class="cover" src="${escapeHtml(displayImg)}" data-original-src="${escapeHtml(img)}" alt="${escapeHtml(displayName)} 封面" onerror="handleImageDisplayError(this)">` : `<div class="cover" aria-hidden="true"></div>`}
             <div class="bangumi-card-copy">
               <div class="title">${escapeHtml(displayName)}</div>
               ${secondaryName ? `<div class="sub">${escapeHtml(secondaryName)}</div>` : ""}
