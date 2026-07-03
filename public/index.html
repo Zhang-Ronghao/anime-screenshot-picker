@@ -3063,6 +3063,7 @@
 
   <script>
     const BGM_API = "https://api.bgm.tv";
+    const BGM_PROXY_PATH = "/bangumi";
     const FANCAPS_BASE = "https://fancaps.net";
     const ANIDB_TITLES_URL = "https://anidb.net/api/anime-titles.xml.gz";
     const ANIDB_LOCAL_DUMP_MONTH = "2026-05";
@@ -3526,8 +3527,8 @@
 
       while (guard < 80) {
         guard += 1;
-        const url = `${BGM_API}/v0/users/${encodeURIComponent(username)}/collections?subject_type=2&type=2&limit=${limit}&offset=${offset}`;
-        const res = await fetchWithTimeout(url, {
+        const url = `/v0/users/${encodeURIComponent(username)}/collections?subject_type=2&type=2&limit=${limit}&offset=${offset}`;
+        const res = await fetchBangumiApi(url, {
           headers: { "Accept": "application/json" }
         }, BANGUMI_REQUEST_TIMEOUT_MS);
         if (!res.ok) throw new Error(`读取用户收藏失败：HTTP ${res.status}`);
@@ -3607,7 +3608,7 @@
     async function fetchBangumiCoverRecord(record) {
       if (record.images?.length) return record;
 
-      const res = await fetchWithTimeout(`${BGM_API}/v0/subjects/${encodeURIComponent(record.bgmId)}`, {
+      const res = await fetchBangumiApi(`/v0/subjects/${encodeURIComponent(record.bgmId)}`, {
         headers: {
           "Accept": "application/json"
         }
@@ -4403,7 +4404,7 @@
       setStatus("正在搜索动画条目...");
 
       try {
-        const res = await fetch(`${BGM_API}/v0/search/subjects?limit=12&offset=0`, {
+        const res = await fetchBangumiApi("/v0/search/subjects?limit=12&offset=0", {
           method: "POST",
           headers: {
             "Accept": "application/json",
@@ -4474,7 +4475,7 @@
       setStatus("正在读取动画条目...");
 
       try {
-        const res = await fetch(`${BGM_API}/v0/subjects/${id}`, {
+        const res = await fetchBangumiApi(`/v0/subjects/${id}`, {
           headers: { "Accept": "application/json" }
         });
 
@@ -7131,6 +7132,37 @@
       } finally {
         window.clearTimeout(timer);
       }
+    }
+
+    async function fetchBangumiApi(path, options = {}, timeoutMs = BANGUMI_REQUEST_TIMEOUT_MS) {
+      const normalizedPath = String(path || "").startsWith("/") ? String(path) : `/${path}`;
+      const proxyUrl = `${BGM_PROXY_PATH}?path=${encodeURIComponent(normalizedPath)}`;
+
+      try {
+        const res = await fetchWithTimeout(proxyUrl, options, timeoutMs);
+        if (res.status !== 404) return res;
+
+        logBangumiDiagnostic("proxy-not-found-fallback", {
+          path: normalizedPath,
+          message: "本地静态预览未提供 /bangumi 函数，回退为直连 Bangumi API"
+        });
+      } catch (err) {
+        if (!isLikelyLocalStaticPreview()) throw err;
+        logBangumiDiagnostic("proxy-unavailable-fallback", {
+          path: normalizedPath,
+          message: err?.message || String(err)
+        });
+      }
+
+      return fetchWithTimeout(`${BGM_API}${normalizedPath}`, options, timeoutMs);
+    }
+
+    function isLikelyLocalStaticPreview() {
+      return (
+        window.location.protocol === "file:" ||
+        window.location.hostname === "127.0.0.1" ||
+        window.location.hostname === "localhost"
+      );
     }
 
     function logBangumiDiagnostic(type, detail = {}) {
