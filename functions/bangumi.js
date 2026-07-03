@@ -1,4 +1,6 @@
 const BANGUMI_API = 'https://api.bgm.tv';
+const UPSTREAM_TIMEOUT_MS = 10000;
+const SUBJECT_CACHE_TTL = 60 * 60 * 24 * 30;
 
 const CORS_HEADERS = {
   'Access-Control-Allow-Origin': '*',
@@ -36,37 +38,104 @@ export async function onRequest(context) {
     if (cached) return withCors(cached, { 'X-Bangumi-Proxy-Cache': 'HIT' });
   }
 
-  const upstream = await fetch(targetUrl.toString(), {
+  const upstream = await fetchBangumiWithRetry(targetUrl, {
     method: request.method,
-    headers: {
-      'User-Agent': 'AnimeScreenshotPicker/1.0 (https://github.com/zrh/anime-screenshot-picker)',
-      'Accept': 'application/json',
-      'Content-Type': 'application/json',
-    },
     body: request.method === 'POST' ? await request.text() : undefined,
-    cf: {
-      cacheTtl: canCache ? 60 * 60 * 24 : 0,
-      cacheEverything: false,
-    },
+    canCache,
   });
 
-  const contentType = upstream.headers.get('content-type') || 'application/json; charset=utf-8';
+  if (!upstream.response) {
+    return json({
+      error: 'Bangumi upstream request failed',
+      detail: upstream.error || 'Unknown upstream error',
+      attempts: upstream.attempts,
+      path: targetUrl.pathname,
+    }, 502, {
+      'X-Bangumi-Upstream-Error': sanitizeHeader(upstream.error || 'Unknown upstream error'),
+      'X-Bangumi-Upstream-Attempts': String(upstream.attempts),
+    });
+  }
+
+  const contentType = upstream.response.headers.get('content-type') || 'application/json; charset=utf-8';
   const headers = new Headers(CORS_HEADERS);
   headers.set('Content-Type', contentType);
-  headers.set('Cache-Control', canCache ? 'public, max-age=86400' : 'no-store');
+  headers.set('Cache-Control', canCache ? `public, max-age=${SUBJECT_CACHE_TTL}` : 'no-store');
   headers.set('X-Bangumi-Proxy-Cache', 'MISS');
+  headers.set('X-Bangumi-Upstream-Attempts', String(upstream.attempts));
+  if (!upstream.response.ok) {
+    headers.set('X-Bangumi-Upstream-Status', String(upstream.response.status));
+  }
 
-  const response = new Response(upstream.body, {
-    status: upstream.status,
-    statusText: upstream.statusText,
+  const response = new Response(upstream.response.body, {
+    status: upstream.response.status,
+    statusText: upstream.response.statusText,
     headers,
   });
 
-  if (canCache && upstream.ok) {
+  if (canCache && upstream.response.ok) {
     context.waitUntil(cache.put(cacheKey, response.clone()));
   }
 
   return response;
+}
+
+async function fetchBangumiWithRetry(targetUrl, options) {
+  const attempts = options.method === 'GET' ? 3 : 2;
+  let lastError = '';
+
+  for (let attempt = 1; attempt <= attempts; attempt++) {
+    const controller = new AbortController();
+    const timer = setTimeout(() => controller.abort(), UPSTREAM_TIMEOUT_MS);
+
+    try {
+      const response = await fetch(targetUrl.toString(), {
+        method: options.method,
+        headers: {
+          'User-Agent': 'AnimeScreenshotPicker/1.0 (Bangumi proxy; contact: deployed-site-owner)',
+          'Accept': 'application/json',
+          'Content-Type': 'application/json',
+        },
+        body: options.body,
+        signal: controller.signal,
+        cf: {
+          cacheTtl: options.canCache ? SUBJECT_CACHE_TTL : 0,
+          cacheEverything: false,
+        },
+      });
+
+      if (response.ok || !shouldRetryStatus(response.status) || attempt === attempts) {
+        return { response, attempts: attempt };
+      }
+
+      lastError = `HTTP ${response.status}`;
+    } catch (err) {
+      lastError = err?.name === 'AbortError'
+        ? `Upstream timeout after ${Math.round(UPSTREAM_TIMEOUT_MS / 1000)} seconds`
+        : (err?.message || String(err));
+
+      if (attempt === attempts) {
+        return { response: null, attempts: attempt, error: lastError };
+      }
+    } finally {
+      clearTimeout(timer);
+    }
+
+    await sleep(180 * attempt);
+  }
+
+  return { response: null, attempts, error: lastError || 'Unknown upstream error' };
+}
+
+function shouldRetryStatus(status) {
+  return status === 408 || status === 425 || status === 429 || status >= 500;
+}
+
+function sleep(ms) {
+  return new Promise(resolve => setTimeout(resolve, ms));
+}
+
+function sanitizeHeader(value) {
+  return String(value || '').replace(/[^\t\x20-\x7e]/g, ' ').slice(0, 180);
 }
 
 function normalizeBangumiPath(path) {
@@ -133,11 +202,12 @@ function withCors(response, extraHeaders = {}) {
   });
 }
 
-function json(data, status = 200) {
+function json(data, status = 200, extraHeaders = {}) {
   return new Response(JSON.stringify(data, null, 2), {
     status,
     headers: {
       ...CORS_HEADERS,
+      ...extraHeaders,
       'Content-Type': 'application/json; charset=utf-8',
       'Cache-Control': 'no-store',
     },
