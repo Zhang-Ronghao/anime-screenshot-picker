@@ -2117,6 +2117,13 @@
       margin-bottom: 18px;
     }
 
+    .about-intro {
+      margin: 0 0 14px;
+      color: var(--text);
+      font-size: var(--text-ui);
+      line-height: var(--leading-body);
+    }
+
     .about-section {
       padding: 12px;
       border: 1px solid color-mix(in oklch, var(--border) 78%, var(--selected-border));
@@ -3134,10 +3141,20 @@
 
   <main>
 
+  <div id="sourcePanel" class="panel source-panel" aria-labelledby="sourcePanelLabel">
+    <h2 id="sourcePanelLabel">题目来源</h2>
+    <input id="autoImageSource" type="hidden" value="fancaps" />
+    <div class="auto-source-toggle" role="group" aria-label="题目来源">
+      <button id="autoSourceFanCapsBtn" class="auto-source-option active" type="button" aria-pressed="true" aria-controls="modePanel autoPanel searchPanel" onclick="setAutoImageSource('fancaps')">FanCaps 截图</button>
+      <button id="autoSourceBangumiCoverBtn" class="auto-source-option" type="button" aria-pressed="false" aria-controls="autoPanel" onclick="setAutoImageSource('bangumi-cover')">Bangumi 封面</button>
+      <button id="autoSourceBangumiCharacterBtn" class="auto-source-option" type="button" aria-pressed="false" aria-controls="autoPanel" onclick="setAutoImageSource('bangumi-character-mosaic')">马赛克人物题</button>
+    </div>
+  </div>
+
   <div id="modePanel" class="panel mode-panel" role="group" aria-label="出题方式" aria-describedby="modePrompt">
     <button id="autoModeBtn" class="mode-button active" type="button" aria-pressed="true" aria-controls="autoPanel" onclick="switchMode('auto')">自动出题</button>
     <button id="manualModeBtn" class="mode-button light" type="button" aria-pressed="false" aria-controls="searchPanel" onclick="switchMode('manual')">手动出题</button>
-    <span class="mode-prompt" id="modePrompt">自动可批量抽截图、封面或马赛克人物题；手动可浏览更多截图</span>
+    <span class="mode-prompt" id="modePrompt">FanCaps 截图支持自动抽题，也可以手动浏览选择</span>
   </div>
 
   <div class="shared-status-panel" aria-label="工作状态">
@@ -3150,21 +3167,6 @@
   <div id="autoPanel" class="panel">
     <h2>自动出题</h2>
     <div class="workflow-note workflow-note-nowrap">填写 Bangumi 用户 ID 后，只从该用户标记“看过”的动画里抽题；留空则从全部可用动画里抽题</div>
-    <input id="autoImageSource" type="hidden" value="fancaps" />
-    <div class="auto-source-toggle" role="group" aria-label="图片来源">
-      <button id="autoSourceFanCapsBtn" class="auto-source-option active" type="button" aria-pressed="true" onclick="setAutoImageSource('fancaps')">
-        FanCaps 截图
-        <span>从已匹配截图池随机抽画面</span>
-      </button>
-      <button id="autoSourceBangumiCoverBtn" class="auto-source-option" type="button" aria-pressed="false" onclick="setAutoImageSource('bangumi-cover')">
-        Bangumi 封面
-        <span>调用条目 API 读取 large 原图封面</span>
-      </button>
-      <button id="autoSourceBangumiCharacterBtn" class="auto-source-option" type="button" aria-pressed="false" onclick="setAutoImageSource('bangumi-character-mosaic')">
-        马赛克人物题
-        <span>抽取首位主角并生成四阶段提示图</span>
-      </button>
-    </div>
     <div class="auto-form-grid">
       <div class="auto-field">
         <label for="autoBangumiUser">Bangumi 用户 ID（可选）</label>
@@ -3243,39 +3245,34 @@
           <button onclick="closeAboutModal()">关闭</button>
         </div>
       </div>
+      <p class="about-intro">数据截至 2026-05-27。自动出题最多 20 题，可选择 FanCaps 截图、Bangumi 封面或马赛克人物题。</p>
       <div class="about-sections">
         <section class="about-section">
-          <h3>数据来源</h3>
+          <h3>图片来源</h3>
           <ul class="about-list">
-            <li>数据源截至 2026-05-27</li>
-            <li>自动题库可选择 FanCaps 截图、Bangumi 封面或马赛克人物题</li>
-            <li>马赛克人物题从 Bangumi 角色接口筛选主角，并采用第一位有图的主角</li>
-            <li>人物题在浏览器本地合成，不会上传人物原图或生成结果</li>
+            <li><strong>FanCaps 截图题库</strong>：使用已匹配的 TV 动画截图（每动画每集4张），也可手动浏览更多截图。</li>
+            <li><strong>Bangumi 封面 / 人物图</strong>：实时读取动画封面或主角图片。</li>
           </ul>
         </section>
         <section class="about-section">
           <h3>题库规模</h3>
           <ul class="about-list">
-            <li>Bangumi 看过人数 ≥ 100 封面候选：<span class="stat-emphasis">9,749</span> 部</li>
-            <li>成功匹配 FanCaps：<span class="stat-emphasis">2,272</span> 部 TV 动画</li>
-            <li>截图总数：<span class="stat-emphasis">146,335</span> 张</li>
+            <li><strong>FanCaps 截图题库</strong>：成功匹配 <span class="stat-emphasis">2,272</span> 部 TV 动画（不含动画电影），共有 <span class="stat-emphasis">146,335</span> 张截图。</li>
+            <li><strong>Bangumi 封面 / 人物图</strong>：看过人数 ≥ 100 的动画候选共 <span class="stat-emphasis">9,749</span> 部。</li>
           </ul>
         </section>
         <section class="about-section">
           <h3>覆盖情况</h3>
           <ul class="about-list">
-            <li>FanCaps 截图覆盖 Bangumi 看过人数 Top500：<span class="stat-emphasis">349</span> 部，占 <span class="stat-emphasis">69.8%</span></li>
-            <li>FanCaps 截图覆盖 Bangumi 看过人数 Top1000：<span class="stat-emphasis">636</span> 部，占 <span class="stat-emphasis">63.6%</span></li>
-            <li>Bangumi 封面和人物题候选覆盖看过人数 ≥ 100 的动画条目，生成时实时读取图片</li>
-            <li>部分热门 TV 动画也可能没有可用 FanCaps 截图</li>
+            <li><strong>FanCaps 截图题库</strong>：覆盖 Bangumi 看过人数 Top 500 中的 <span class="stat-emphasis">349</span> 部，占 <span class="stat-emphasis">69.8%</span>；Top 1000 中的 <span class="stat-emphasis">636</span> 部，占 <span class="stat-emphasis">63.6%</span>。</li>
+            <li><strong>Bangumi 封面 / 人物图</strong>：覆盖看过人数 ≥ 100 的动画候选。</li>
           </ul>
         </section>
         <section class="about-section">
-          <h3>出题范围</h3>
+          <h3>出题方式</h3>
           <ul class="about-list">
-            <li>自动出题：最多 20 题，可选截图、封面或马赛克人物题</li>
-            <li>马赛克人物题使用白色 16:9 画板，可全局调整三档马赛克强度，并通过 ZIP 上传游戏</li>
-            <li>手动出题：可浏览 FanCaps 上更多截图</li>
+            <li><strong>FanCaps 截图题库</strong>：支持自动随机出题，也可手动挑选截图。</li>
+            <li><strong>Bangumi 封面 / 人物图</strong>：支持自动生成封面题或马赛克人物题。</li>
           </ul>
         </section>
       </div>
@@ -3440,6 +3437,7 @@
     document.getElementById("autoQuestionCount")?.addEventListener("input", getAutoQuestionCount);
     syncMosaicStrengthControl();
     syncAutoImageSourceButtons();
+    syncQuestionSourceFlow();
 
     document.getElementById("searchBangumiBtn").addEventListener("click", searchBangumi);
     keywordInput.addEventListener("keydown", (e) => {
@@ -3450,8 +3448,9 @@
     window.addEventListener("resize", updateFloatingNavVisibility);
 
 
-    function switchMode(mode) {
-      const isAuto = mode === "auto";
+    function switchMode(mode, options = {}) {
+      const supportsManual = getAutoImageSource() === AUTO_SOURCE_FANCAPS;
+      const isAuto = mode !== "manual" || !supportsManual;
 
       autoPanelEl.style.display = isAuto ? "" : "none";
       searchPanelEl.style.display = isAuto ? "none" : "";
@@ -3468,9 +3467,11 @@
       manualModeBtn.setAttribute("aria-pressed", String(!isAuto));
       autoModeBtn.setAttribute("aria-pressed", String(isAuto));
 
-      setStatus(isAuto ? "已切换到自动出题" : "已切换到手动出题");
+      if (options.announce !== false) {
+        setStatus(isAuto ? "已切换到自动出题" : "已切换到手动出题");
+      }
       renderSelectedBasket();
-      scrollToElement(isAuto ? autoPanelEl : searchPanelEl);
+      if (options.scroll !== false) scrollToElement(isAuto ? autoPanelEl : searchPanelEl);
     }
 
 
@@ -3480,7 +3481,14 @@
       if (!autoImageSourceEl || autoImageSourceEl.value === next) return;
       autoImageSourceEl.value = next;
       syncAutoImageSourceButtons();
+      syncQuestionSourceFlow();
       handleAutoImageSourceChange();
+    }
+
+    function syncQuestionSourceFlow() {
+      const supportsManual = getAutoImageSource() === AUTO_SOURCE_FANCAPS;
+      if (modePanelEl) modePanelEl.style.display = supportsManual ? "" : "none";
+      if (!supportsManual) switchMode("auto", { announce: false, scroll: false });
     }
 
     function syncAutoImageSourceButtons() {

@@ -22,6 +22,25 @@ test('page contains one unique set of mosaic controls', () => {
   assert.match(html, /\["Weak", "弱", blockSizes\[2\]\]/);
 });
 
+test('question source is selected before the supported question mode', () => {
+  const sourcePanelIndex = html.indexOf('id="sourcePanel"');
+  const modePanelIndex = html.indexOf('id="modePanel"');
+  const autoPanelIndex = html.indexOf('id="autoPanel"');
+  assert.ok(sourcePanelIndex > 0 && sourcePanelIndex < modePanelIndex && modePanelIndex < autoPanelIndex);
+  assert.match(html, /function syncQuestionSourceFlow\(\)/);
+  assert.match(html, /modePanelEl\.style\.display = supportsManual \? "" : "none"/);
+  assert.match(html, /if \(!supportsManual\) switchMode\("auto", \{ announce: false, scroll: false \}\)/);
+});
+
+test('source buttons use concise labels without secondary descriptions', () => {
+  for (const label of ['FanCaps 截图', 'Bangumi 封面', '马赛克人物题']) {
+    assert.match(html, new RegExp(`class="auto-source-option[^>]*>${label}</button>`));
+  }
+  assert.doesNotMatch(html, /从已匹配截图池随机抽画面/);
+  assert.doesNotMatch(html, /调用条目 API 读取 large 原图封面/);
+  assert.doesNotMatch(html, /抽取首位主角并生成四阶段提示图/);
+});
+
 test('mosaic strength control is rendered with the generated draft and reuses source blobs', () => {
   assert.match(html, /游戏中分阶段展示：强马赛克 → 中马赛克 → 弱马赛克 → 原图（答案）/);
   assert.match(html, /\.mosaic-display-order\s*\{[\s\S]*?color: var\(--text\)/);
