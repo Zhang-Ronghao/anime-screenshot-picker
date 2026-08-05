@@ -12,12 +12,13 @@
 6. 多部动画的已选截图会保留在全局选择篮中。
 7. 可复制或导出已选图片 URL。
 
-自动出题支持两种图片来源：
+自动出题支持三种图片来源：
 
 - `FanCaps 截图库`：从已匹配的 FanCaps 截图池中随机抽题。
 - `Bangumi 封面图`：从看过人数 ≥ 100 的 Bangumi 动画候选池中随机抽条目，再调用 Bangumi API 获取 `images.large` 原图封面。
+- `马赛克人物题`：随机抽取动画，通过 Bangumi 角色接口筛选 `relation === "主角"` 的角色，默认采用第一位有原图的主角，并在浏览器本地生成三档马赛克加原图的 16:9 合成图。
 
-两种来源共用年份范围、Bangumi 看过人数、Bangumi 用户看过列表筛选逻辑。题目数量固定最多 20 道。
+三种来源共用年份范围、Bangumi 看过人数、Bangumi 用户看过列表筛选逻辑。题目数量固定最多 20 道。马赛克人物题提供全局强度调整，使用白色背景，主要通过图片 ZIP 下载后上传游戏。
 
 ## 项目结构
 
@@ -44,13 +45,25 @@ Bangumi API 和封面图片在部分网络环境也可能无法由用户浏览�
 /bangumi?path=%2Fv0%2Fsubjects%2F245665
 ```
 
-`/bangumi` 只允许必要的 Bangumi API 路径，包括动画条目、搜索和用户收藏列表。自动封面出题读取 `images.large` 时会走这个后端代理。
+`/bangumi` 只允许必要的 Bangumi API 路径，包括动画条目、条目角色、搜索和用户收藏列表。自动封面及人物出题读取数据时会走这个后端代理；角色响应会被裁剪为 ID、名称、关系和图片字段。
 
 ```text
 /proxy?url=https%3A%2F%2Ffancaps.net%2F...
 ```
 
-`/proxy` 只开放必要的 FanCaps 页面、FanCaps 图片和 Bangumi 封面图片路径，避免被当成通用开放代理滥用。Bangumi 封面在页面展示和 ZIP 打包下载时都会通过 `/proxy` 读取。
+`/proxy` 只开放必要的 FanCaps 页面、FanCaps 图片、Bangumi 封面和角色图片路径，避免被当成通用开放代理滥用。Bangumi 图片在页面展示、浏览器合成和 ZIP 打包下载时都会通过 `/proxy` 读取。
+
+## 马赛克人物题画板
+
+输出固定为 `1440 × 810`，宽度平均分为 9 列：
+
+- 第 1–2 列：最强马赛克。
+- 第 3–4 列：中等马赛克。
+- 第 5–6 列：最弱马赛克。
+- 第 7 列：白色留空。
+- 第 8–9 列：人物原图。
+
+人物图在每个两列区域中按 `contain` 等比缩放并居中，四周保留少量白边，不裁剪、不越界。全局强度滑块位于题单草稿标题下方，会保持当前人物不变，同时调整三档像素块大小并重新生成全部人物题。合成结果是页面内临时 Blob，因此不导出远程 URL 题单；请下载 ZIP 后选择游戏的“上传图片”流程。人物题 ZIP 只有在全部图片打包成功后才会下载，文件名按人物名、动画名的顺序命名，并使用 UTF-8 编码；导出时会为缺少中文名的角色按需读取 Bangumi 人物详情，并优先采用简体中文名。
 
 ## 本地运行
 
@@ -208,7 +221,7 @@ https://anime-screenshot-picker.pages.dev
 
 ## 安全限制
 
-`functions/proxy.js` 只允许代理 FanCaps 的相关页面/图片和 Bangumi 封面图片，避免被当成通用开放代理滥用。
+`functions/proxy.js` 只允许代理 FanCaps 的相关页面/图片和 Bangumi 封面、角色图片，避免被当成通用开放代理滥用。
 
 当前允许路径包括：
 
@@ -222,6 +235,8 @@ https://fancaps.net/movies/picture.php
 https://cdni.fancaps.net/file/fancaps-animeimages/...
 https://lain.bgm.tv/pic/cover/...
 https://lain.bgm.tv/r/.../pic/cover/...
+https://lain.bgm.tv/pic/crt/...
+https://lain.bgm.tv/r/.../pic/crt/...
 ```
 
 ## 备注

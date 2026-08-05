@@ -1564,7 +1564,7 @@
 
     .auto-source-toggle {
       display: grid;
-      grid-template-columns: repeat(2, minmax(0, 1fr));
+      grid-template-columns: repeat(3, minmax(0, 1fr));
       gap: var(--space-sm);
       width: 100%;
       margin-top: var(--space-md);
@@ -1608,6 +1608,221 @@
 
     .auto-source-option.active span {
       color: color-mix(in oklch, var(--selected) 70%, var(--muted));
+    }
+
+    .mosaic-settings {
+      display: flex;
+      gap: var(--space-md);
+      align-items: center;
+      margin: var(--space-sm) 0 var(--space-md);
+      padding: 10px 12px;
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      background: var(--panel-soft);
+    }
+
+    .mosaic-settings[hidden] {
+      display: none;
+    }
+
+    .mosaic-guidance {
+      margin: var(--space-xs) 0 0;
+    }
+
+    .mosaic-display-order {
+      margin: var(--space-xs) 0 0;
+      color: var(--text);
+      font-size: var(--text-sm);
+      line-height: var(--leading-body);
+    }
+
+    .mosaic-settings-copy {
+      display: grid;
+      gap: 2px;
+      min-width: 168px;
+    }
+
+    .mosaic-settings-copy strong {
+      font-size: var(--text-ui);
+      line-height: var(--leading-ui);
+    }
+
+    .mosaic-settings-copy span,
+    .mosaic-strength-readout {
+      color: var(--muted);
+      font-size: var(--text-xs);
+      line-height: var(--leading-body);
+    }
+
+    .mosaic-settings-main {
+      display: grid;
+      grid-template-columns: minmax(330px, 1fr) auto;
+      gap: var(--space-md);
+      align-items: center;
+      flex: 1;
+      min-width: 0;
+    }
+
+    .mosaic-strength-control {
+      display: grid;
+      grid-template-columns: auto minmax(180px, 1fr) auto auto;
+      gap: 9px;
+      align-items: center;
+    }
+
+    .mosaic-strength-slider {
+      --mosaic-progress: 60%;
+      --mosaic-thumb-size: 18px;
+      position: relative;
+      min-width: 0;
+    }
+
+    .mosaic-strength-slider::before {
+      position: absolute;
+      top: 50%;
+      right: 0;
+      left: 0;
+      height: 4px;
+      border-radius: 999px;
+      background: linear-gradient(
+        to right,
+        var(--selected) 0 var(--mosaic-progress),
+        var(--border) var(--mosaic-progress) 100%
+      );
+      content: "";
+      transform: translateY(-50%);
+    }
+
+    .mosaic-strength-slider input[type="range"] {
+      position: relative;
+      z-index: 2;
+      appearance: none;
+      width: 100%;
+      height: 24px;
+      margin: 0;
+      padding: 0;
+      border: 0;
+      border-radius: 0;
+      background: transparent;
+      box-shadow: none;
+      cursor: pointer;
+    }
+
+    .mosaic-strength-slider input[type="range"]:focus {
+      outline: 0;
+      box-shadow: none;
+    }
+
+    .mosaic-strength-slider input[type="range"]::-webkit-slider-runnable-track {
+      height: 4px;
+      background: transparent;
+    }
+
+    .mosaic-strength-slider input[type="range"]::-webkit-slider-thumb {
+      appearance: none;
+      box-sizing: border-box;
+      width: var(--mosaic-thumb-size);
+      height: var(--mosaic-thumb-size);
+      margin-top: -7px;
+      border: 0;
+      background: transparent;
+      box-shadow: none;
+      opacity: 0;
+    }
+
+    .mosaic-strength-slider input[type="range"]::-moz-range-track {
+      height: 4px;
+      background: transparent;
+    }
+
+    .mosaic-strength-slider input[type="range"]::-moz-range-progress {
+      background: transparent;
+    }
+
+    .mosaic-strength-slider input[type="range"]::-moz-range-thumb {
+      box-sizing: border-box;
+      width: var(--mosaic-thumb-size);
+      height: var(--mosaic-thumb-size);
+      border: 0;
+      background: transparent;
+      box-shadow: none;
+      opacity: 0;
+    }
+
+    .mosaic-strength-ticks {
+      position: absolute;
+      z-index: 3;
+      top: 50%;
+      right: 0;
+      left: 0;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      pointer-events: none;
+      transform: translateY(-50%);
+    }
+
+    .mosaic-strength-ticks span {
+      width: 6px;
+      height: 6px;
+      border-radius: 50%;
+      background: var(--text);
+      box-shadow: 0 0 0 2px var(--panel-soft);
+    }
+
+    .mosaic-strength-ticks span.active {
+      box-sizing: border-box;
+      width: 14px;
+      height: 14px;
+      border: 3px solid var(--panel-soft);
+      background: var(--selected);
+      box-shadow: 0 0 0 2px var(--selected);
+    }
+
+    .mosaic-strength-slider:focus-within .mosaic-strength-ticks span.active {
+      box-shadow: 0 0 0 2px var(--selected), 0 0 0 6px var(--focus-ring-soft);
+    }
+
+    .mosaic-strength-control > span {
+      color: var(--muted);
+      font-size: var(--text-xs);
+      font-weight: var(--weight-semibold);
+    }
+
+    .mosaic-strength-readout {
+      min-width: 64px;
+      padding: 5px 8px;
+      border-radius: 8px;
+      background: var(--panel);
+      text-align: center;
+      color: var(--selected);
+      font-weight: var(--weight-semibold);
+    }
+
+    .mosaic-block-values {
+      display: flex;
+      gap: 8px;
+      align-items: center;
+      padding-left: var(--space-sm);
+      border-left: 1px solid var(--border);
+    }
+
+    .mosaic-block-value {
+      display: grid;
+      grid-template-columns: auto 64px auto;
+      gap: 4px;
+      align-items: center;
+      color: var(--muted);
+      font-size: var(--text-xs);
+      font-weight: var(--weight-semibold);
+      white-space: nowrap;
+    }
+
+    .mosaic-block-value input {
+      width: 64px;
+      min-height: 32px;
+      padding: 4px 5px;
+      text-align: center;
     }
 
     .auto-draft-grid {
@@ -1737,12 +1952,41 @@
       object-fit: contain;
     }
 
+    .draft-card img.draft-image-mosaic {
+      aspect-ratio: 16 / 9;
+      object-fit: contain;
+      background: #ffffff;
+      border: 1px solid var(--border);
+    }
+
+    .modal-choice img.draft-image-character {
+      aspect-ratio: 3 / 4;
+      object-fit: contain;
+      background: #ffffff;
+    }
+
     .draft-title {
       font-size: var(--text-control);
       font-weight: var(--weight-bold);
       line-height: var(--leading-ui);
       min-height: 38px;
       margin-bottom: 6px;
+    }
+
+    .draft-anime-title {
+      margin: 0 0 6px;
+      color: var(--text);
+      font-size: var(--text-control);
+      font-weight: var(--weight-semibold);
+      line-height: var(--leading-ui);
+    }
+
+    .draft-card-mosaic .draft-title {
+      min-height: 0;
+      margin: 2px 0 4px;
+      color: var(--text);
+      font-size: var(--text-title);
+      font-weight: var(--weight-bold);
     }
 
     .draft-meta {
@@ -2092,6 +2336,18 @@
       .auto-year-range {
         grid-column: 1 / -1;
       }
+
+      .mosaic-settings-main {
+        grid-template-columns: 1fr;
+        gap: var(--space-sm);
+      }
+
+      .mosaic-block-values {
+        padding-top: var(--space-sm);
+        padding-left: 0;
+        border-top: 1px solid var(--border);
+        border-left: 0;
+      }
     }
 
     @media (max-width: 640px) {
@@ -2114,6 +2370,20 @@
       }
       .auto-source-toggle {
         grid-template-columns: 1fr;
+      }
+      .mosaic-settings {
+        align-items: stretch;
+        flex-direction: column;
+      }
+      .mosaic-strength-control {
+        grid-template-columns: auto minmax(120px, 1fr) auto;
+      }
+      .mosaic-strength-readout {
+        grid-column: 1 / -1;
+        justify-self: stretch;
+      }
+      .mosaic-block-values {
+        flex-wrap: wrap;
       }
       .year-range-line {
         grid-template-columns: 1fr;
@@ -2859,7 +3129,7 @@
     <button class="header-help-button" type="button" aria-label="查看题库说明" title="题库说明" onclick="showAboutModal()">题库说明 ⓘ</button>
     <div class="header-kicker">动漫高手·一眼顶针</div>
     <h1>动画截图出题工具</h1>
-    <p class="sub">从 FanCaps 截图或 Bangumi 封面中挑选画面，生成可导出的题单</p>
+    <p class="sub">从 FanCaps 截图、Bangumi 封面或人物图中挑选画面，生成可导出的题单</p>
   </header>
 
   <main>
@@ -2867,7 +3137,7 @@
   <div id="modePanel" class="panel mode-panel" role="group" aria-label="出题方式" aria-describedby="modePrompt">
     <button id="autoModeBtn" class="mode-button active" type="button" aria-pressed="true" aria-controls="autoPanel" onclick="switchMode('auto')">自动出题</button>
     <button id="manualModeBtn" class="mode-button light" type="button" aria-pressed="false" aria-controls="searchPanel" onclick="switchMode('manual')">手动出题</button>
-    <span class="mode-prompt" id="modePrompt">自动可批量抽截图或封面；手动可浏览更多截图，适合精挑</span>
+    <span class="mode-prompt" id="modePrompt">自动可批量抽截图、封面或马赛克人物题；手动可浏览更多截图</span>
   </div>
 
   <div class="shared-status-panel" aria-label="工作状态">
@@ -2889,6 +3159,10 @@
       <button id="autoSourceBangumiCoverBtn" class="auto-source-option" type="button" aria-pressed="false" onclick="setAutoImageSource('bangumi-cover')">
         Bangumi 封面
         <span>调用条目 API 读取 large 原图封面</span>
+      </button>
+      <button id="autoSourceBangumiCharacterBtn" class="auto-source-option" type="button" aria-pressed="false" onclick="setAutoImageSource('bangumi-character-mosaic')">
+        马赛克人物题
+        <span>抽取首位主角并生成四阶段提示图</span>
       </button>
     </div>
     <div class="auto-form-grid">
@@ -2974,8 +3248,9 @@
           <h3>数据来源</h3>
           <ul class="about-list">
             <li>数据源截至 2026-05-27</li>
-            <li>自动题库可选择 FanCaps 截图库或 Bangumi 封面图</li>
-            <li>FanCaps 主要覆盖 TV 动画；Bangumi 封面来自条目 API 的 large 原图</li>
+            <li>自动题库可选择 FanCaps 截图、Bangumi 封面或马赛克人物题</li>
+            <li>马赛克人物题从 Bangumi 角色接口筛选主角，并采用第一位有图的主角</li>
+            <li>人物题在浏览器本地合成，不会上传人物原图或生成结果</li>
           </ul>
         </section>
         <section class="about-section">
@@ -2991,14 +3266,15 @@
           <ul class="about-list">
             <li>FanCaps 截图覆盖 Bangumi 看过人数 Top500：<span class="stat-emphasis">349</span> 部，占 <span class="stat-emphasis">69.8%</span></li>
             <li>FanCaps 截图覆盖 Bangumi 看过人数 Top1000：<span class="stat-emphasis">636</span> 部，占 <span class="stat-emphasis">63.6%</span></li>
-            <li>Bangumi 封面候选覆盖看过人数 ≥ 100 的动画条目，生成时实时读取封面</li>
+            <li>Bangumi 封面和人物题候选覆盖看过人数 ≥ 100 的动画条目，生成时实时读取图片</li>
             <li>部分热门 TV 动画也可能没有可用 FanCaps 截图</li>
           </ul>
         </section>
         <section class="about-section">
           <h3>出题范围</h3>
           <ul class="about-list">
-            <li>自动出题：最多 20 题，可选截图或封面来源</li>
+            <li>自动出题：最多 20 题，可选截图、封面或马赛克人物题</li>
+            <li>马赛克人物题使用白色 16:9 画板，可全局调整三档马赛克强度，并通过 ZIP 上传游戏</li>
             <li>手动出题：可浏览 FanCaps 上更多截图</li>
           </ul>
         </section>
@@ -3061,6 +3337,7 @@
     <button type="button" onclick="scrollToBasket()">查看已选并导出（<span id="floatSelectedCount" class="selectedCount">0</span>）</button>
   </div>
 
+  <script src="./mosaic.js"></script>
   <script>
     const BGM_API = "https://api.bgm.tv";
     const BGM_PROXY_PATH = "/bangumi";
@@ -3076,6 +3353,9 @@
     const BANGUMI_AUTO_DATA_PATH = "./bangumi_anime_subjects.jsonl";
     const DEFAULT_PROXY = "/proxy?url=";
     const AUTO_MAX_QUESTION_COUNT = 20;
+    const AUTO_SOURCE_FANCAPS = "fancaps";
+    const AUTO_SOURCE_BANGUMI_COVER = "bangumi-cover";
+    const AUTO_SOURCE_CHARACTER_MOSAIC = "bangumi-character-mosaic";
     const BANGUMI_COVER_SIZE = "large";
     const BANGUMI_NO_COVER_URL = "https://lain.bgm.tv/img/no_icon_subject.png";
     const BANGUMI_REQUEST_TIMEOUT_MS = 12000;
@@ -3120,6 +3400,7 @@
     const autoImageSourceEl = document.getElementById("autoImageSource");
     const autoSourceFanCapsBtn = document.getElementById("autoSourceFanCapsBtn");
     const autoSourceBangumiCoverBtn = document.getElementById("autoSourceBangumiCoverBtn");
+    const autoSourceBangumiCharacterBtn = document.getElementById("autoSourceBangumiCharacterBtn");
 
     let selectedImages = new Map();
     let imageItemsById = new Map();
@@ -3139,6 +3420,10 @@
     let autoModalState = null;
     let autoGenerating = false;
     let autoGenerateRunId = 0;
+    let mosaicRenderRunId = 0;
+    let mosaicStrengthValue = 4;
+    let mosaicCustomBlockSizes = null;
+    const characterChineseNamePromiseCache = new Map();
     let autoModalRequestId = 0;
     let lastModalFocus = null;
     let hasUsedSelectedBasket = false;
@@ -3153,6 +3438,7 @@
     renderAutoDraft();
     syncAutoYearRangeLabels("init");
     document.getElementById("autoQuestionCount")?.addEventListener("input", getAutoQuestionCount);
+    syncMosaicStrengthControl();
     syncAutoImageSourceButtons();
 
     document.getElementById("searchBangumiBtn").addEventListener("click", searchBangumi);
@@ -3190,7 +3476,7 @@
 
     function setAutoImageSource(source) {
       if (autoGenerating) return;
-      const next = source === "bangumi-cover" ? "bangumi-cover" : "fancaps";
+      const next = normalizeAutoImageSource(source);
       if (!autoImageSourceEl || autoImageSourceEl.value === next) return;
       autoImageSourceEl.value = next;
       syncAutoImageSourceButtons();
@@ -3199,10 +3485,11 @@
 
     function syncAutoImageSourceButtons() {
       const source = getAutoImageSource();
-      const isCover = source === "bangumi-cover";
+      const isCover = source === AUTO_SOURCE_BANGUMI_COVER;
+      const isMosaic = source === AUTO_SOURCE_CHARACTER_MOSAIC;
       if (autoSourceFanCapsBtn) {
-        autoSourceFanCapsBtn.classList.toggle("active", !isCover);
-        autoSourceFanCapsBtn.setAttribute("aria-pressed", String(!isCover));
+        autoSourceFanCapsBtn.classList.toggle("active", source === AUTO_SOURCE_FANCAPS);
+        autoSourceFanCapsBtn.setAttribute("aria-pressed", String(source === AUTO_SOURCE_FANCAPS));
         autoSourceFanCapsBtn.disabled = autoGenerating;
       }
       if (autoSourceBangumiCoverBtn) {
@@ -3210,18 +3497,102 @@
         autoSourceBangumiCoverBtn.setAttribute("aria-pressed", String(isCover));
         autoSourceBangumiCoverBtn.disabled = autoGenerating;
       }
+      if (autoSourceBangumiCharacterBtn) {
+        autoSourceBangumiCharacterBtn.classList.toggle("active", isMosaic);
+        autoSourceBangumiCharacterBtn.setAttribute("aria-pressed", String(isMosaic));
+        autoSourceBangumiCharacterBtn.disabled = autoGenerating;
+      }
+      const mosaicStrengthEl = document.getElementById("mosaicStrength");
+      if (mosaicStrengthEl) mosaicStrengthEl.disabled = autoGenerating;
+      document.querySelectorAll("#mosaicSettings .mosaic-block-value input").forEach(input => {
+        input.disabled = autoGenerating;
+      });
+      if (addAutoDraftBtn) {
+        addAutoDraftBtn.disabled = autoGenerating || isMosaic || !autoDraft.length;
+        addAutoDraftBtn.title = isMosaic ? "马赛克人物题请下载 ZIP 后上传游戏" : "";
+      }
     }
 
     function handleAutoImageSourceChange() {
+      disposeMosaicDraftItems(autoDraft);
       autoDraft = [];
       autoFilteredPool = [];
       closeAutoModal();
       renderAutoDraft();
       if (autoPoolInfoEl) autoPoolInfoEl.textContent = "等待生成";
       const source = getAutoImageSource();
-      setStatus(source === "bangumi-cover"
+      setStatus(source === AUTO_SOURCE_BANGUMI_COVER
         ? "已切换到 Bangumi 封面图。生成时会调用 Bangumi API 获取 large 原图封面"
-        : "已切换到 FanCaps 截图库");
+        : source === AUTO_SOURCE_CHARACTER_MOSAIC
+          ? "已切换到马赛克人物题。将抽取动画首位主角并生成四阶段提示图"
+          : "已切换到 FanCaps 截图库");
+    }
+
+    function normalizeAutoImageSource(source) {
+      if (source === AUTO_SOURCE_BANGUMI_COVER) return AUTO_SOURCE_BANGUMI_COVER;
+      if (source === AUTO_SOURCE_CHARACTER_MOSAIC) return AUTO_SOURCE_CHARACTER_MOSAIC;
+      return AUTO_SOURCE_FANCAPS;
+    }
+
+    function isMosaicSource(source = getAutoImageSource()) {
+      return source === AUTO_SOURCE_CHARACTER_MOSAIC;
+    }
+
+    function syncMosaicStrengthControl() {
+      const mosaicStrengthEl = document.getElementById("mosaicStrength");
+      const mosaicStrengthReadoutEl = document.getElementById("mosaicStrengthReadout");
+      if (!mosaicStrengthEl || !mosaicStrengthReadoutEl || !window.MosaicComposer) return;
+      const strength = window.MosaicComposer.normalizeStrength(mosaicStrengthEl.value);
+      mosaicStrengthValue = strength;
+      mosaicStrengthEl.value = String(strength);
+      mosaicStrengthEl.closest(".mosaic-strength-slider")?.style.setProperty("--mosaic-progress", `${((strength - 1) / 5) * 100}%`);
+      const strengthLabels = ["最弱", "较弱", "稍弱", "标准", "较强", "最强"];
+      mosaicStrengthReadoutEl.textContent = mosaicCustomBlockSizes ? "自定义" : strengthLabels[strength - 1];
+      document.querySelectorAll("#mosaicStrengthTicks [data-strength]").forEach(tick => {
+        tick.classList.toggle("active", Number(tick.dataset.strength) === strength);
+      });
+      const blockSizes = getMosaicBlockSizes();
+      ["Strong", "Medium", "Weak"].forEach((name, index) => {
+        const input = document.getElementById(`mosaicBlock${name}`);
+        if (input && document.activeElement !== input) input.value = String(blockSizes[index]);
+      });
+    }
+
+    function getMosaicStrength() {
+      return window.MosaicComposer?.normalizeStrength(mosaicStrengthValue) || 4;
+    }
+
+    function getMosaicBlockSizes() {
+      if (Array.isArray(mosaicCustomBlockSizes)) return [...mosaicCustomBlockSizes];
+      return window.MosaicComposer?.getBlockSizes(getMosaicStrength()) || [64, 32, 16];
+    }
+
+    function selectMosaicStrengthPreset() {
+      mosaicCustomBlockSizes = null;
+      syncMosaicStrengthControl();
+    }
+
+    function applyMosaicCustomBlockSizes() {
+      if (!window.MosaicComposer || autoGenerating) return;
+      const inputs = ["Strong", "Medium", "Weak"].map(name => document.getElementById(`mosaicBlock${name}`));
+      const values = inputs.map(input => Number(input?.value));
+      const min = window.MosaicComposer.MIN_BLOCK_SIZE;
+      const max = window.MosaicComposer.MAX_BLOCK_SIZE;
+      const validRange = values.every(value => Number.isInteger(value) && value >= min && value <= max);
+      const validOrder = values[0] > values[1] && values[1] > values[2];
+      if (!validRange || !validOrder) {
+        setStatus(`请输入 ${min}–${max} 的整数，并保持强 > 中 > 弱`);
+        const currentValues = getMosaicBlockSizes();
+        inputs.forEach((input, index) => {
+          if (input) input.value = String(currentValues[index]);
+        });
+        return;
+      }
+
+      const preset = window.MosaicComposer.getBlockSizes(getMosaicStrength());
+      mosaicCustomBlockSizes = values.every((value, index) => value === preset[index]) ? null : values;
+      syncMosaicStrengthControl();
+      rerenderMosaicDraftForStrength();
     }
 
 
@@ -3277,7 +3648,8 @@
     }
 
     async function loadAutoDataset(source = getAutoImageSource()) {
-      if (source === "bangumi-cover") return loadBangumiAutoDataset();
+      if (source === AUTO_SOURCE_BANGUMI_COVER) return loadBangumiAutoDataset();
+      if (source === AUTO_SOURCE_CHARACTER_MOSAIC) return loadBangumiCharacterDataset();
       return loadFanCapsAutoDataset();
     }
 
@@ -3312,7 +3684,7 @@
             const doneCount = Number(raw.done_count || 0) || 0;
 
             records.push({
-              source: "fancaps",
+              source: AUTO_SOURCE_FANCAPS,
               bgmId,
               anidbId: raw.anidb_id ? String(raw.anidb_id) : "",
               title: clean(raw.label_text || raw.name_cn || raw.name || `Bangumi ${bgmId}`),
@@ -3361,7 +3733,7 @@
             if (!bgmId) continue;
 
             records.push({
-              source: "bangumi-cover",
+              source: AUTO_SOURCE_BANGUMI_COVER,
               bgmId,
               title: clean(raw.label_text || raw.name_cn || raw.name || `Bangumi ${bgmId}`),
               date: raw.date || "",
@@ -3385,9 +3757,26 @@
       return autoDatasetPromise.bangumiCover;
     }
 
+    async function loadBangumiCharacterDataset() {
+      if (autoDataset?.bangumiCharacter) return autoDataset.bangumiCharacter;
+      const records = await loadBangumiAutoDataset();
+      autoDataset = autoDataset || {};
+      autoDataset.bangumiCharacter = records.map(record => ({
+        source: AUTO_SOURCE_CHARACTER_MOSAIC,
+        bgmId: record.bgmId,
+        title: record.title,
+        date: record.date,
+        year: record.year,
+        doneCount: record.doneCount,
+        ratingCount: record.ratingCount,
+        images: [],
+        characters: null,
+      }));
+      return autoDataset.bangumiCharacter;
+    }
+
     function getAutoImageSource() {
-      const value = autoImageSourceEl?.value || "fancaps";
-      return value === "bangumi-cover" ? "bangumi-cover" : "fancaps";
+      return normalizeAutoImageSource(autoImageSourceEl?.value || AUTO_SOURCE_FANCAPS);
     }
 
     function getAutoQuestionCount() {
@@ -3412,17 +3801,23 @@
       if (autoGenerateStatusEl) {
         if (autoGenerating) {
           const source = getAutoImageSource();
-          autoGenerateStatusEl.textContent = source === "bangumi-cover"
+          autoGenerateStatusEl.textContent = source === AUTO_SOURCE_BANGUMI_COVER
             ? pickOne([
                 "正在抽取动画并读取封面...",
                 "正在调用 Bangumi API 获取原图封面...",
                 "正在避开重复动画..."
               ])
-            : pickOne([
-                "正在从截图池里抽一组题...",
-                "正在避开重复动画...",
-                "正在把候选截图排成草稿..."
-              ]);
+            : source === AUTO_SOURCE_CHARACTER_MOSAIC
+              ? pickOne([
+                  "正在抽取动画和首位主角...",
+                  "正在生成四阶段马赛克提示图...",
+                  "正在避开重复人物..."
+                ])
+              : pickOne([
+                  "正在从截图池里抽一组题...",
+                  "正在避开重复动画...",
+                  "正在把候选截图排成草稿..."
+                ]);
         }
         autoGenerateStatusEl.style.display = autoGenerating ? "inline-flex" : "none";
       }
@@ -3450,34 +3845,48 @@
         const sampleCount = Math.min(count, pool.length);
 
         if (!pool.length) {
-          autoDraft = [];
+          replaceAutoDraftItems([]);
           renderAutoDraft();
-          setStatus(source === "bangumi-cover"
+          setStatus(source === AUTO_SOURCE_BANGUMI_COVER
             ? "当前条件下没有可用封面条目。可以放宽年份、看过人数或清空 Bangumi 用户筛选"
-            : "当前条件下没有可用截图。可以放宽年份、看过人数或清空 Bangumi 用户筛选");
+            : source === AUTO_SOURCE_CHARACTER_MOSAIC
+              ? "当前条件下没有可用人物候选。可以放宽年份、看过人数或清空 Bangumi 用户筛选"
+              : "当前条件下没有可用截图。可以放宽年份、看过人数或清空 Bangumi 用户筛选");
           setProgress(100, false);
           return;
         }
 
-        setProgress(source === "bangumi-cover" ? 52 : 72, true);
-        if (source === "bangumi-cover") {
-          autoDraft = await makeBangumiCoverDraftItems(pool, sampleCount, { runId, source });
+        setProgress(source === AUTO_SOURCE_FANCAPS ? 72 : 52, true);
+        let nextDraft;
+        if (source === AUTO_SOURCE_BANGUMI_COVER) {
+          nextDraft = await makeBangumiCoverDraftItems(pool, sampleCount, { runId, source });
           if (!isCurrentAutoGeneration(runId, source)) return;
+        } else if (source === AUTO_SOURCE_CHARACTER_MOSAIC) {
+          nextDraft = await makeBangumiCharacterMosaicDraftItems(pool, sampleCount, { runId, source });
+          if (!isCurrentAutoGeneration(runId, source)) {
+            disposeMosaicDraftItems(nextDraft);
+            return;
+          }
         } else {
-          autoDraft = sampleUnique(pool, sampleCount).map(record => makeAutoDraftItem(record));
+          nextDraft = sampleUnique(pool, sampleCount).map(record => makeAutoDraftItem(record));
         }
+        replaceAutoDraftItems(nextDraft);
 
         if (!autoDraft.length) {
           renderAutoDraft();
-          setStatus("抽中的 Bangumi 条目没有可用封面。请放宽条件或稍后再试");
+          setStatus(source === AUTO_SOURCE_CHARACTER_MOSAIC
+            ? "抽中的 Bangumi 条目没有可用主角人物图。请放宽条件或稍后再试"
+            : "抽中的 Bangumi 条目没有可用封面。请放宽条件或稍后再试");
           setProgress(100, false);
           return;
         }
 
         renderAutoDraft();
-        setStatus(source === "bangumi-cover"
+        setStatus(source === AUTO_SOURCE_BANGUMI_COVER
           ? `已生成 ${autoDraft.length} 题封面草稿。可以换动画，或加入已选图片`
-          : `已生成 ${autoDraft.length} 题草稿。可以换图、换动画，或加入已选截图`);
+          : source === AUTO_SOURCE_CHARACTER_MOSAIC
+            ? `已生成 ${autoDraft.length} 道马赛克人物题。可以换人物、换动画或下载 ZIP`
+            : `已生成 ${autoDraft.length} 题草稿。可以换图、换动画，或加入已选截图`);
         setProgress(100, false);
         scrollToElement(autoDraftAreaEl);
       } catch (err) {
@@ -3509,11 +3918,13 @@
         if (minDone && record.doneCount < minDone) return false;
         if (yearFrom && (!record.year || record.year < yearFrom)) return false;
         if (yearTo && (!record.year || record.year > yearTo)) return false;
-        if (source === "fancaps") return record.images && record.images.length;
+        if (source === AUTO_SOURCE_FANCAPS) return record.images && record.images.length;
         return true;
       });
 
-      const sourceLabel = source === "bangumi-cover" ? "封面条目" : "截图动画";
+      const sourceLabel = source === AUTO_SOURCE_BANGUMI_COVER
+        ? "封面条目"
+        : source === AUTO_SOURCE_CHARACTER_MOSAIC ? "人物候选动画" : "截图动画";
       const scope = user ? `符合用户看过：${pool.length} 部${sourceLabel}` : `可用${sourceLabel}：${pool.length} 部`;
       if (autoPoolInfoEl) autoPoolInfoEl.textContent = scope;
       return pool;
@@ -3556,7 +3967,7 @@
       return {
         uid: `draft_${record.bgmId}_${hashString(chosen)}_${Math.random().toString(36).slice(2, 7)}`,
         bgmId: record.bgmId,
-        source: record.source || "fancaps",
+        source: record.source || AUTO_SOURCE_FANCAPS,
         title: record.title,
         date: record.date,
         year: record.year,
@@ -3630,8 +4041,187 @@
       return record;
     }
 
+    async function makeBangumiCharacterMosaicDraftItems(pool, count, options = {}) {
+      const items = [];
+      const usedCharacterIds = new Set();
+      const candidates = sampleUnique(pool, pool.length);
+      const batchSize = 2;
+      const requestCap = Math.min(pool.length, Math.max(count * 8, count + 40));
+      let failedBatchStreak = 0;
+
+      for (let i = 0; i < candidates.length && i < requestCap && items.length < count; i += batchSize) {
+        if (options.runId && !isCurrentAutoGeneration(options.runId, options.source || AUTO_SOURCE_CHARACTER_MOSAIC)) break;
+        const batch = candidates.slice(i, i + batchSize);
+        const tried = Math.min(i + batch.length, requestCap);
+        setStatus(`正在生成人物题：已完成 ${items.length}/${count}，已尝试 ${tried}/${requestCap}`);
+
+        const settled = await Promise.all(batch.map(async record => {
+          try {
+            const hydrated = await fetchBangumiCharacterRecord(record);
+            const character = hydrated?.characters?.[0];
+            if (!character) return { failed: false, item: null };
+            return {
+              failed: false,
+              characterId: character.id,
+              item: await makeCharacterMosaicDraftItem(hydrated, character),
+            };
+          } catch (err) {
+            logBangumiDiagnostic("character-mosaic-fetch-failed", {
+              bgmId: record?.bgmId,
+              title: record?.title,
+              message: err?.message || String(err)
+            });
+            return { failed: true, item: null };
+          }
+        }));
+
+        const failedCount = settled.filter(result => result.failed).length;
+        failedBatchStreak = failedCount === batch.length ? failedBatchStreak + 1 : 0;
+        if (failedBatchStreak >= 3 && !items.length) {
+          throw new Error("Bangumi 人物接口或图片连续多批请求失败，请稍后重试");
+        }
+
+        for (const result of settled) {
+          if (!result.item) continue;
+          if (items.length >= count) {
+            disposeMosaicDraftItems([result.item]);
+            continue;
+          }
+          if (usedCharacterIds.has(result.characterId)) {
+            disposeMosaicDraftItems([result.item]);
+            continue;
+          }
+          usedCharacterIds.add(result.characterId);
+          items.push(result.item);
+        }
+
+        const percent = 52 + Math.round((items.length / Math.max(1, count)) * 36);
+        setProgress(Math.min(88, percent), true);
+        if (items.length < count) await sleep(120);
+      }
+
+      return items;
+    }
+
+    async function fetchBangumiCharacterRecord(record) {
+      if (Array.isArray(record.characters)) return record.characters.length ? record : null;
+
+      const res = await fetchBangumiApi(`/v0/subjects/${encodeURIComponent(record.bgmId)}/characters`, {
+        headers: { "Accept": "application/json" }
+      }, BANGUMI_REQUEST_TIMEOUT_MS);
+      if (!res.ok) {
+        const detail = await readBangumiErrorDetail(res);
+        throw new Error(`Bangumi 人物读取失败：subject ${record.bgmId}, HTTP ${res.status}${detail ? `，${detail}` : ""}`);
+      }
+
+      const data = await res.json();
+      record.characters = (Array.isArray(data) ? data : [])
+        .filter(character => character?.relation === "主角")
+        .map(character => ({
+          id: String(character.id || ""),
+          name: clean(character.name || ""),
+          imageUrl: clean(character.images?.large || ""),
+        }))
+        .filter(character => character.id && character.name && isBangumiCharacterImageUrl(character.imageUrl));
+
+      return record.characters.length ? record : null;
+    }
+
+    async function makeCharacterMosaicDraftItem(record, character, uid = "", existingOriginalBlob = null) {
+      if (!window.MosaicComposer) throw new Error("马赛克合成模块未加载");
+      const originalBlob = existingOriginalBlob instanceof Blob
+        ? existingOriginalBlob
+        : await fetchImageBlob(character.imageUrl);
+      const imageBlob = await window.MosaicComposer.composeFromBlob(originalBlob, {
+        strength: getMosaicStrength(),
+        blockSizes: getMosaicBlockSizes(),
+        type: "image/jpeg",
+        quality: 0.92,
+      });
+      const imageUrl = URL.createObjectURL(imageBlob);
+      return {
+        uid: uid || `draft_character_${record.bgmId}_${character.id}_${Math.random().toString(36).slice(2, 7)}`,
+        bgmId: record.bgmId,
+        source: AUTO_SOURCE_CHARACTER_MOSAIC,
+        title: character.name,
+        animeTitle: record.title,
+        characterId: character.id,
+        characterName: character.name,
+        originalImageUrl: character.imageUrl,
+        originalImageBlob: originalBlob,
+        date: record.date,
+        year: record.year,
+        doneCount: record.doneCount,
+        imageUrl,
+        imageBlob,
+        mosaicStrength: getMosaicStrength(),
+        mosaicBlockSizes: getMosaicBlockSizes(),
+        record,
+      };
+    }
+
+    function replaceAutoDraftItems(nextItems) {
+      const next = Array.isArray(nextItems) ? nextItems : [];
+      disposeMosaicDraftItems(autoDraft, next);
+      autoDraft = next;
+    }
+
+    function disposeMosaicDraftItems(items, keepItems = []) {
+      const keepUrls = new Set((keepItems || []).map(item => item?.imageUrl).filter(Boolean));
+      for (const item of items || []) {
+        if (item?.source !== AUTO_SOURCE_CHARACTER_MOSAIC) continue;
+        const url = String(item.imageUrl || "");
+        if (url.startsWith("blob:") && !keepUrls.has(url)) URL.revokeObjectURL(url);
+      }
+    }
+
+    async function rerenderMosaicDraftForStrength() {
+      syncMosaicStrengthControl();
+      if (autoGenerating || !isMosaicSource() || !autoDraft.length) return;
+
+      const runId = ++mosaicRenderRunId;
+      setAutoGenerating(true);
+      setStatus("正在按新的全局强度重新生成人物题...");
+      setProgress(8, true);
+      const nextItems = [];
+
+      try {
+        for (let i = 0; i < autoDraft.length; i++) {
+          const item = autoDraft[i];
+          const character = item.record?.characters?.find(candidate => candidate.id === item.characterId);
+          if (!character) {
+            nextItems.push(item);
+            continue;
+          }
+          try {
+            nextItems.push(await makeCharacterMosaicDraftItem(item.record, character, item.uid, item.originalImageBlob));
+          } catch (err) {
+            console.warn("人物题强度重绘失败", item.characterName, err);
+            nextItems.push(item);
+          }
+          setProgress(8 + Math.round(((i + 1) / autoDraft.length) * 84), true);
+        }
+
+        if (runId !== mosaicRenderRunId || !isMosaicSource()) {
+          disposeMosaicDraftItems(nextItems, autoDraft);
+          return;
+        }
+        replaceAutoDraftItems(nextItems);
+        renderAutoDraft();
+        const readout = document.getElementById("mosaicStrengthReadout")?.textContent || "";
+        setStatus(`已应用新的全局马赛克强度：${readout}`);
+        setProgress(100, false);
+      } catch (err) {
+        disposeMosaicDraftItems(nextItems, autoDraft);
+        setProgress(0, false);
+        setStatus(`马赛克强度更新失败：${err.message}`);
+      } finally {
+        if (runId === mosaicRenderRunId) setAutoGenerating(false);
+      }
+    }
+
     function renderAutoDraft() {
-      if (addAutoDraftBtn) addAutoDraftBtn.disabled = !autoDraft.length;
+      if (addAutoDraftBtn) addAutoDraftBtn.disabled = !autoDraft.length || isMosaicSource();
 
       if (!autoDraft.length) {
         autoDraftAreaEl.innerHTML = `<div class="empty content-spaced-sm">还没有题单草稿。设置条件后，点击“生成题单草稿”</div>`;
@@ -3646,20 +4236,61 @@
             </div>
             <span class="pill">${autoDraft.length} 题</span>
           </div>
+          ${isMosaicSource() ? `<p class="mosaic-display-order">游戏中分阶段展示：强马赛克 → 中马赛克 → 弱马赛克 → 原图（答案）</p>` : ""}
+          ${isMosaicSource() ? renderMosaicStrengthSettings() : ""}
           <div class="auto-draft-grid">
             ${autoDraft.map((item, idx) => renderAutoDraftCard(item, idx)).join("")}
           </div>
           <div class="auto-draft-bottom-actions">
-            <button type="button" class="light" onclick="addAutoDraftToSelected()">把草稿加入已选</button>
-            <button type="button" onclick="copyAutoDraftJsonl()">复制草稿题单</button>
-            <button type="button" onclick="exportAutoDraftJsonl()">导出草稿题单</button>
-            <button type="button" onclick="downloadAutoDraftImages()">下载草稿图片ZIP</button>
+            ${isMosaicSource()
+              ? `<span class="fineprint">合成图仅保存在当前页面，请下载 ZIP 后上传游戏</span>`
+              : `<button type="button" class="light" onclick="addAutoDraftToSelected()">把草稿加入已选</button>
+                 <button type="button" onclick="copyAutoDraftJsonl()">复制草稿题单</button>
+                 <button type="button" onclick="exportAutoDraftJsonl()">导出草稿题单</button>`}
+            <button type="button" onclick="downloadAutoDraftImages()">下载${isMosaicSource() ? "马赛克人物题" : "草稿图片"} ZIP</button>
             ${renderInlineDownloadProgress("autoDraftDownloadProgress")}
           </div>
         </div>
       `;
       revealElement(autoDraftAreaEl);
+      syncMosaicStrengthControl();
       updateSelectedCount();
+    }
+
+    function renderMosaicStrengthSettings() {
+      const blockSizes = getMosaicBlockSizes();
+      return `
+        <p class="fineprint mosaic-guidance">部分非人设图的马赛克效果不佳，建议手动更换。</p>
+        <div id="mosaicSettings" class="mosaic-settings">
+          <div class="mosaic-settings-copy">
+            <strong>马赛克强度</strong>
+          </div>
+          <div class="mosaic-settings-main">
+            <div class="mosaic-strength-control">
+              <span>更弱</span>
+              <div class="mosaic-strength-slider">
+                <input id="mosaicStrength" type="range" min="1" max="6" step="1" value="${getMosaicStrength()}" aria-label="当前题单的全局马赛克强度，共六档" oninput="selectMosaicStrengthPreset()" onchange="rerenderMosaicDraftForStrength()" />
+                <div id="mosaicStrengthTicks" class="mosaic-strength-ticks" aria-hidden="true">
+                  ${Array.from({ length: 6 }, (_, index) => `<span data-strength="${index + 1}"></span>`).join("")}
+                </div>
+              </div>
+              <span>更强</span>
+              <div id="mosaicStrengthReadout" class="mosaic-strength-readout"></div>
+            </div>
+            <div class="mosaic-block-values" role="group" aria-label="自定义强中弱马赛克块大小">
+              ${[
+                ["Strong", "强", blockSizes[0]],
+                ["Medium", "中", blockSizes[1]],
+                ["Weak", "弱", blockSizes[2]],
+              ].map(([name, label, value]) => `
+                <label class="mosaic-block-value">
+                  <span>${label}</span>
+                  <input id="mosaicBlock${name}" type="number" min="3" max="160" step="1" inputmode="numeric" value="${value}" aria-label="${label}马赛克块大小，单位像素" onchange="applyMosaicCustomBlockSizes()" onkeydown="if (event.key === 'Enter') this.blur()" />
+                  <span>px</span>
+                </label>`).join("")}
+            </div>
+          </div>
+        </div>`;
     }
 
     function renderInlineDownloadProgress(id) {
@@ -3677,18 +4308,22 @@
     }
 
     function renderAutoDraftCard(item, idx) {
-      const isCover = item.source === "bangumi-cover";
+      const isCover = item.source === AUTO_SOURCE_BANGUMI_COVER;
+      const isMosaic = item.source === AUTO_SOURCE_CHARACTER_MOSAIC;
       const imageUrl = getAutoDraftDisplayUrl(item);
       const originalImageUrl = item.imageUrl || "";
-      const imageAlt = isCover ? `${item.title} 封面图候选` : `${item.title} 截图候选`;
-      const imageClass = isCover ? "draft-image-cover" : "";
+      const imageAlt = isCover ? `${item.title} 封面图候选` : isMosaic ? `${item.characterName} 马赛克人物题` : `${item.title} 截图候选`;
+      const imageClass = isCover ? "draft-image-cover" : isMosaic ? "draft-image-mosaic" : "";
       return `
-        <div class="draft-card draft-enter" id="${escapeHtml(item.uid)}" style="--stagger-delay: ${Math.min(idx * 24, 168)}ms;">
+        <div class="draft-card draft-enter${isMosaic ? " draft-card-mosaic" : ""}" id="${escapeHtml(item.uid)}" style="--stagger-delay: ${Math.min(idx * 24, 168)}ms;">
           <img class="${imageClass}" src="${escapeHtml(imageUrl)}" data-original-src="${escapeHtml(originalImageUrl)}" alt="${escapeHtml(imageAlt)}" loading="lazy" referrerpolicy="no-referrer" onerror="handleImageDisplayError(this)">
           <div class="draft-title">${idx + 1}. ${escapeHtml(item.title)}</div>
-          <div class="draft-meta">${escapeHtml(item.date || "日期未知")} · 看过 ${Number(item.doneCount || 0).toLocaleString()} · ${isCover ? "Bangumi 封面" : "FanCaps 截图"}</div>
+          ${isMosaic ? `<div class="draft-anime-title">${escapeHtml(item.animeTitle || item.record?.title || "动画未知")}</div>` : ""}
+          <div class="draft-meta">${escapeHtml(item.date || "日期未知")} · 看过 ${Number(item.doneCount || 0).toLocaleString()} · ${isCover ? "Bangumi 封面" : isMosaic ? "马赛克人物题" : "FanCaps 截图"}</div>
           <div class="draft-actions">
-            ${isCover ? "" : `<button onclick="openChangeImageModal('${escapeJsString(item.uid)}')">换图</button>`}
+            ${isMosaic
+              ? `<button onclick="openChangeCharacterModal('${escapeJsString(item.uid)}')">换人物</button>`
+              : isCover ? "" : `<button onclick="openChangeImageModal('${escapeJsString(item.uid)}')">换图</button>`}
             <button class="quiet" onclick="openChangeAnimeModal('${escapeJsString(item.uid)}')">换动画</button>
             <button class="quiet" onclick="removeAutoDraftItem('${escapeJsString(item.uid)}')">移除</button>
           </div>
@@ -3697,7 +4332,8 @@
     }
 
     function getAutoDraftDisplayUrl(item) {
-      if (item?.source === "bangumi-cover") return toImageProxyUrl(item.imageUrl || "");
+      if (item?.source === AUTO_SOURCE_CHARACTER_MOSAIC) return item.imageUrl || "";
+      if (item?.source === AUTO_SOURCE_BANGUMI_COVER) return toImageProxyUrl(item.imageUrl || "");
       return originalToFanCapsThumbnailUrl(item?.imageUrl || "");
     }
 
@@ -3708,11 +4344,15 @@
       }
       const count = getAutoQuestionCount();
       const source = getAutoImageSource();
-      if (source === "bangumi-cover") {
-        autoDraft = await makeBangumiCoverDraftItems(autoFilteredPool, Math.min(count, autoFilteredPool.length));
+      let nextDraft;
+      if (source === AUTO_SOURCE_BANGUMI_COVER) {
+        nextDraft = await makeBangumiCoverDraftItems(autoFilteredPool, Math.min(count, autoFilteredPool.length));
+      } else if (source === AUTO_SOURCE_CHARACTER_MOSAIC) {
+        nextDraft = await makeBangumiCharacterMosaicDraftItems(autoFilteredPool, Math.min(count, autoFilteredPool.length));
       } else {
-        autoDraft = sampleUnique(autoFilteredPool, Math.min(count, autoFilteredPool.length)).map(record => makeAutoDraftItem(record));
+        nextDraft = sampleUnique(autoFilteredPool, Math.min(count, autoFilteredPool.length)).map(record => makeAutoDraftItem(record));
       }
+      replaceAutoDraftItems(nextDraft);
       renderAutoDraft();
       setStatus("已重新随机");
     }
@@ -3729,6 +4369,8 @@
     }
 
     function removeAutoDraftItemNow(uid) {
+      const removed = autoDraft.find(item => item.uid === uid);
+      if (removed) disposeMosaicDraftItems([removed]);
       autoDraft = autoDraft.filter(item => item.uid !== uid);
       renderAutoDraft();
       setStatus("已移除 1 题");
@@ -3737,8 +4379,10 @@
     function openChangeImageModal(uid) {
       const item = autoDraft.find(x => x.uid === uid);
       if (!item) return;
-      if (item.source === "bangumi-cover") {
-        setStatus("Bangumi 封面模式每部动画只有一张封面图，可以改换动画");
+      if (item.source === AUTO_SOURCE_BANGUMI_COVER || item.source === AUTO_SOURCE_CHARACTER_MOSAIC) {
+        setStatus(item.source === AUTO_SOURCE_CHARACTER_MOSAIC
+          ? "马赛克人物题请使用“换人物”或“换动画”"
+          : "Bangumi 封面模式每部动画只有一张封面图，可以改换动画");
         return;
       }
 
@@ -3803,6 +4447,56 @@
       setStatus("已更换图片");
     }
 
+    function openChangeCharacterModal(uid) {
+      const item = autoDraft.find(candidate => candidate.uid === uid);
+      if (!item || item.source !== AUTO_SOURCE_CHARACTER_MOSAIC) return;
+      autoModalState = { type: "character", uid };
+      autoModalTitleEl.textContent = "选择其他主角";
+      autoModalHintEl.textContent = item.animeTitle || item.record?.title || "";
+      renderChangeCharacterChoices(item);
+      showAutoModal();
+    }
+
+    function renderChangeCharacterChoices(item) {
+      const usedCharacterIds = new Set(autoDraft
+        .filter(candidate => candidate.uid !== item.uid && candidate.source === AUTO_SOURCE_CHARACTER_MOSAIC)
+        .map(candidate => candidate.characterId));
+      const characters = (item.record?.characters || [])
+        .filter(character => character.id !== item.characterId && !usedCharacterIds.has(character.id));
+
+      if (!characters.length) {
+        autoModalChoicesEl.innerHTML = `<div class="empty">这部动画没有其他可用且未重复的主角，可以改换动画</div>`;
+        return;
+      }
+
+      autoModalChoicesEl.innerHTML = characters.map((character, idx) => `
+        <div class="modal-choice choice-enter" style="--stagger-delay: ${Math.min(idx * 22, 132)}ms;">
+          <img class="draft-image-character" src="${escapeHtml(toImageProxyUrl(character.imageUrl))}" data-original-src="${escapeHtml(character.imageUrl)}" alt="${escapeHtml(character.name)} 人物图" loading="lazy" referrerpolicy="no-referrer" onerror="handleImageDisplayError(this)">
+          <div class="modal-choice-title">${escapeHtml(character.name)}</div>
+          <button onclick="chooseAutoCharacter('${escapeJsString(item.uid)}', '${escapeJsString(character.id)}')">选择</button>
+        </div>
+      `).join("");
+    }
+
+    async function chooseAutoCharacter(uid, characterId) {
+      const idx = autoDraft.findIndex(item => item.uid === uid);
+      const current = autoDraft[idx];
+      const character = current?.record?.characters?.find(candidate => candidate.id === characterId);
+      if (idx < 0 || !character) return;
+
+      setStatus(`正在为 ${character.name} 生成马赛克人物题...`);
+      try {
+        const next = await makeCharacterMosaicDraftItem(current.record, character, uid);
+        disposeMosaicDraftItems([current], [next]);
+        autoDraft[idx] = next;
+        replaceAutoDraftCard(uid, idx);
+        closeAutoModal();
+        setStatus(`已换为主角：${character.name}`);
+      } catch (err) {
+        setStatus(`人物图生成失败：${err.message}`);
+      }
+    }
+
     function openChangeAnimeModal(uid) {
       const item = autoDraft.find(x => x.uid === uid);
       if (!item) return;
@@ -3853,10 +4547,11 @@
       }
 
       let hydratedChoices = choices;
-      if (source === "bangumi-cover") {
-        autoModalChoicesEl.innerHTML = `<div class="empty">正在读取候选动画封面...</div>`;
-        const settled = await Promise.all(choices.map(record => fetchBangumiCoverRecord(record).catch(err => {
-          logBangumiDiagnostic("modal-cover-fetch-failed", {
+      if (source === AUTO_SOURCE_BANGUMI_COVER || source === AUTO_SOURCE_CHARACTER_MOSAIC) {
+        autoModalChoicesEl.innerHTML = `<div class="empty">正在读取候选动画${source === AUTO_SOURCE_CHARACTER_MOSAIC ? "主角" : "封面"}...</div>`;
+        const hydrate = source === AUTO_SOURCE_CHARACTER_MOSAIC ? fetchBangumiCharacterRecord : fetchBangumiCoverRecord;
+        const settled = await Promise.all(choices.map(record => hydrate(record).catch(err => {
+          logBangumiDiagnostic(source === AUTO_SOURCE_CHARACTER_MOSAIC ? "modal-character-fetch-failed" : "modal-cover-fetch-failed", {
             bgmId: record?.bgmId,
             title: record?.title,
             message: err?.message || String(err)
@@ -3865,9 +4560,16 @@
         })));
         if (!isCurrentAutoModalRequest(uid, requestId, source)) return;
         hydratedChoices = settled.filter(Boolean);
+        if (source === AUTO_SOURCE_CHARACTER_MOSAIC) {
+          const usedCharacterIds = new Set(autoDraft
+            .filter(item => item.uid !== uid && item.source === AUTO_SOURCE_CHARACTER_MOSAIC)
+            .map(item => item.characterId));
+          hydratedChoices = hydratedChoices.filter(record => !usedCharacterIds.has(record.characters?.[0]?.id));
+        }
         if (!hydratedChoices.length) {
-          autoModalHintEl.textContent = "这一批候选没有可用封面";
-          autoModalChoicesEl.innerHTML = `<div class="empty">这一批候选没有可用封面。可以换一批，或放宽条件后重新生成草稿</div>`;
+          const target = source === AUTO_SOURCE_CHARACTER_MOSAIC ? "未重复的主角人物图" : "可用封面";
+          autoModalHintEl.textContent = `这一批候选没有${target}`;
+          autoModalChoicesEl.innerHTML = `<div class="empty">这一批候选没有${target}。可以换一批，或放宽条件后重新生成草稿</div>`;
           return;
         }
       }
@@ -3877,12 +4579,16 @@
         : "从当前筛选范围中随机给出 5 部";
 
       autoModalChoicesEl.innerHTML = hydratedChoices.map((record, idx) => {
-        const image = source === "bangumi-cover" ? record.images?.[0] : randomOne(record.images);
-        const displayImage = source === "bangumi-cover" ? toImageProxyUrl(image) : originalToFanCapsThumbnailUrl(image);
+        const character = source === AUTO_SOURCE_CHARACTER_MOSAIC ? record.characters?.[0] : null;
+        const image = source === AUTO_SOURCE_BANGUMI_COVER ? record.images?.[0] : character?.imageUrl || randomOne(record.images);
+        const displayImage = source === AUTO_SOURCE_BANGUMI_COVER || source === AUTO_SOURCE_CHARACTER_MOSAIC
+          ? toImageProxyUrl(image)
+          : originalToFanCapsThumbnailUrl(image);
         return `
           <div class="modal-choice choice-enter" style="--stagger-delay: ${Math.min(idx * 22, 132)}ms;">
-            <img class="${source === "bangumi-cover" ? "draft-image-cover" : ""}" src="${escapeHtml(displayImage)}" data-original-src="${escapeHtml(image || "")}" alt="${escapeHtml(record.title)} ${source === "bangumi-cover" ? "封面图" : "截图"}候选" loading="lazy" referrerpolicy="no-referrer" onerror="handleImageDisplayError(this)">
+            <img class="${source === AUTO_SOURCE_BANGUMI_COVER ? "draft-image-cover" : source === AUTO_SOURCE_CHARACTER_MOSAIC ? "draft-image-character" : ""}" src="${escapeHtml(displayImage)}" data-original-src="${escapeHtml(image || "")}" alt="${escapeHtml(record.title)} ${source === AUTO_SOURCE_BANGUMI_COVER ? "封面图" : source === AUTO_SOURCE_CHARACTER_MOSAIC ? "人物图" : "截图"}候选" loading="lazy" referrerpolicy="no-referrer" onerror="handleImageDisplayError(this)">
             <div class="modal-choice-title">${escapeHtml(record.title)}</div>
+            ${character ? `<div class="draft-meta">首位主角：${escapeHtml(character.name)}</div>` : ""}
             <div class="draft-meta">${escapeHtml(record.date || "日期未知")} · 看过 ${Number(record.doneCount || 0).toLocaleString()}</div>
             <button onclick="chooseAutoAnime('${escapeJsString(uid)}', '${escapeJsString(record.bgmId)}', '${escapeJsString(image)}')">选择</button>
           </div>
@@ -3906,7 +4612,7 @@
       let nextRecord = record;
       let nextImageUrl = imageUrl || randomOne(record.images);
 
-      if (source === "bangumi-cover") {
+      if (source === AUTO_SOURCE_BANGUMI_COVER) {
         const hydrated = await fetchBangumiCoverRecord(record).catch(() => null);
         if (!hydrated?.images?.length) {
           setStatus("这部动画没有可用封面，请换一批再试");
@@ -3914,6 +4620,24 @@
         }
         nextRecord = hydrated;
         nextImageUrl = hydrated.images[0];
+      } else if (source === AUTO_SOURCE_CHARACTER_MOSAIC) {
+        const hydrated = await fetchBangumiCharacterRecord(record).catch(() => null);
+        const character = hydrated?.characters?.[0];
+        if (!character) {
+          setStatus("这部动画没有可用主角人物图，请换一批再试");
+          return;
+        }
+        try {
+          const next = await makeCharacterMosaicDraftItem(hydrated, character, uid);
+          disposeMosaicDraftItems([autoDraft[idx]], [next]);
+          autoDraft[idx] = next;
+          replaceAutoDraftCard(uid, idx);
+          closeAutoModal();
+          setStatus(`已更换动画并选用首位主角：${character.name}`);
+        } catch (err) {
+          setStatus(`人物题生成失败：${err.message}`);
+        }
+        return;
       }
 
       autoDraft[idx] = makeAutoDraftItem(nextRecord, nextImageUrl);
@@ -3939,6 +4663,9 @@
       if (autoModalState.type === "image") {
         const item = autoDraft.find(x => x.uid === autoModalState.uid);
         if (item) renderChangeImageChoices(item);
+      } else if (autoModalState.type === "character") {
+        const item = autoDraft.find(x => x.uid === autoModalState.uid);
+        if (item) renderChangeCharacterChoices(item);
       } else if (autoModalState.type === "anime") {
         renderChangeAnimeChoices(autoModalState.uid);
       }
@@ -4148,6 +4875,7 @@
 
     function getAutoDraftJsonlRecords() {
       return autoDraft
+        .filter(item => item.source !== AUTO_SOURCE_CHARACTER_MOSAIC)
         .map(item => ({
           image_url: item.imageUrl || "",
           label_text: item.title || ""
@@ -4166,6 +4894,10 @@
         setStatus("还没有题单草稿。请先生成题单草稿");
         return;
       }
+      if (isMosaicSource()) {
+        setStatus("马赛克人物题是本地合成图，请下载 ZIP 后上传游戏");
+        return;
+      }
       const text = getAutoDraftJsonlText();
       try {
         await navigator.clipboard.writeText(text);
@@ -4181,9 +4913,13 @@
         setStatus("还没有题单草稿。请先生成题单草稿");
         return;
       }
+      if (isMosaicSource()) {
+        setStatus("马赛克人物题是本地合成图，请下载 ZIP 后上传游戏");
+        return;
+      }
       const text = getAutoDraftJsonlText();
-      const source = autoDraft[0]?.source === "bangumi-cover" ? "bangumi-cover" : "fancaps";
-      const filename = source === "bangumi-cover" ? "bangumi-cover-auto-question-list.jsonl" : "fancaps-auto-question-list.jsonl";
+      const source = autoDraft[0]?.source === AUTO_SOURCE_BANGUMI_COVER ? AUTO_SOURCE_BANGUMI_COVER : AUTO_SOURCE_FANCAPS;
+      const filename = source === AUTO_SOURCE_BANGUMI_COVER ? "bangumi-cover-auto-question-list.jsonl" : "fancaps-auto-question-list.jsonl";
       downloadBlob(new Blob([text], { type: "application/x-ndjson" }), filename);
       announceDelight("exportDraft", autoDraft.length);
       showUsageModal("export");
@@ -4195,22 +4931,31 @@
         return;
       }
 
-      const entries = autoDraft
+      let entries = autoDraft
         .map((item, index) => ({
           item,
           index,
-          url: item.imageUrl || ""
+          url: item.imageUrl || "",
+          blob: item.imageBlob || null,
         }))
-        .filter(entry => entry.url);
+        .filter(entry => entry.url || entry.blob);
 
       if (!entries.length) {
         setStatus("草稿里没有可下载的图片地址");
         return;
       }
 
-      const source = autoDraft[0]?.source === "bangumi-cover" ? "bangumi-cover" : "fancaps";
-      const sourceLabel = source === "bangumi-cover" ? "封面草稿图片" : "草稿图片";
-      const folderBase = source === "bangumi-cover" ? "bangumi-cover-draft-images" : "fancaps-draft-images";
+      const source = getAutoImageSource();
+      if (source === AUTO_SOURCE_CHARACTER_MOSAIC) {
+        setStatus("正在查询角色中文名...");
+        entries = await prepareMosaicExportEntries(entries);
+      }
+      const sourceLabel = source === AUTO_SOURCE_BANGUMI_COVER
+        ? "封面草稿图片"
+        : source === AUTO_SOURCE_CHARACTER_MOSAIC ? "马赛克人物题" : "草稿图片";
+      const folderBase = source === AUTO_SOURCE_BANGUMI_COVER
+        ? "bangumi-cover-draft-images"
+        : source === AUTO_SOURCE_CHARACTER_MOSAIC ? "bangumi-character-mosaic-questions" : "fancaps-draft-images";
 
       await downloadImageEntriesAsZip(entries, {
         label: sourceLabel,
@@ -4219,8 +4964,48 @@
         folderName: makeDownloadFolderName(folderBase),
         makeFilename: makeAutoDraftImageFilename,
         partialText: (successCount, failCount) => `已打包 ${successCount} 张${sourceLabel}，${failCount} 张失败`,
-        failureText: `${sourceLabel}打包失败。请检查连接方式后重试`
+        failureText: `${sourceLabel}打包失败。请检查连接方式后重试`,
+        requireAll: source === AUTO_SOURCE_CHARACTER_MOSAIC
       });
+    }
+
+    async function prepareMosaicExportEntries(entries) {
+      return Promise.all(entries.map(async entry => {
+        const item = entry.item;
+        if (!item?.characterId) return entry;
+
+        const chineseName = await fetchCharacterChineseName(item.characterId).catch(err => {
+          console.warn("角色中文名查询失败", item.characterId, err);
+          return "";
+        });
+        if (!chineseName) return entry;
+        return {
+          ...entry,
+          item: { ...item, exportCharacterName: chineseName },
+        };
+      }));
+    }
+
+    function fetchCharacterChineseName(characterId) {
+      const id = String(characterId || "").trim();
+      if (!/^\d+$/.test(id)) return Promise.resolve("");
+      if (characterChineseNamePromiseCache.has(id)) return characterChineseNamePromiseCache.get(id);
+
+      const promise = (async () => {
+        const res = await fetchBangumiApi(`/v0/characters/${encodeURIComponent(id)}`, {
+          headers: { "Accept": "application/json" }
+        }, BANGUMI_REQUEST_TIMEOUT_MS);
+        if (!res.ok) throw new Error(`Bangumi 人物详情读取失败：HTTP ${res.status}`);
+        const data = await res.json();
+        return clean(data?.chineseName || "");
+      })();
+      characterChineseNamePromiseCache.set(id, promise);
+      promise.catch(() => {
+        if (characterChineseNamePromiseCache.get(id) === promise) {
+          characterChineseNamePromiseCache.delete(id);
+        }
+      });
+      return promise;
     }
 
     function addAutoDraftToSelected() {
@@ -4228,10 +5013,14 @@
         setStatus("还没有题单草稿。请先生成题单草稿");
         return;
       }
+      if (isMosaicSource()) {
+        setStatus("马赛克人物题请直接下载 ZIP 后上传游戏");
+        return;
+      }
 
       const addedIds = [];
       for (const item of autoDraft) {
-        const source = item.source === "bangumi-cover" ? "bangumi_cover" : "fancaps";
+        const source = item.source === AUTO_SOURCE_BANGUMI_COVER ? "bangumi_cover" : "fancaps";
         const id = `auto_${source}_${item.bgmId}_${hashString(item.imageUrl)}`;
         addedIds.push(id);
         selectedImages.set(id, {
@@ -4240,7 +5029,7 @@
           thumbUrl: getAutoDraftDisplayUrl(item),
           originalUrl: item.imageUrl,
           picturePageUrl: "",
-          sourcePage: item.source === "bangumi-cover" ? BANGUMI_AUTO_DATA_PATH : FANCAPS_AUTO_DATA_PATH,
+          sourcePage: item.source === AUTO_SOURCE_BANGUMI_COVER ? BANGUMI_AUTO_DATA_PATH : FANCAPS_AUTO_DATA_PATH,
           labelText: item.title,
           kind: "auto"
         });
@@ -4279,9 +5068,24 @@
           parsed.hostname === "lain.bgm.tv" &&
           (
             parsed.pathname.startsWith("/pic/cover/") ||
-            /^\/r\/\d+\/pic\/cover\//.test(parsed.pathname)
+            /^\/r\/\d+\/pic\/cover\//.test(parsed.pathname) ||
+            (
+              (parsed.pathname.startsWith("/pic/crt/") || /^\/r\/\d+\/pic\/crt\//.test(parsed.pathname)) &&
+              /\/\d+_crt_[^/]+\.(avif|gif|jpe?g|png|webp)$/i.test(parsed.pathname)
+            )
           )
         );
+      } catch {
+        return false;
+      }
+    }
+
+    function isBangumiCharacterImageUrl(url) {
+      try {
+        const parsed = new URL(url);
+        return parsed.protocol === "https:" && parsed.hostname === "lain.bgm.tv" && (
+          parsed.pathname.startsWith("/pic/crt/") || /^\/r\/\d+\/pic\/crt\//.test(parsed.pathname)
+        ) && /\/\d+_crt_[^/]+\.(avif|gif|jpe?g|png|webp)$/i.test(parsed.pathname);
       } catch {
         return false;
       }
@@ -6626,7 +7430,7 @@
         updateInlineDownloadProgress(options.progressId, percent, text, true);
 
         try {
-          const blob = await fetchImageBlob(entry.url);
+          const blob = entry.blob instanceof Blob ? entry.blob : await fetchImageBlob(entry.url);
           const filename = options.makeFilename(entry.item, current, entry.url, blob);
           files.push({
             name: `${options.folderName}/${filename}`,
@@ -6647,6 +7451,14 @@
         setStatus(text);
         updateInlineDownloadProgress(options.progressId, 100, text, true);
         hideInlineDownloadProgressSoon(options.progressId);
+        return;
+      }
+
+      if (options.requireAll && failCount) {
+        setProgress(100, false);
+        const text = `${options.label}未完整打包（成功 ${successCount}/${entries.length}），已取消下载，请重试`;
+        setStatus(text);
+        updateInlineDownloadProgress(options.progressId, 100, text, true);
         return;
       }
 
@@ -6732,7 +7544,7 @@
       const view = new DataView(header.buffer);
       view.setUint32(0, 0x04034b50, true);
       view.setUint16(4, 20, true);
-      view.setUint16(6, 0, true);
+      view.setUint16(6, 0x0800, true);
       view.setUint16(8, 0, true);
       view.setUint16(10, time, true);
       view.setUint16(12, date, true);
@@ -6750,7 +7562,7 @@
       view.setUint32(0, 0x02014b50, true);
       view.setUint16(4, 20, true);
       view.setUint16(6, 20, true);
-      view.setUint16(8, 0, true);
+      view.setUint16(8, 0x0800, true);
       view.setUint16(10, 0, true);
       view.setUint16(12, time, true);
       view.setUint16(14, date, true);
@@ -6837,8 +7649,23 @@
       const padded = String(index).padStart(3, "0");
       const key = url || item.imageUrl || padded;
       const ext = getImageExtension(key, blob?.type);
-      const prefix = item.source === "bangumi-cover" ? "bangumi-cover-draft" : "fancaps-draft";
+      if (item.source === AUTO_SOURCE_CHARACTER_MOSAIC) {
+        const anime = sanitizeFilenamePart(item.animeTitle || item.record?.title || "anime", 32);
+        const character = sanitizeFilenamePart(item.exportCharacterName || item.characterName || item.title || "character", 24);
+        return `${padded}-${character}-${anime}-mosaic.${ext}`;
+      }
+      const prefix = item.source === AUTO_SOURCE_BANGUMI_COVER ? "bangumi-cover-draft" : "fancaps-draft";
       return `${prefix}-${padded}-${hashString(key)}.${ext}`;
+    }
+
+    function sanitizeFilenamePart(value, maxLength = 72) {
+      return String(value || "")
+        .normalize("NFKC")
+        .replace(/[<>:"/\\|?*\x00-\x1f]/g, "-")
+        .replace(/[. ]+$/g, "")
+        .replace(/\s+/g, " ")
+        .trim()
+        .slice(0, maxLength) || "untitled";
     }
 
     function getImageExtension(url, contentType = "") {
@@ -6873,7 +7700,7 @@
       document.body.appendChild(a);
       a.click();
       a.remove();
-      window.setTimeout(() => URL.revokeObjectURL(url), 1000);
+      window.setTimeout(() => URL.revokeObjectURL(url), 60000);
       if (statusText) setStatus(statusText);
     }
 

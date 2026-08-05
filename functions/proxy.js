@@ -155,12 +155,12 @@ function isFanCapsImagePath(pathname) {
 }
 
 function isBangumiImagePath(pathname) {
+  const isCover = pathname.startsWith('/pic/cover/') || /^\/r\/\d+\/pic\/cover\//.test(pathname);
+  const isCharacter = (
+    pathname.startsWith('/pic/crt/') || /^\/r\/\d+\/pic\/crt\//.test(pathname)
+  ) && /\/\d+_crt_[^/]+\.(avif|gif|jpe?g|png|webp)$/i.test(pathname);
   return (
-    (
-      pathname.startsWith('/pic/cover/') ||
-      /^\/r\/\d+\/pic\/cover\//.test(pathname)
-    ) &&
-    /\.(avif|gif|jpe?g|png|webp)$/i.test(pathname)
+    (isCover || isCharacter) && /\.(avif|gif|jpe?g|png|webp)$/i.test(pathname)
   );
 }
 

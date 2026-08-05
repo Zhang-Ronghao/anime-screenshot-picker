@@ -2,12 +2,14 @@
   "name": "anime-screenshot-picker",
   "version": "1.0.0",
   "private": true,
+  "type": "module",
   "description": "Anime screenshot picker for quiz/game assets, powered by Bangumi and FanCaps.",
   "scripts": {
     "bgm-cover": "node scripts/bangumi-cover.mjs",
     "build-bgm-anime": "node scripts/build-bangumi-anime-subjects.mjs",
     "dev": "wrangler pages dev public --compatibility-date=2026-05-23",
-    "deploy": "wrangler pages deploy public --project-name anime-screenshot-picker"
+    "deploy": "wrangler pages deploy public --project-name anime-screenshot-picker",
+    "test": "node --test --test-concurrency=1"
   },
   "devDependencies": {
     "wrangler": "^4.0.0"
