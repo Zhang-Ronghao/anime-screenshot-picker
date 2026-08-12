@@ -815,7 +815,7 @@
           </div>
           <div class="upload-copy">
             <strong>上传人物图片</strong>
-            <p>可多选或拖入，支持 JPG、PNG、WebP、GIF、AVIF</p>
+            <p>可多选、拖放或粘贴</p>
             <button id="chooseFilesBtn" type="button">选择图片</button>
           </div>
           <input id="fileInput" class="sr-only" type="file" accept="image/*" multiple>
@@ -824,15 +824,13 @@
         <div class="global-settings">
           <div class="section-heading">
             <h2>全局强度</h2>
-            <p>只影响“跟随全局”的图片</p>
           </div>
           <div class="settings-line">
             <div class="preset-group">
-              <span class="field-label">六档预设</span>
               <div id="globalPresets" class="preset-row" role="group" aria-label="全局马赛克强度预设"></div>
             </div>
             <div class="custom-group">
-              <label class="field-label" for="globalStrong">自定义块大小，需满足强 &gt; 中 &gt; 弱</label>
+              <label class="field-label" for="globalStrong">自定义</label>
               <div class="number-row">
                 <label class="number-field"><span>强</span><input id="globalStrong" type="number" min="3" max="160" step="1" inputmode="numeric" aria-label="全局强马赛克块大小"></label>
                 <label class="number-field"><span>中</span><input id="globalMedium" type="number" min="3" max="160" step="1" inputmode="numeric" aria-label="全局中马赛克块大小"></label>
@@ -981,7 +979,7 @@
           const strength = index + 1;
           const sizes = getBlockSizes(strength);
           const active = settings.mode === "preset" && settings.strength === strength;
-          return `<button class="preset-button${active ? " is-active" : ""}" type="button" data-preset-scope="${prefix}" data-strength="${strength}" data-bars="${sizes.join("·")}" aria-pressed="${active}" title="${label}：${sizes.join(" / ")} px">${strength} · ${label}</button>`;
+          return `<button class="preset-button${active ? " is-active" : ""}" type="button" data-preset-scope="${prefix}" data-strength="${strength}" aria-pressed="${active}" title="${label}：${sizes.join(" / ")} px">${label}</button>`;
         }).join("");
       }
 
@@ -1019,9 +1017,9 @@
             <div id="emptyDropTarget" class="empty-state">
               <div>
                 <div class="empty-illustration" aria-hidden="true"></div>
-                <h3>从一张图片开始</h3>
-                <p>拖入一张或多张本地图片。默认使用“标准”强度，输出固定为 1440 × 810 JPG。</p>
-                <button type="button" data-action="choose-files">选择本地图片</button>
+            <h3>暂无图片</h3>
+            <p>请从上方上传，添加后会自动生成预览。</p>
+            <button type="button" data-action="choose-files">选择图片</button>
               </div>
             </div>`;
           return;

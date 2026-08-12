@@ -37,7 +37,7 @@ test('local image workshop keeps the original manual controls', () => {
 
 test('embedded workshop preserves theme tokens and readable strength layouts', () => {
   assert.match(manualMosaicComponent, /replace\(\/:root\/g, ":host"\)/);
-  assert.match(manualMosaicComponent, /grid-template-columns: repeat\(6, minmax\(72px, 1fr\)\)/);
+  assert.match(manualMosaicComponent, /grid-template-columns: repeat\(6, minmax\(68px, 1fr\)\)/);
   assert.match(manualMosaicComponent, /grid-template-columns: repeat\(2, minmax\(0, 1fr\)\)/);
   assert.match(manualMosaicComponent, /white-space: nowrap/);
 });
