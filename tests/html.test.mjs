@@ -4,6 +4,43 @@ import { readFile } from 'node:fs/promises';
 import vm from 'node:vm';
 
 const html = await readFile(new URL('../public/index.html', import.meta.url), 'utf8');
+const manualMosaicHtml = await readFile(new URL('../public/manual-mosaic.html', import.meta.url), 'utf8');
+const manualMosaicComponent = await readFile(new URL('../public/manual-mosaic-workshop.js', import.meta.url), 'utf8');
+
+test('manual mosaic workshop belongs to the character source manual mode', () => {
+  assert.doesNotMatch(html, /manualMosaicSourceBtn|AUTO_SOURCE_MANUAL_MOSAIC|<iframe/);
+  assert.match(html, /id="manualMosaicPanel"[^>]*aria-label="手动马赛克人物题"/);
+  assert.match(html, /<manual-mosaic-workshop><\/manual-mosaic-workshop>/);
+  assert.match(html, /source === AUTO_SOURCE_FANCAPS \|\| source === AUTO_SOURCE_CHARACTER_MOSAIC/);
+  assert.match(html, /isManualMosaic = !isAuto && source === AUTO_SOURCE_CHARACTER_MOSAIC/);
+  assert.match(html, /自动抽取主角，或上传本地人物图手动制作/);
+});
+
+test('local image workshop keeps the original manual controls', () => {
+  for (const id of [
+    'fileInput',
+    'globalPresets',
+    'applyGlobalCustom',
+    'removeAllBackgroundsBtn',
+    'restoreAllBackgroundsBtn',
+    'downloadAllBtn',
+    'galleryContent',
+    'inspector',
+  ]) {
+    assert.equal((manualMosaicHtml.match(new RegExp(`id=["']${id}["']`, 'g')) || []).length, 1, `${id} should occur once`);
+  }
+  assert.match(manualMosaicHtml, /window\.addEventListener\("paste"/);
+  assert.match(manualMosaicHtml, /async function removeWhiteBackgrounds/);
+  assert.match(manualMosaicHtml, /async function downloadAll/);
+  assert.match(manualMosaicHtml, /function setItemScope/);
+});
+
+test('embedded workshop preserves theme tokens and readable strength layouts', () => {
+  assert.match(manualMosaicComponent, /replace\(\/:root\/g, ":host"\)/);
+  assert.match(manualMosaicComponent, /grid-template-columns: repeat\(6, minmax\(72px, 1fr\)\)/);
+  assert.match(manualMosaicComponent, /grid-template-columns: repeat\(2, minmax\(0, 1fr\)\)/);
+  assert.match(manualMosaicComponent, /white-space: nowrap/);
+});
 
 test('page contains one unique set of mosaic controls', () => {
   for (const id of ['autoSourceBangumiCharacterBtn', 'mosaicSettings', 'mosaicStrength', 'mosaicStrengthReadout']) {
@@ -29,7 +66,7 @@ test('question source is selected before the supported question mode', () => {
   assert.ok(sourcePanelIndex > 0 && sourcePanelIndex < modePanelIndex && modePanelIndex < autoPanelIndex);
   assert.match(html, /function syncQuestionSourceFlow\(\)/);
   assert.match(html, /modePanelEl\.style\.display = supportsManual \? "" : "none"/);
-  assert.match(html, /if \(!supportsManual\) switchMode\("auto", \{ announce: false, scroll: false \}\)/);
+  assert.match(html, /switchMode\("auto", \{ announce: false, scroll: false \}\)/);
 });
 
 test('source buttons use concise labels without secondary descriptions', () => {

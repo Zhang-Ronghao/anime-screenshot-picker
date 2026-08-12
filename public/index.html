@@ -1610,6 +1610,11 @@
       color: color-mix(in oklch, var(--selected) 70%, var(--muted));
     }
 
+    .manual-mosaic-panel {
+      overflow: hidden;
+      padding: 0;
+    }
+
     .mosaic-settings {
       display: flex;
       gap: var(--space-md);
@@ -3205,6 +3210,10 @@
     <div id="autoDraftArea"></div>
   </div>
 
+  <section id="manualMosaicPanel" class="panel manual-mosaic-panel" style="display: none;" aria-label="手动马赛克人物题">
+    <manual-mosaic-workshop></manual-mosaic-workshop>
+  </section>
+
   <div id="autoChoiceModal" class="modal-backdrop" aria-hidden="true" onclick="handleModalBackdropClick(event)">
     <div class="modal-box" role="dialog" aria-modal="true" aria-labelledby="autoModalTitle" tabindex="-1">
       <div class="modal-head">
@@ -3335,6 +3344,7 @@
   </div>
 
   <script src="./mosaic.js"></script>
+  <script src="./manual-mosaic-workshop.js"></script>
   <script>
     const BGM_API = "https://api.bgm.tv";
     const BGM_PROXY_PATH = "/bangumi";
@@ -3398,6 +3408,7 @@
     const autoSourceFanCapsBtn = document.getElementById("autoSourceFanCapsBtn");
     const autoSourceBangumiCoverBtn = document.getElementById("autoSourceBangumiCoverBtn");
     const autoSourceBangumiCharacterBtn = document.getElementById("autoSourceBangumiCharacterBtn");
+    const manualMosaicPanelEl = document.getElementById("manualMosaicPanel");
 
     let selectedImages = new Map();
     let imageItemsById = new Map();
@@ -3449,16 +3460,19 @@
 
 
     function switchMode(mode, options = {}) {
-      const supportsManual = getAutoImageSource() === AUTO_SOURCE_FANCAPS;
+      const source = getAutoImageSource();
+      const supportsManual = source === AUTO_SOURCE_FANCAPS || source === AUTO_SOURCE_CHARACTER_MOSAIC;
       const isAuto = mode !== "manual" || !supportsManual;
+      const isManualMosaic = !isAuto && source === AUTO_SOURCE_CHARACTER_MOSAIC;
 
       autoPanelEl.style.display = isAuto ? "" : "none";
-      searchPanelEl.style.display = isAuto ? "none" : "";
-      revealElement(isAuto ? autoPanelEl : searchPanelEl);
+      searchPanelEl.style.display = !isAuto && !isManualMosaic ? "" : "none";
+      manualMosaicPanelEl.style.display = isManualMosaic ? "" : "none";
+      revealElement(isAuto ? autoPanelEl : isManualMosaic ? manualMosaicPanelEl : searchPanelEl);
 
       const manualEls = [bangumiResultsEl, subjectDetailEl, fanCapsResultsEl, imagePanelEl];
       for (const el of manualEls) {
-        if (isAuto) hideElement(el);
+        if (isAuto || isManualMosaic) hideElement(el);
         else showElement(el, false);
       }
 
@@ -3468,10 +3482,10 @@
       autoModeBtn.setAttribute("aria-pressed", String(isAuto));
 
       if (options.announce !== false) {
-        setStatus(isAuto ? "已切换到自动出题" : "已切换到手动出题");
+        setStatus(isAuto ? "已切换到自动出题" : isManualMosaic ? "已切换到手动马赛克人物题" : "已切换到手动出题");
       }
       renderSelectedBasket();
-      if (options.scroll !== false) scrollToElement(isAuto ? autoPanelEl : searchPanelEl);
+      if (options.scroll !== false) scrollToElement(isAuto ? autoPanelEl : isManualMosaic ? manualMosaicPanelEl : searchPanelEl);
     }
 
 
@@ -3486,9 +3500,16 @@
     }
 
     function syncQuestionSourceFlow() {
-      const supportsManual = getAutoImageSource() === AUTO_SOURCE_FANCAPS;
+      const source = getAutoImageSource();
+      const supportsManual = source === AUTO_SOURCE_FANCAPS || source === AUTO_SOURCE_CHARACTER_MOSAIC;
       if (modePanelEl) modePanelEl.style.display = supportsManual ? "" : "none";
-      if (!supportsManual) switchMode("auto", { announce: false, scroll: false });
+      if (modePanelEl) {
+        const prompt = document.getElementById("modePrompt");
+        if (prompt) prompt.textContent = source === AUTO_SOURCE_CHARACTER_MOSAIC
+          ? "自动抽取主角，或上传本地人物图手动制作"
+          : "FanCaps 截图支持自动抽题，也可以手动浏览选择";
+      }
+      switchMode("auto", { announce: false, scroll: false });
     }
 
     function syncAutoImageSourceButtons() {
